@@ -1,0 +1,59 @@
+//------------------------------------------------------------------------------
+/**
+ * @file whole_text_runtime_manifest.h.in
+ * @brief 完成runtimeの検証済みpinをbaseline hostへ渡すheaderを生成します
+ * @version 1.0.0
+ * @date 2026/10/19
+ * @author Shunji Ogawa
+ * @copyright Copyright (c) 2026 Shunji Ogawa. MIT License.
+ * @par 更新履歴
+ * <pre>
+ * 0.1.0 Shunji Ogawa 2026/10/19 新規作成
+ * 0.1.0 Shunji Ogawa 2026/10/19 二つのCPU slotの完成file pinを定義
+ * 0.1.0 Shunji Ogawa 2026/10/19 headerと各macroの役割説明を追加
+ * 0.1.0 Shunji Ogawa 2026/10/20 ADR1291のslot別V2 modeと能力bitを伝播
+ * 0.1.0 Shunji Ogawa 2026/10/21 ADR1314の固定Ministral16GB契約を接続
+ * 1.0.0 Shunji Ogawa 2026/11/12 ADR1433の更新履歴を新規作成からの昇順・末尾追記へ統一
+ * 1.0.0 Shunji Ogawa 2026/11/12 ADR1437のコメント行末・終端の句点を省略
+ * </pre>
+ * @note CMakeで全byteを照合済みの値だけを埋め込み、開発pathを保持しません
+ */
+//------------------------------------------------------------------------------
+#pragma once
+// DLLとhostで一致させる実Debug/Release構成
+#define KOEFUDE_WT_CONFIGURATION "@CMAKE_BUILD_TYPE@"
+// 明示検証済みportable slotの有無
+#define KOEFUDE_WT_PORTABLE_AVAILABLE @WT_PORTABLE_AVAILABLE@
+// 完成portable DLLの全byte数
+#define KOEFUDE_WT_PORTABLE_BYTES @WT_PORTABLE_BYTES@ULL
+// 完成portable DLLのSHA-256
+#define KOEFUDE_WT_PORTABLE_SHA "@WT_PORTABLE_SHA@"
+// portable sidecarの全byteのSHA-256
+#define KOEFUDE_WT_PORTABLE_RECEIPT_SHA "@WT_PORTABLE_RECEIPT_SHA@"
+// 厳密検証済みportable slotだけの明示V2 mode。空slotとlegacyは0
+#define KOEFUDE_WT_PORTABLE_ACCOUNTING_V2 @WT_PORTABLE_ACCOUNTING_V2@
+// portable slotのV2能力bit。空slotとlegacyは0
+#define KOEFUDE_WT_PORTABLE_CAPABILITIES_MASK @WT_PORTABLE_CAPABILITIES_MASK@U
+// 明示検証済みAVX2/no-repack slotの有無
+#define KOEFUDE_WT_AVX2_AVAILABLE @WT_AVX2_AVAILABLE@
+// 完成AVX2/no-repack DLLの全byte数
+#define KOEFUDE_WT_AVX2_BYTES @WT_AVX2_BYTES@ULL
+// 完成AVX2/no-repack DLLのSHA-256
+#define KOEFUDE_WT_AVX2_SHA "@WT_AVX2_SHA@"
+// AVX2/no-repack sidecarの全byteのSHA-256
+#define KOEFUDE_WT_AVX2_RECEIPT_SHA "@WT_AVX2_RECEIPT_SHA@"
+// 厳密検証済みAVX2/no-repack slotだけの明示V2 mode。空slotとlegacyは0
+#define KOEFUDE_WT_AVX2_ACCOUNTING_V2 @WT_AVX2_ACCOUNTING_V2@
+// AVX2/no-repack slotのV2能力bit。空slotとlegacyは0
+#define KOEFUDE_WT_AVX2_CAPABILITIES_MASK @WT_AVX2_CAPABILITIES_MASK@U
+
+// ADR1284: host/native共通V2 ABI headerの全byte識別値
+#define KOEFUDE_WT_ABI_HEADER_SHA "@WT_ABI_HEADER_SHA@"
+
+// 固有Ministral16GB第三slotの完成pin。空slotは利用不可です
+#define KOEFUDE_WT_MINISTRAL_AVAILABLE @WT_MINISTRAL_AVAILABLE@
+#define KOEFUDE_WT_MINISTRAL_BYTES @WT_MINISTRAL_BYTES@ULL
+#define KOEFUDE_WT_MINISTRAL_SHA "@WT_MINISTRAL_SHA@"
+#define KOEFUDE_WT_MINISTRAL_RECEIPT_SHA "@WT_MINISTRAL_RECEIPT_SHA@"
+#define KOEFUDE_WT_MINISTRAL_ACCOUNTING_V2 @WT_MINISTRAL_ACCOUNTING_V2@
+#define KOEFUDE_WT_MINISTRAL_CAPABILITIES_MASK @WT_MINISTRAL_CAPABILITIES_MASK@U

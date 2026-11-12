@@ -1,0 +1,22 @@
+//------------------------------------------------------------------------------
+/**
+ * @file version.h
+ * @brief CMakeの製品版をWindowタイトルとversion resourceで共有します
+ * @version 1.0.0
+ * @date 2026/09/09
+ * @author Shunji Ogawa
+ * @copyright Copyright (c) 2026 Shunji Ogawa. MIT License.
+ * @par 更新履歴
+ * <pre>
+ * 0.1.0 Shunji Ogawa 2026/09/09 新規作成
+ * 0.1.0 Shunji Ogawa 2026/09/09 CMakeから同一の製品版を生成
+ * 1.0.0 Shunji Ogawa 2026/11/10 ADR1377の正式版と配布版の一元生成を維持
+ * 1.0.0 Shunji Ogawa 2026/11/12 ADR1433の更新履歴を新規作成からの昇順・末尾追記へ統一
+ * 1.0.0 Shunji Ogawa 2026/11/12 ADR1437のコメント行末・終端の句点を省略
+ * </pre>
+ */
+//------------------------------------------------------------------------------
+#pragma once
+#define KOEFUDE_VERSION_NUMERIC @PROJECT_VERSION_MAJOR@,@PROJECT_VERSION_MINOR@,@PROJECT_VERSION_PATCH@,0 // file版
+#define KOEFUDE_VERSION_STRING "@PROJECT_VERSION@" // resource用の製品版
+#define KOEFUDE_VERSION_WIDE L"@PROJECT_VERSION@" // Windowタイトル用の製品版

@@ -1,0 +1,367 @@
+{
+  "schema_version": 1,
+  "models": [
+    {
+      "id": "whisper-large-v3-turbo-q8",
+      "file": "ggml-large-v3-turbo-q8_0.bin",
+      "size": 874188075,
+      "sha256": "317eb69c11673c9de1e1f0d459b253999804ec71ac4c23c17ecf5fbe24e259a1",
+      "url": "https://huggingface.co/ggerganov/whisper.cpp/resolve/5359861c739e955e79d9a303bcbc70fb988958b1/ggml-large-v3-turbo-q8_0.bin",
+      "license": "MIT",
+      "source": "https://huggingface.co/openai/whisper-large-v3-turbo",
+      "asr": {
+        "family": "Whisper",
+        "profile": "Standard",
+        "family_resource": 171,
+        "choice_resource": 157,
+        "result_resource": 152,
+        "japanese_only": false,
+        "gpu_bytes": 6442450944,
+        "gpu_validated": true,
+        "history_tokens": 224,
+        "vad_threshold_milli": 500,
+        "vad_silence_ms": 500,
+        "vad_padding_ms": 200,
+        "engine": "WhisperCpp",
+        "tokens_model": -1,
+        "frame_ms": 0,
+        "vad_gain": false,
+        "external_data_model": -1
+      },
+      "revision": "5359861c739e955e79d9a303bcbc70fb988958b1"
+    },
+    {
+      "id": "pyannote-segmentation-3-fp32",
+      "file": "sherpa-onnx-pyannote-segmentation-3-0/model.onnx",
+      "size": 5992913,
+      "sha256": "220ad67ca923bef2fa91f2390c786097bf305bceb5e261d4af67b38e938e1079",
+      "url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/speaker-segmentation-models/sherpa-onnx-pyannote-segmentation-3-0.tar.bz2",
+      "archive_size": 6958444,
+      "archive_sha256": "24615ee884c897d9d2ba09bb4d30da6bb1b15e685065962db5b02e76e4996488",
+      "revision": "archive-sha256-24615ee884c897d9d2ba09bb4d30da6bb1b15e685065962db5b02e76e4996488",
+      "license": "MIT",
+      "source": "https://huggingface.co/pyannote/segmentation-3.0"
+    },
+    {
+      "id": "campplus-zh-en-common-advanced",
+      "file": "3dspeaker_speech_campplus_sv_zh_en_16k-common_advanced.onnx",
+      "size": 28281164,
+      "sha256": "aa3cfc16963a10586a9393f5035d6d6b57e98d358b347f80c2a30bf4f00ceba2",
+      "url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/speaker-recongition-models/3dspeaker_speech_campplus_sv_zh_en_16k-common_advanced.onnx",
+      "revision": "github-release-asset-198893102",
+      "license": "Apache-2.0",
+      "source": "https://modelscope.cn/models/iic/speech_campplus_sv_zh_en_16k-common_advanced",
+      "source_weight_revision": "73001f7ab0bbf7a18739f6e0a48bc1bc74f7a271",
+      "source_weight_sha256": "92f29b94e6948786a26778c9e302525d185bb08c8b9f5252ed98776902840199"
+    },
+    {
+      "id": "whisper-large-v3-fp16",
+      "file": "ggml-large-v3.bin",
+      "size": 3095033483,
+      "sha256": "64d182b440b98d5203c4f9bd541544d84c605196c4f7b845dfa11fb23594d1e2",
+      "url": "https://huggingface.co/ggerganov/whisper.cpp/resolve/5359861c739e955e79d9a303bcbc70fb988958b1/ggml-large-v3.bin",
+      "license": "MIT",
+      "source": "https://huggingface.co/openai/whisper-large-v3",
+      "asr": {
+        "family": "Whisper",
+        "profile": "Quality",
+        "family_resource": 171,
+        "choice_resource": 156,
+        "result_resource": 151,
+        "japanese_only": false,
+        "gpu_bytes": 8589934592,
+        "gpu_validated": true,
+        "history_tokens": 0,
+        "vad_threshold_milli": 350,
+        "vad_silence_ms": 800,
+        "vad_padding_ms": 500,
+        "engine": "WhisperCpp",
+        "tokens_model": -1,
+        "frame_ms": 0,
+        "vad_gain": false,
+        "external_data_model": -1
+      },
+      "revision": "5359861c739e955e79d9a303bcbc70fb988958b1"
+    },
+    {
+      "id": "silero-vad-6.2.0",
+      "file": "ggml-silero-v6.2.0.bin",
+      "size": 885098,
+      "sha256": "2aa269b785eeb53a82983a20501ddf7c1d9c48e33ab63a41391ac6c9f7fb6987",
+      "url": "https://huggingface.co/ggml-org/whisper-vad/resolve/9ffd54a1e1ee413ddf265af9913beaf518d1639b/ggml-silero-v6.2.0.bin",
+      "license": "MIT",
+      "source": "https://github.com/snakers4/silero-vad",
+      "revision": "9ffd54a1e1ee413ddf265af9913beaf518d1639b"
+    },
+    {
+      "id": "kotoba-whisper-v2-fp16",
+      "file": "ggml-kotoba-whisper-v2.0.bin",
+      "size": 1519521155,
+      "sha256": "eff70a8a236e731abba774ba71e1f6d0fce53302137208c32207e694e0bf4546",
+      "url": "https://huggingface.co/kotoba-tech/kotoba-whisper-v2.0-ggml/resolve/e3a0cf6a62b95911703cfb97d819292e058f12c3/ggml-kotoba-whisper-v2.0.bin",
+      "license": "Apache-2.0",
+      "source": "https://huggingface.co/kotoba-tech/kotoba-whisper-v2.0/tree/7eb575277d18909a4af8a24e3ae8cce2e99794ae",
+      "asr": {
+        "family": "Kotoba",
+        "profile": "Quality",
+        "family_resource": 172,
+        "choice_resource": 173,
+        "result_resource": 175,
+        "japanese_only": true,
+        "gpu_bytes": 6442450944,
+        "gpu_validated": true,
+        "history_tokens": 0,
+        "vad_threshold_milli": 500,
+        "vad_silence_ms": 500,
+        "vad_padding_ms": 200,
+        "engine": "WhisperCpp",
+        "tokens_model": -1,
+        "frame_ms": 0,
+        "vad_gain": false,
+        "external_data_model": -1
+      },
+      "revision": "e3a0cf6a62b95911703cfb97d819292e058f12c3"
+    },
+    {
+      "id": "kotoba-whisper-v2-q5",
+      "file": "ggml-kotoba-whisper-v2.0-q5_0.bin",
+      "size": 537819875,
+      "sha256": "4a3b92192b5d3578ff854a5876213e2e27af0c2d357492c2d14271e82c303658",
+      "url": "https://huggingface.co/kotoba-tech/kotoba-whisper-v2.0-ggml/resolve/e3a0cf6a62b95911703cfb97d819292e058f12c3/ggml-kotoba-whisper-v2.0-q5_0.bin",
+      "license": "Apache-2.0",
+      "source": "https://huggingface.co/kotoba-tech/kotoba-whisper-v2.0/tree/7eb575277d18909a4af8a24e3ae8cce2e99794ae",
+      "asr": {
+        "family": "Kotoba",
+        "profile": "Standard",
+        "family_resource": 172,
+        "choice_resource": 174,
+        "result_resource": 176,
+        "japanese_only": true,
+        "gpu_bytes": 6442450944,
+        "gpu_validated": true,
+        "history_tokens": 0,
+        "vad_threshold_milli": 500,
+        "vad_silence_ms": 500,
+        "vad_padding_ms": 200,
+        "engine": "WhisperCpp",
+        "tokens_model": -1,
+        "frame_ms": 0,
+        "vad_gain": false,
+        "external_data_model": -1
+      },
+      "revision": "e3a0cf6a62b95911703cfb97d819292e058f12c3"
+    },
+    {
+      "id": "parakeet-ja-ctc-int8",
+      "file": "sherpa-onnx-nemo-parakeet-tdt_ctc-0.6b-ja-35000-int8/model.int8.onnx",
+      "size": 655542604,
+      "sha256": "3addd00ef5bd1742078389e540b77394e4a508bdf2f4c9ad1b4a76d93e76598e",
+      "url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-nemo-parakeet-tdt_ctc-0.6b-ja-35000-int8.tar.bz2",
+      "archive_size": 489389564,
+      "archive_sha256": "4b0a800ef29f4f4c8667339bf6f60d5bfdc2852ddc9dc5741aea65b6f8d1306b",
+      "revision": "github-release-asset-271243108",
+      "license": "CC-BY-4.0",
+      "source": "https://huggingface.co/nvidia/parakeet-tdt_ctc-0.6b-ja/tree/44edb27eea9317daf89333e75eb830db4b1cc298",
+      "asr": {
+        "family": "Parakeet",
+        "profile": "Standard",
+        "family_resource": 217,
+        "choice_resource": 218,
+        "result_resource": 219,
+        "japanese_only": true,
+        "gpu_bytes": 3221225472,
+        "gpu_validated": false,
+        "history_tokens": 0,
+        "vad_threshold_milli": 350,
+        "vad_silence_ms": 800,
+        "vad_padding_ms": 500,
+        "engine": "ParakeetCtc",
+        "tokens_model": 8,
+        "frame_ms": 80,
+        "vad_gain": true,
+        "external_data_model": -1
+      }
+    },
+    {
+      "id": "parakeet-ja-tokens",
+      "file": "sherpa-onnx-nemo-parakeet-tdt_ctc-0.6b-ja-35000-int8/tokens.txt",
+      "size": 28557,
+      "sha256": "732f64c53909f2620c713f4106b487d92e6f54a6915b3cd3d1dbd32f9f4f392a",
+      "url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-nemo-parakeet-tdt_ctc-0.6b-ja-35000-int8.tar.bz2",
+      "archive_size": 489389564,
+      "archive_sha256": "4b0a800ef29f4f4c8667339bf6f60d5bfdc2852ddc9dc5741aea65b6f8d1306b",
+      "revision": "github-release-asset-271243108",
+      "license": "CC-BY-4.0",
+      "source": "https://huggingface.co/nvidia/parakeet-tdt_ctc-0.6b-ja/tree/44edb27eea9317daf89333e75eb830db4b1cc298"
+    },
+    {
+      "id": "parakeet-ja-ctc-fp32",
+      "file": "parakeet-ja-ctc-fp32/model.onnx",
+      "size": 954179,
+      "sha256": "273eeee4e7dc3c19caf7d450b131d1a0f7389d899e12eb088f1527f9d96bdeb3",
+      "url": "https://huggingface.co/OpenVoiceOS/nvidia-parakeet-tdt_ctc-0.6b-ja-onnx/resolve/4353e7b9e2e9ebdd35e85b8140c7351d03c2219c/model.onnx",
+      "revision": "4353e7b9e2e9ebdd35e85b8140c7351d03c2219c",
+      "license": "CC-BY-4.0",
+      "source": "https://huggingface.co/OpenVoiceOS/nvidia-parakeet-tdt_ctc-0.6b-ja-onnx/tree/4353e7b9e2e9ebdd35e85b8140c7351d03c2219c",
+      "asr": {
+        "family": "Parakeet",
+        "profile": "Quality",
+        "family_resource": 217,
+        "choice_resource": 220,
+        "result_resource": 221,
+        "japanese_only": true,
+        "gpu_bytes": 6442450944,
+        "gpu_validated": true,
+        "history_tokens": 0,
+        "vad_threshold_milli": 350,
+        "vad_silence_ms": 800,
+        "vad_padding_ms": 500,
+        "engine": "ParakeetCtc",
+        "tokens_model": 8,
+        "frame_ms": 80,
+        "vad_gain": true,
+        "external_data_model": 10
+      },
+      "source_size": 953841,
+      "source_sha256": "f137f0192549e4674b275c0c78395c444bdc3d60f530c5ec99850f9296bf5e8f",
+      "metadata_append_hex": "72120a0a766f6361625f73697a65120433303732721d0a0e6e6f726d616c697a655f74797065120b7065725f6665617475726572170a1273756273616d706c696e675f666163746f7212013872290a0a6d6f64656c5f74797065121b456e63446563487962726964524e4e544354434250454d6f64656c720c0a0776657273696f6e12013172140a0c6d6f64656c5f617574686f7212044e654d6f723d0a0375726c123668747470733a2f2f68756767696e67666163652e636f2f6e76696469612f706172616b6565742d7464745f6374632d302e36622d6a61725b0a07636f6d6d656e741250435443206272616e63683b20736f75726365204f70656e566f6963654f53207265766973696f6e203433353365376239653265396562646433356538356238313430633733353164303363323231396372190a116b6f65667564655f707265636973696f6e120466703332",
+      "preparation": "sherpa metadata only; unchanged graph and FP32 external weights; ADR 0029"
+    },
+    {
+      "id": "parakeet-ja-ctc-fp32-data",
+      "file": "parakeet-ja-ctc-fp32/model.onnx_data",
+      "size": 2484355076,
+      "sha256": "23afc8933dcdae942aa2a23eda6c7231d465449be4411585e6109bbf10f76e89",
+      "url": "https://huggingface.co/OpenVoiceOS/nvidia-parakeet-tdt_ctc-0.6b-ja-onnx/resolve/4353e7b9e2e9ebdd35e85b8140c7351d03c2219c/model.onnx_data",
+      "revision": "4353e7b9e2e9ebdd35e85b8140c7351d03c2219c",
+      "license": "CC-BY-4.0",
+      "source": "https://huggingface.co/OpenVoiceOS/nvidia-parakeet-tdt_ctc-0.6b-ja-onnx/tree/4353e7b9e2e9ebdd35e85b8140c7351d03c2219c"
+    },
+    {
+      "id": "rinna-japanese-gpt2-small-fp32",
+      "file": "rinna-japanese-gpt2-small-fp32/model.onnx",
+      "size": 541636872,
+      "sha256": "d1c6d10fcecfce64f2653f122f019bf46898a543f84e45d48c32dc9331147ad1",
+      "revision": "f7fdefe2941d9629a7b2894564435e0e035df6a6",
+      "license": "MIT; Unicode-3.0 for the Unicode 15.1.0 lowercase mapping",
+      "source": "https://huggingface.co/rinna/japanese-gpt2-small/tree/f7fdefe2941d9629a7b2894564435e0e035df6a6",
+      "comparison_only": true,
+      "preparation": {
+        "script": "scripts/prepare_japanese_lm.py",
+        "method": "FP32 causal next-token log probabilities; ONNX opset17; batch1; no-cache; Unicode15.1 case mapping",
+        "sources": [
+          {
+            "file": "README.md",
+            "size": 2454,
+            "url": "https://huggingface.co/rinna/japanese-gpt2-small/resolve/f7fdefe2941d9629a7b2894564435e0e035df6a6/README.md",
+            "sha256": "b79b7ddbbba000952b5365116b3e3f98c13cd9590e4eb408665690e61c9be729"
+          },
+          {
+            "file": "config.json",
+            "size": 846,
+            "url": "https://huggingface.co/rinna/japanese-gpt2-small/resolve/f7fdefe2941d9629a7b2894564435e0e035df6a6/config.json",
+            "sha256": "4d24067dce6d871e567adb695ed55f6b318ba8bfa2d022c37608e6a13000abe1"
+          },
+          {
+            "file": "model.safetensors",
+            "size": 454274094,
+            "url": "https://huggingface.co/rinna/japanese-gpt2-small/resolve/f7fdefe2941d9629a7b2894564435e0e035df6a6/model.safetensors",
+            "sha256": "190ab28ad38053ea6f39198e7b5228bc2be8914cc524f0e731dd66d5a35ba246"
+          },
+          {
+            "file": "special_tokens_map.json",
+            "size": 153,
+            "url": "https://huggingface.co/rinna/japanese-gpt2-small/resolve/f7fdefe2941d9629a7b2894564435e0e035df6a6/special_tokens_map.json",
+            "sha256": "a4fdf54099a0e4b6d81bff96557662ef8ef3ccd9e5a5fbdb8117b33fe1c608b5"
+          },
+          {
+            "file": "spiece.model",
+            "size": 805634,
+            "url": "https://huggingface.co/rinna/japanese-gpt2-small/resolve/f7fdefe2941d9629a7b2894564435e0e035df6a6/spiece.model",
+            "sha256": "b5cbdfa8aa7c54c8c5af85b78c309c54a5f2749a20468bf6f60eee007fe6fec1"
+          },
+          {
+            "file": "tokenizer_config.json",
+            "size": 282,
+            "url": "https://huggingface.co/rinna/japanese-gpt2-small/resolve/f7fdefe2941d9629a7b2894564435e0e035df6a6/tokenizer_config.json",
+            "sha256": "bea5023449df29f226cc37cd583f7317758256a343ac042dfa141d55fe57c464"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rinna-japanese-gpt2-small-tokenizer",
+      "file": "rinna-japanese-gpt2-small-fp32/spiece.model",
+      "size": 805634,
+      "sha256": "b5cbdfa8aa7c54c8c5af85b78c309c54a5f2749a20468bf6f60eee007fe6fec1",
+      "url": "https://huggingface.co/rinna/japanese-gpt2-small/resolve/f7fdefe2941d9629a7b2894564435e0e035df6a6/spiece.model",
+      "revision": "f7fdefe2941d9629a7b2894564435e0e035df6a6",
+      "license": "MIT",
+      "source": "https://huggingface.co/rinna/japanese-gpt2-small/tree/f7fdefe2941d9629a7b2894564435e0e035df6a6",
+      "comparison_only": true
+    },
+    {
+      "id": "gemma-4-31b-it-qat-q4-0-gguf",
+      "file": "gemma-4-31B_q4_0-it.gguf",
+      "repository": "google/gemma-4-31B-it-qat-q4_0-gguf",
+      "revision": "59dde24573e7e61570dba08b18a2e1fe246955ed",
+      "size": 17651001568,
+      "sha256": "179cfb99212709597eae5929112cfca677e1bbf566178b479ae1da0c4772874b",
+      "license": "Apache-2.0",
+      "source": "https://huggingface.co/google/gemma-4-31B-it-qat-q4_0-gguf/tree/59dde24573e7e61570dba08b18a2e1fe246955ed",
+      "acquisition_scope": "whole_text",
+      "url": "https://huggingface.co/google/gemma-4-31B-it-qat-q4_0-gguf/resolve/59dde24573e7e61570dba08b18a2e1fe246955ed/gemma-4-31B_q4_0-it.gguf"
+    },
+    {
+      "id": "ministral-3-14b-instruct-2512-q4-k-m-gguf",
+      "file": "Ministral-3-14B-Instruct-2512-Q4_K_M.gguf",
+      "repository": "mistralai/Ministral-3-14B-Instruct-2512-GGUF",
+      "revision": "74fac473c43357d7fb2671713608183cc72496d0",
+      "size": 8239593024,
+      "sha256": "824e0f3373e69b84f2cae46fdcb9bd1ebc6ab3bfc7acc125d818b7b8178cc613",
+      "license": "Apache-2.0",
+      "source": "https://huggingface.co/mistralai/Ministral-3-14B-Instruct-2512-GGUF/tree/74fac473c43357d7fb2671713608183cc72496d0",
+      "acquisition_scope": "whole_text",
+      "url": "https://huggingface.co/mistralai/Ministral-3-14B-Instruct-2512-GGUF/resolve/74fac473c43357d7fb2671713608183cc72496d0/Ministral-3-14B-Instruct-2512-Q4_K_M.gguf"
+    }
+  ],
+  "shared_roles": {
+    "voice_activity": 4,
+    "segmentation": 1,
+    "embedding": 2
+  },
+  "whole_text_roles": {
+    "native_cpu": 13,
+    "native_cpu_16gb": 14
+  },
+  "api_asr": [
+    {
+      "family": "OpenAiAudio",
+      "profile": "Quality",
+      "engine": "OpenAiTranscriptions",
+      "model_id": "gpt-transcribe",
+      "endpoint": "https://api.openai.com/v1/audio/transcriptions",
+      "family_resource": 3400,
+      "choice_resource": 3401,
+      "result_resource": 3400,
+      "vad_threshold_milli": 350,
+      "vad_silence_ms": 800,
+      "vad_padding_ms": 500,
+      "vad_gain": true
+    },
+    {
+      "family": "OpenAiAudio",
+      "profile": "Standard",
+      "engine": "OpenAiTranscriptions",
+      "model_id": "gpt-transcribe",
+      "endpoint": "https://api.openai.com/v1/audio/transcriptions",
+      "family_resource": 3400,
+      "choice_resource": 3443,
+      "result_resource": 3400,
+      "vad_threshold_milli": 350,
+      "vad_silence_ms": 800,
+      "vad_padding_ms": 500,
+      "vad_gain": true
+    }
+  ]
+}

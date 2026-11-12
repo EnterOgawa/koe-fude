@@ -1,0 +1,267 @@
+{
+  "schema_version": 1,
+  "dependencies": [
+    {
+      "id": "kaldi-native-fbank",
+      "revision": "v1.22.3 / b09e686fe2084732ddd30d1ef80acfc0f13eaf01",
+      "url": "https://github.com/csukuangfj/kaldi-native-fbank/archive/refs/tags/v1.22.3.tar.gz",
+      "size": 71144,
+      "sha256": "9176cc66fc7ce1edf85cf355b06e320c57db6297df74277f575183468893cf61",
+      "archive_root": "kaldi-native-fbank-1.22.3",
+      "directory": "kaldi-native-fbank",
+      "license": "Apache-2.0"
+    },
+    {
+      "id": "kissfft",
+      "revision": "febd4caeed32e33ad8b2e0bb5ea77542c40f18ec",
+      "url": "https://github.com/mborgerding/kissfft/archive/febd4caeed32e33ad8b2e0bb5ea77542c40f18ec.zip",
+      "size": 74252,
+      "sha256": "497103e664168ebe39580b757adbe616f6cf85a16572af581ca7bc42d0ab13fd",
+      "archive_root": "kissfft-febd4caeed32e33ad8b2e0bb5ea77542c40f18ec",
+      "archive_format": "zip",
+      "directory": "kissfft",
+      "license": "BSD-3-Clause"
+    },
+    {
+      "id": "whisper.cpp",
+      "revision": "371b5a7561823ab2bb32142d2751e35e7534727b",
+      "url": "https://codeload.github.com/ggml-org/whisper.cpp/tar.gz/371b5a7561823ab2bb32142d2751e35e7534727b",
+      "size": 9136244,
+      "sha256": "89051d8fca516a3ad1f5c2f8f9d2fccb089afbaec338fca3f8731999babc6f81",
+      "archive_root": "whisper.cpp-371b5a7561823ab2bb32142d2751e35e7534727b",
+      "directory": "whisper.cpp",
+      "license": "MIT"
+    },
+    {
+      "id": "sherpa-onnx",
+      "revision": "v1.13.7 / 917bed95c8e5c7c18aa4d69fea42e9ef8ef0a60e",
+      "url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/v1.13.7/sherpa-onnx-v1.13.7-win-x64-shared-MT-Release-no-tts.tar.bz2",
+      "size": 22932067,
+      "sha256": "38a0a32c0f55752b887209a099b1c477bf350d5d9d254602a842d0610a8da831",
+      "archive_root": "sherpa-onnx-v1.13.7-win-x64-shared-MT-Release-no-tts",
+      "directory": "sherpa-onnx-v1.13.7-win-x64-shared-MT-Release-no-tts",
+      "license": "Apache-2.0; ONNX Runtime 1.27.1 MIT"
+    },
+    {
+      "id": "eigen",
+      "revision": "5.0.1",
+      "url": "https://gitlab.com/libeigen/eigen/-/archive/5.0.1/eigen-5.0.1.tar.gz",
+      "size": 2967272,
+      "sha256": "e9c326dc8c05cd1e044c71f30f1b2e34a6161a3b6ecf445d56b53ff1669e3dec",
+      "archive_root": "eigen-5.0.1",
+      "directory": "eigen",
+      "license": "MPL-2.0"
+    },
+    {
+      "id": "onnxruntime-headers",
+      "revision": "v1.27.1",
+      "directory": "onnxruntime-headers",
+      "license": "MIT",
+      "files": [
+        {
+          "file": "onnxruntime_c_api.h",
+          "url": "https://raw.githubusercontent.com/microsoft/onnxruntime/v1.27.1/include/onnxruntime/core/session/onnxruntime_c_api.h",
+          "size": 392401,
+          "sha256": "523131bab81173fe287c578f7dda344e1dc5c749fa3f70b55fbbf8f210850313"
+        },
+        {
+          "file": "onnxruntime_cxx_api.h",
+          "url": "https://raw.githubusercontent.com/microsoft/onnxruntime/v1.27.1/include/onnxruntime/core/session/onnxruntime_cxx_api.h",
+          "size": 168888,
+          "sha256": "c5f9bb73d7674cf99a197b383a144eb2a5eda71cc060193a86c7d24e6fa36ed7"
+        },
+        {
+          "file": "onnxruntime_cxx_inline.h",
+          "url": "https://raw.githubusercontent.com/microsoft/onnxruntime/v1.27.1/include/onnxruntime/core/session/onnxruntime_cxx_inline.h",
+          "size": 157429,
+          "sha256": "114b4d008351eaa4462560438474cebd104f74259cc8af607acc0b97453200d2"
+        },
+        {
+          "file": "onnxruntime_float16.h",
+          "url": "https://raw.githubusercontent.com/microsoft/onnxruntime/v1.27.1/include/onnxruntime/core/session/onnxruntime_float16.h",
+          "size": 17991,
+          "sha256": "88b242845d25981633a0bbd1c148e273cf8bfb016ea3f57c4af41a06530f72b0"
+        },
+        {
+          "file": "onnxruntime_ep_c_api.h",
+          "url": "https://raw.githubusercontent.com/microsoft/onnxruntime/v1.27.1/include/onnxruntime/core/session/onnxruntime_ep_c_api.h",
+          "size": 149810,
+          "sha256": "f65ac849718cabe3ff4902698dd2de643c3b3dbe0010242b2b0407548e7ee00c"
+        }
+      ]
+    },
+    {
+      "id": "sherpa-onnx-cuda12",
+      "revision": "917bed95c8e5c7c18aa4d69fea42e9ef8ef0a60e",
+      "url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/v1.13.7/sherpa-onnx-v1.13.7-cuda-12.x-cudnn-9.x-onnxruntime1.27.1-win-x64-cuda.tar.bz2",
+      "size": 375601142,
+      "sha256": "3aa63e4dd6a394a7ee3e8b170a80df49c27b6cf0e52cea4fa77fc51431f3bc27",
+      "directory": "sherpa-onnx-cuda",
+      "archive_root": "sherpa-onnx-v1.13.7-cuda-12.x-cudnn-9.x-onnxruntime1.27.1-win-x64-cuda",
+      "license": "Apache-2.0; ONNX Runtime 1.27.1 MIT",
+      "expanded_limit": 1073741824,
+      "runtime_files": [
+        {
+          "file": "lib/onnxruntime.dll",
+          "size": 15839544,
+          "sha256": "27c4d97f66eade25bb3202c09ace2c674e7ecbe139f9956c80272306409385d6"
+        },
+        {
+          "file": "lib/onnxruntime_providers_cuda.dll",
+          "size": 328539448,
+          "sha256": "ffdbf04ad2dbdb435a30df9bc280fa9bad819ceec02b27cdb5a193cdabc44248"
+        },
+        {
+          "file": "lib/onnxruntime_providers_shared.dll",
+          "size": 21816,
+          "sha256": "a5585d5e782e0f9626c05591184d68a5a1aaf43c2c82a051dd351809c5c828b7"
+        },
+        {
+          "file": "lib/sherpa-onnx-c-api.dll",
+          "size": 4593664,
+          "sha256": "b7913ad063723790ac123bcf58e0d2bdc5660052bdbc6e53f629f5cd4d5813bc"
+        }
+      ]
+    },
+    {
+      "id": "nvidia-cuda_cudart",
+      "revision": "12.8.90",
+      "url": "https://developer.download.nvidia.com/compute/cuda/redist/cuda_cudart/windows-x86_64/cuda_cudart-windows-x86_64-12.8.90-archive.zip",
+      "size": 3037735,
+      "sha256": "4a39058fd8519444a81cfc7ae055d136f48d1a31ffa41ae255b35b2edd61e13b",
+      "archive_root": "cuda_cudart-windows-x86_64-12.8.90-archive",
+      "archive_format": "zip",
+      "directory": "nvidia-cuda_cudart",
+      "license": "NVIDIA CUDA Software License Agreement",
+      "expanded_limit": 4294967296,
+      "runtime_files": [
+        {
+          "file": "bin/cudart64_12.dll",
+          "size": 573952,
+          "sha256": "c2c9a9c22a9bcba90e261825968836787b331038047a26770cffb7a583c28344"
+        }
+      ]
+    },
+    {
+      "id": "nvidia-libcublas",
+      "revision": "12.8.4.1",
+      "url": "https://developer.download.nvidia.com/compute/cuda/redist/libcublas/windows-x86_64/libcublas-windows-x86_64-12.8.4.1-archive.zip",
+      "size": 563660944,
+      "sha256": "57a470112cec7e112c95253dde8b3c7184d795dbd92b0bde77a4cb7f8c94c8aa",
+      "archive_root": "libcublas-windows-x86_64-12.8.4.1-archive",
+      "archive_format": "zip",
+      "directory": "nvidia-libcublas",
+      "license": "NVIDIA CUDA Software License Agreement",
+      "expanded_limit": 4294967296,
+      "runtime_files": [
+        {
+          "file": "bin/cublas64_12.dll",
+          "size": 113716224,
+          "sha256": "9513540e4ec4c51ee9e7304138c2cc255c29a8c181f9e80c38efa25738becd99"
+        },
+        {
+          "file": "bin/cublasLt64_12.dll",
+          "size": 674667520,
+          "sha256": "b199d1ff892a81b7fd3d57ba1781549609b41500b36008fef326038393ad46c7"
+        }
+      ]
+    },
+    {
+      "id": "nvidia-libcufft",
+      "revision": "11.3.3.83",
+      "url": "https://developer.download.nvidia.com/compute/cuda/redist/libcufft/windows-x86_64/libcufft-windows-x86_64-11.3.3.83-archive.zip",
+      "size": 190568498,
+      "sha256": "cc6e0ba958cf23387b462017a24464c72bd901549046133f3d1ebcc3d7444c90",
+      "archive_root": "libcufft-windows-x86_64-11.3.3.83-archive",
+      "archive_format": "zip",
+      "directory": "nvidia-libcufft",
+      "license": "NVIDIA CUDA Software License Agreement",
+      "expanded_limit": 4294967296,
+      "runtime_files": [
+        {
+          "file": "bin/cufft64_11.dll",
+          "size": 276121600,
+          "sha256": "f4fea9227b14843894ad5436725f9638b172171142c95291fc6ae7a493248221"
+        }
+      ]
+    },
+    {
+      "id": "nvidia-cudnn",
+      "revision": "9.10.2.21",
+      "url": "https://developer.download.nvidia.com/compute/cudnn/redist/cudnn/windows-x86_64/cudnn-windows-x86_64-9.10.2.21_cuda12-archive.zip",
+      "size": 683336095,
+      "sha256": "c1a4567d822ebda7373fa1f19255dff4942302de741f830160b6c7d1fb31af23",
+      "archive_root": "cudnn-windows-x86_64-9.10.2.21_cuda12-archive",
+      "archive_format": "zip",
+      "directory": "nvidia-cudnn",
+      "license": "NVIDIA cuDNN Software License Agreement",
+      "expanded_limit": 4294967296,
+      "runtime_files": [
+        {
+          "file": "bin/cudnn64_9.dll",
+          "size": 266288,
+          "sha256": "9edbcdff73b0af070eb160b2ce66e59feca04aa017351d8eedcc5e8e149967d2"
+        },
+        {
+          "file": "bin/cudnn_adv64_9.dll",
+          "size": 282445872,
+          "sha256": "f202e8ff36209ac4292fe2ef79d4539487495b3b948f0c978cc63298f43a1850"
+        },
+        {
+          "file": "bin/cudnn_cnn64_9.dll",
+          "size": 4618272,
+          "sha256": "3f03dec3b81f137f049e1d1c06ff469248eef54ff9424b3b9045fc0f69559d1a"
+        },
+        {
+          "file": "bin/cudnn_engines_precompiled64_9.dll",
+          "size": 513926688,
+          "sha256": "ebc2c1f74366b029a4350f7f9a3b109ccd5aa9b4ae02527950793dd29f7b74fb"
+        },
+        {
+          "file": "bin/cudnn_engines_runtime_compiled64_9.dll",
+          "size": 20201008,
+          "sha256": "93ab6351ca0f2b6ca842f83d284e56c427525778c14657229801a13cf8121bd8"
+        },
+        {
+          "file": "bin/cudnn_graph64_9.dll",
+          "size": 2420256,
+          "sha256": "a933efeb280a3252297f92d79f7e83003bcbc6f665872d11645d1dbbab9cb598"
+        },
+        {
+          "file": "bin/cudnn_heuristic64_9.dll",
+          "size": 56823328,
+          "sha256": "458175f12771a35de0ea39c04250d727c2424d42a7ffe0bc987ae81204748fba"
+        },
+        {
+          "file": "bin/cudnn_ops64_9.dll",
+          "size": 126508576,
+          "sha256": "851d8f4191a24b322b0be738d191a3159455f0da4db47a19f5cc7ad6e55edf61"
+        }
+      ]
+    },
+    {
+      "id": "nvidia-cuda_nvrtc",
+      "revision": "12.8.93",
+      "url": "https://developer.download.nvidia.com/compute/cuda/redist/cuda_nvrtc/windows-x86_64/cuda_nvrtc-windows-x86_64-12.8.93-archive.zip",
+      "size": 305588898,
+      "sha256": "a63302a077f0248a743a1a7caa7dbd80d0fac56c6cfa9c41fa05fac9b7e5eda5",
+      "archive_format": "zip",
+      "archive_root": "cuda_nvrtc-windows-x86_64-12.8.93-archive",
+      "directory": "nvidia-cuda_nvrtc",
+      "license": "NVIDIA CUDA Software License Agreement",
+      "expanded_limit": 2147483648,
+      "runtime_files": [
+        {
+          "file": "bin/nvrtc64_120_0.dll",
+          "size": 86728192,
+          "sha256": "02d2d7ef4690bf1a55dda1d3ac94c86ce8d16920071c87bcd3e70e94ef346e93"
+        },
+        {
+          "file": "bin/nvrtc-builtins64_128.dll",
+          "size": 6356480,
+          "sha256": "a7afa2a40cbd3f922a33d8bf71c13cb26ca707c7016a9bc5fcde36759ba668f5"
+        }
+      ]
+    }
+  ]
+}

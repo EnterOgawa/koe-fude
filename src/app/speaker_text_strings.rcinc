@@ -1,0 +1,25 @@
+// ADR1372 / 0.1.0 Shunji Ogawa 2026/11/10: 原API状態とは独立した話者表示説明。
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+STRINGTABLE
+BEGIN
+    IDS_SPEAKER_TEXT_MENU "話者の表示を細かくする（PC内処理）"
+    IDS_SPEAKER_TEXT_SAVE "話者付きTXTを保存…"
+    IDS_SPEAKER_TEXT_NOTICE "話者表示: Parakeet Qualityによる追加のPC内認識と保存済み音響話者区間の対応。元API本文は変更せず、APIの語時刻ではありません。日本語・文脈優先・話者分けONでは原文保存後に一回処理します。補助モデルは音声送信前に準備します。"
+    IDS_SPEAKER_TEXT_ACTIVE "話者表示（PC内処理）: 参照と本文の対応中"
+    IDS_SPEAKER_TEXT_DONE "話者表示: 保存済み。音声原文と改善文は保持"
+    IDS_SPEAKER_TEXT_FAILED "話者表示: 処理または保存に失敗。原文と前の表示は保持"
+    IDS_SPEAKER_TEXT_CANCELLED "話者表示: PC内処理を取消し/中断。原文と前の表示は保持"
+    IDS_SPEAKER_TEXT_PREPARING "話者表示: 補助Parakeet Qualityモデルを準備"
+END
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+STRINGTABLE
+BEGIN
+    IDS_SPEAKER_TEXT_MENU "Refine speaker display (on this PC)"
+    IDS_SPEAKER_TEXT_SAVE "Save TXT with speakers..."
+    IDS_SPEAKER_TEXT_NOTICE "Speaker display uses additional Parakeet Quality recognition on this PC and saved acoustic speaker turns. API text is preserved; these are not API word timestamps. Japanese Context Quality with speakers enabled runs this once after the original is saved. Auxiliary models are prepared before audio is sent."
+    IDS_SPEAKER_TEXT_ACTIVE "Speaker display (on this PC): aligning reference and text"
+    IDS_SPEAKER_TEXT_DONE "Speaker display saved; original and improved text retained"
+    IDS_SPEAKER_TEXT_FAILED "Speaker display failed to process or save; original and previous display retained"
+    IDS_SPEAKER_TEXT_CANCELLED "Local speaker display cancelled/interrupted; original and previous display retained"
+    IDS_SPEAKER_TEXT_PREPARING "Speaker display: preparing auxiliary Parakeet Quality model"
+END

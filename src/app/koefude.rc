@@ -1,0 +1,642 @@
+//------------------------------------------------------------------------------
+/**
+ * @file koefude.rc
+ * @brief 多言語UI、自作アイコン、version情報、manifestを定義します
+ * @version 1.0.0
+ * @date 2026/09/09
+ * @author Shunji Ogawa
+ * @copyright Copyright (c) 2026 Shunji Ogawa. MIT License.
+ * @par 更新履歴
+ * <pre>
+ * 0.1.0 Shunji Ogawa 2026/09/09 新規作成
+ * 0.1.0 Shunji Ogawa 2026/09/09 初期デスクトップresourceを追加
+ * 0.1.0 Shunji Ogawa 2026/09/09 品質優先modelと無音除外の選択を表示
+ * 0.1.0 Shunji Ogawa 2026/09/09 常設品質欄と同梱modelの案内へ変更
+ * 0.1.0 Shunji Ogawa 2026/09/09 モデル系統とモデル別品質の選択を表示
+ * 0.1.0 Shunji Ogawa 2026/09/09 自作アイコン・CMake版・言語別resourceを追加
+ * 0.1.0 Shunji Ogawa 2026/10/19 改行をLFへ統一
+ * 0.1.0 Shunji Ogawa 2026/10/19 自由全文の明示CPU試用と原文切替の翻訳を追加
+ * 0.1.0 Shunji Ogawa 2026/10/19 固定AVX2方式と通常workerの検証接続を追加
+ * 0.1.0 Shunji Ogawa 2026/10/20 補正準備の状態・容量・残件説明を追加
+ * 0.1.0 Shunji Ogawa 2026/10/20 ADR1280の明示モデル導入と同一枠の操作排他を接続
+ * 0.1.0 Shunji Ogawa 2026/10/20 ADR1283のDirect取得案内と実段階を追加
+ * 0.1.0 Shunji Ogawa 2026/10/21 ADR1314の固定Ministral16GB契約を接続
+ * 0.1.0 Shunji Ogawa 2026/11/08 ADR1343の文章専用補正を接続
+ * 0.1.0 Shunji Ogawa 2026/11/08 ADR1344の明示API補正と独立保存を接続
+ * 0.1.0 Shunji Ogawa 2026/11/08 ADR1346の通常API補正・保存モデル表示・限定ログを接続
+ * 0.1.0 Shunji Ogawa 2026/11/08 ADR1347の音声テーブル・独立API設定と文章操作を接続
+ * 0.1.0 Shunji Ogawa 2026/11/08 ADR1349の一回適用と全単価表示へ更新
+ * 0.1.0 Shunji Ogawa 2026/11/08 ADR1351のAPI専用HTTP失敗・保存状態を接続
+ * 0.1.0 Shunji Ogawa 2026/11/08 ADR1352の実区間進捗・採用保存を接続
+ * 0.1.0 Shunji Ogawa 2026/11/09 ADR1353の実完了工程説明を追加
+ * 0.1.0 Shunji Ogawa 2026/11/09 ADR1354の統合設定と話者名dialogを追加
+ * 0.1.0 Shunji Ogawa 2026/11/09 ADR1356の調整境界の翻訳目的名を追加
+ * 0.1.0 Shunji Ogawa 2026/11/09 ADR1358の短い状態headerを追加
+ * 0.1.0 Shunji Ogawa 2026/11/09 ADR1363の共通比較表と旧全文比較の説明へ更新
+ * 0.1.0 Shunji Ogawa 2026/11/09 ADR1364の旧結果の表示位置/未対応説明を更新
+ * 0.1.0 Shunji Ogawa 2026/11/09 ADR1365の改善有無のtooltip説明を追加
+ * 0.1.0 Shunji Ogawa 2026/11/09 ADR1368の明示音声APIと従来経路の境界を接続
+ * 1.0.0 Shunji Ogawa 2026/11/10 ADR1377のCMake一元版を製品resourceへ反映
+ * 1.0.0 Shunji Ogawa 2026/11/10 ADR1378の明示更新境界を追加
+ * 1.0.0 Shunji Ogawa 2026/11/11 ADR1400の文字起こし設定の準備ボタンを削除
+ * 1.0.0 Shunji Ogawa 2026/11/11 ADR1402の通常取得dialogと未確認理由を追加
+ * 1.0.0 Shunji Ogawa 2026/11/12 ADR1433の更新履歴を新規作成からの昇順・末尾追記へ統一
+ * 1.0.0 Shunji Ogawa 2026/11/12 ADR1437のコメント行末・終端の句点を省略
+ * </pre>
+ */
+//------------------------------------------------------------------------------
+#pragma code_page(65001)
+#include <windows.h>
+#include <commctrl.h>
+#include "resource.h"
+#include "speaker_text_strings.rcinc"
+#include "version.h"
+
+LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
+1 RT_MANIFEST "koefude.manifest"
+IDI_APP ICON "icons/koefude.ico"
+IDI_ADD ICON "icons/add.ico"
+IDI_SAVE ICON "icons/save.ico"
+IDI_COPY ICON "icons/copy.ico"
+IDI_CANCEL ICON "icons/cancel.ico"
+IDI_CLEAR ICON "icons/clear.ico"
+IDI_RENAME ICON "icons/rename.ico"
+
+1 VERSIONINFO
+FILEVERSION KOEFUDE_VERSION_NUMERIC
+PRODUCTVERSION KOEFUDE_VERSION_NUMERIC
+FILEOS VOS_NT_WINDOWS32
+FILETYPE VFT_APP
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "041104b0"
+        BEGIN
+            VALUE "CompanyName", "EnterSystem"
+            VALUE "FileDescription", "KoeFude ローカル文字起こし"
+            VALUE "FileVersion", KOEFUDE_VERSION_STRING
+            VALUE "InternalName", "koefude"
+            VALUE "LegalCopyright", "Copyright (c) 2026 Shunji Ogawa"
+            VALUE "OriginalFilename", "KoeFude.exe"
+            VALUE "ProductName", "KoeFude"
+            VALUE "ProductVersion", KOEFUDE_VERSION_STRING
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x411, 1200
+    END
+END
+
+#include "ui_ja.rcinc"
+#include "ui_en.rcinc"
+
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+STRINGTABLE
+BEGIN
+    IDS_WHOLE_TITLE "補正全文（時刻・話者の対応なし）―表示欄で原文へ切替できます。"
+    IDS_WHOLE_CREATE_AVX2 "全文補正を作成（CPU AVX2・試用）"
+    IDS_WHOLE_CREATE_MINISTRAL16GB "全文補正を作成（Ministral 16GB評価・CPU AVX2）"
+    IDS_WHOLE_CPU_UNSUPPORTED "このCPUまたはOSは全文補正のAVX2構成に対応していません。原文と前の補正全文を保持しました。"
+    IDS_WHOLE_RUNTIME_REJECTED "全文補正のDLLと構成情報が一致しません。配布フォルダー一式を復元してください。原文と前の補正全文を保持しました。"
+    IDS_WHOLE_RUNTIME_MISSING "この配布には選択した全文補正のDLLまたは構成情報がありません。必要な配布フォルダー一式を配置してください。"
+    IDS_WHOLE_CREATE "補正全文を作成（試用・CPU）"
+    IDS_WHOLE_COPY "補正全文をコピー"
+    IDS_WHOLE_SAVE "補正全文をTXT保存"
+    IDS_WHOLE_VIEW "補正全文"
+    IDS_WHOLE_ORIGINAL_COPY "原文をコピー"
+    IDS_WHOLE_ORIGINAL_SAVE "原文を保存"
+    IDS_WHOLE_NO_PCM "元ASR時のPCM証拠が未記録です。必要なら明示的に再度文字起こししてください。"
+    IDS_WHOLE_PCM_MISMATCH "元ASRと音声が一致しません。原文と前の補正全文を保持しました。"
+    IDS_WHOLE_RESOURCES "CPU試用の資源余裕が不足したため停止しました。原文と前の補正全文を保持しました。"
+    IDS_WHOLE_MODELS "「補正の準備状況」から補助認識モデルを準備し、選択した補正モデルを準備してください。"
+    IDS_WHOLE_PHASES "音声の同一性を確認中"
+    IDS_WHOLE_PHASE_AUX "補助文字起こし"
+    IDS_WHOLE_PHASE_PREP "補正全文のモデル・入力を準備中"
+    IDS_WHOLE_PHASE_GENERATE "補正全文の生成"
+    IDS_WHOLE_PHASE_VALIDATE "補正全文の全体を検証中"
+END
+
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+STRINGTABLE
+BEGIN
+    IDS_WHOLE_TITLE "Corrected full text (no time/speaker mapping). Select Original to switch."
+    IDS_WHOLE_CREATE_AVX2 "Create corrected full text (CPU AVX2 trial)"
+    IDS_WHOLE_CREATE_MINISTRAL16GB "Create corrected full text (Ministral 16GB evaluation, CPU AVX2)"
+    IDS_WHOLE_CPU_UNSUPPORTED "This CPU or OS does not support the AVX2 configuration. Original and previous correction are retained."
+    IDS_WHOLE_RUNTIME_REJECTED "The whole-text DLL and configuration do not match. Restore the distribution folder. Original and previous correction are retained."
+    IDS_WHOLE_RUNTIME_MISSING "This distribution is missing the selected whole-text DLL or receipt. Place the complete required distribution folder."
+    IDS_WHOLE_CREATE "Create corrected full text (CPU trial)"
+    IDS_WHOLE_COPY "Copy corrected full text"
+    IDS_WHOLE_SAVE "Save corrected full text as TXT"
+    IDS_WHOLE_VIEW "Corrected full text"
+    IDS_WHOLE_ORIGINAL_COPY "Copy original"
+    IDS_WHOLE_ORIGINAL_SAVE "Save original"
+    IDS_WHOLE_NO_PCM "The original ASR has no recorded PCM evidence. Explicitly transcribe again if needed."
+    IDS_WHOLE_PCM_MISMATCH "Audio differs from the original ASR. The original and previous correction are retained."
+    IDS_WHOLE_RESOURCES "The CPU trial stopped due to resource headroom. Previous results are retained."
+    IDS_WHOLE_MODELS "Open Correction preparation to prepare Whisper Quality and import an officially obtained local Gemma file."
+    IDS_WHOLE_PHASES "Checking audio identity"
+    IDS_WHOLE_PHASE_AUX "Auxiliary transcription"
+    IDS_WHOLE_PHASE_PREP "Preparing full-text model and input"
+    IDS_WHOLE_PHASE_GENERATE "Generating corrected full text"
+    IDS_WHOLE_PHASE_VALIDATE "Validating the complete correction"
+END
+
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+STRINGTABLE
+BEGIN
+    IDS_WTP_TITLE "補正の準備状況"
+    IDS_WTP_INTRO "補正に使うモデルを準備します。補助認識モデルと補正モデルをそれぞれ明示取得できます。正規取得済みの補正モデルの導入も利用できます。"
+    IDS_WTP_PORTABLE "従来のCPU方式"
+    IDS_WTP_AVX2 "AVX2対応CPU向け"
+    IDS_WTP_MINISTRAL16GB "Ministral 14B・16GB評価（CPU AVX2、品質・実16GB動作は未受入）"
+    IDS_WTP_WEIGHT "weight保存容量（RAM/VRAM使用量ではありません）"
+    IDS_WTP_CHECK "通信なしで検査"
+    IDS_WTP_READY "検査時点で全要素の準備が整っています。"
+    IDS_WTP_NOT_READY "不足・拒否・未検査があります。"
+    IDS_WTP_RUNTIME "補正用プログラム"
+    IDS_WTP_WHISPER "補助認識モデル（Whisper 品質優先）"
+    IDS_WTP_GEMMA "補正モデル"
+    IDS_WTP_NEXT "1.「補助認識モデルを準備」でWhisper 品質優先を取得します。2.「補正モデルを取得」で表示した固定GemmaをApache-2.0の条件で取得します。正確な保存容量は上記byte数です。保存先は %LOCALAPPDATA%\\koefude\\models、新規取得には保存容量に加え256MiBの空きが必要です。通信先は下記のHTTPS配布先です。既存の有効モデルは再利用します。取得済みファイルは「取得済み補正モデルを導入」から通信なしで導入できます。保存容量はRAM/VRAM使用量ではありません。準備後は元の結果から補正を明示開始できます。"
+    IDS_WTP_WHISPER_PREPARE "補助認識モデルを準備"
+    IDS_WTP_IMPORT "取得済み補正モデルを導入"
+    IDS_WTP_DOWNLOAD "補正モデルを取得"
+    IDS_WTP_DOWNLOAD_FAILURE "取得に失敗した場合は表示した診断コードを確認してください。401/403等で条件が変わった場合は公式配布元の正規取得手順に従い、取得済みファイルの導入も利用できます。自動再試行は行いません。"
+    IDS_WTP_BUSY "別の処理が終わるまで開始できません。処理の終了または取消しを待って、もう一度操作してください。"
+    530 "未検査"
+    531 "準備済み"
+    532 "不足"
+    533 "破損・構成拒否"
+    534 "CPU/OS非対応"
+    535 "検査失敗"
+    540 "明示検査待ち"
+    541 "runtimeを検査中（総量不明）"
+    542 "Whisperを検査中（総量不明）"
+    543 "Gemmaを検査中（総量不明）"
+    544 "取消し待ち（中断不能区間は終了を待ちます）"
+    545 "操作終了（各要素の状態を確認してください）"
+    546 "取消し"
+    547 "操作失敗"
+    548 "導入元を確認中（総量不明）"
+    549 "補正モデルをコピー中"
+    550 "補正モデルの内容を検証中"
+    551 "補正モデルを確定中（取消しは完了待ち）"
+    552 "補助認識モデルを準備中"
+    553 "補正モデルを取得中"
+    554 "取得した補正モデルを検証中"
+    555 "取得した補正モデルを確定中（取消しは完了待ち）"
+END
+
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+STRINGTABLE
+BEGIN
+    IDS_WTP_TITLE "Correction preparation"
+    IDS_WTP_INTRO "Prepare correction models. Explicitly download either model, or import an officially obtained local correction model. Ordinary transcription settings are retained."
+    IDS_WTP_PORTABLE "Standard CPU method"
+    IDS_WTP_AVX2 "For AVX2-capable CPUs"
+    IDS_WTP_MINISTRAL16GB "Ministral 14B 16GB evaluation (CPU AVX2, quality and installed16GB unaccepted)"
+    IDS_WTP_WEIGHT "Weight storage size (not RAM/VRAM usage)"
+    IDS_WTP_CHECK "Check offline"
+    IDS_WTP_READY "All components were ready at inspection time."
+    IDS_WTP_NOT_READY "Some components are missing, rejected, or unchecked."
+    IDS_WTP_RUNTIME "Correction program"
+    IDS_WTP_WHISPER "Auxiliary recognition model (Whisper Quality)"
+    IDS_WTP_GEMMA "Correction model"
+    IDS_WTP_NEXT "1. Prepare the auxiliary Whisper Quality model using the button. HTTPS download hosts are listed below. 2. Download the fixed Gemma model under Apache-2.0. Exact storage bytes are displayed above. The destination is %LOCALAPPDATA%\\koefude\\models; new downloads need the model size plus 256MiB free. Valid existing models are reused. The displayed HTTPS hosts are used. Import local correction model remains available without network access. Storage size is not RAM/VRAM usage. Once ready, explicitly start correction from an existing result."
+    IDS_WTP_WHISPER_PREPARE "Prepare auxiliary model"
+    IDS_WTP_IMPORT "Import local correction model"
+    IDS_WTP_DOWNLOAD "Download correction model"
+    IDS_WTP_DOWNLOAD_FAILURE "Check the original diagnostic code. If access conditions changed (401/403), follow the official acquisition instructions or import an officially obtained local file. No automatic retry."
+    IDS_WTP_BUSY "Wait for the other operation to finish or cancel, then try again."
+    530 "Unchecked"
+    531 "Ready"
+    532 "Missing"
+    533 "Corrupt / configuration rejected"
+    534 "Unsupported CPU/OS"
+    535 "Inspection failed"
+    540 "Waiting for explicit check"
+    541 "Inspecting runtime (total unknown)"
+    542 "Inspecting Whisper (total unknown)"
+    543 "Inspecting Gemma (total unknown)"
+    544 "Cancelling (waiting for non-interruptible I/O)"
+    545 "Operation finished (check each component state)"
+    546 "Cancelled"
+    547 "Operation failed"
+    548 "Checking import source (total unknown)"
+    549 "Copying correction model"
+    550 "Verifying correction model"
+    551 "Committing correction model (cancellation waits for completion)"
+    552 "Preparing auxiliary recognition model"
+    553 "Downloading correction model"
+    554 "Verifying downloaded correction model"
+    555 "Committing downloaded correction model (cancellation waits for completion)"
+END
+
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+STRINGTABLE
+BEGIN
+    IDS_BOUNDED_PREFIX "未完の補正を表示"
+    IDS_BOUNDED_FAILED "補正失敗: 確定した部分だけを表示"
+    IDS_BOUNDED_CANCELLED "補正取消し: 確定した部分だけを表示"
+    IDS_BOUNDED_INTERRUPTED "前回中断: 確定した部分だけを表示"
+    IDS_BOUNDED_RETRY "補正結果の保存を再試行"
+    IDS_BOUNDED_DISCARD "未完の補正を削除"
+    IDS_BOUNDED_UNSAVED "補正結果は未保存です。有効全文は以前の保存結果です。"
+END
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+STRINGTABLE
+BEGIN
+    IDS_BOUNDED_PREFIX "View incomplete correction"
+    IDS_BOUNDED_FAILED "Correction failed: committed prefix only"
+    IDS_BOUNDED_CANCELLED "Correction cancelled: committed prefix only"
+    IDS_BOUNDED_INTERRUPTED "Interrupted: committed prefix only"
+    IDS_BOUNDED_RETRY "Retry saving correction"
+    IDS_BOUNDED_DISCARD "Discard incomplete correction"
+    IDS_BOUNDED_UNSAVED "Correction is unsaved. The previous saved full text remains effective."
+END
+
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+STRINGTABLE
+BEGIN
+    IDS_BOUNDED_EXIT_FAILED "補正結果を保存できていません。［はい］で同じ結果の保存を再試行、［いいえ］で確定部分を残して終了、［キャンセル］で画面へ戻ります。未保存分は次回起動時に中断結果として扱います。"
+END
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+STRINGTABLE
+BEGIN
+    IDS_BOUNDED_EXIT_FAILED "Correction is unsaved. Yes retries saving the same result. No exits while retaining the committed prefix, restored as Interrupted on next launch. Cancel returns to the application."
+END
+
+// ADR1343 / 0.1.0 Shunji Ogawa 2026/11/08: 文章専用試作の操作と待ち理由
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+STRINGTABLE
+BEGIN
+    IDS_TEXT_CONTEXT_CREATE "この原文を文章補正（試作）"
+    IDS_TEXT_CONTEXT_PREPARE "文章補正モデルを準備（試作）"
+    IDS_TEXT_CONTEXT_WAITING "原文の保存後に文章補正を開始します。実行待ちは取消しできます。"
+    IDS_TEXT_CONTEXT_METADATA "元ASRの音声由来metadataが未記録のため文章補正は未実行です。原文を表示します。"
+    IDS_TEXT_CONTEXT_PROTECTED "数値・名前・重要語の保護検査で候補を不採用にしました。原文と候補を保持しています。"
+    IDS_TEXT_CONTEXT_CANCELLED "文章補正の実行待ちを取り消しました。原文を保持しています。"
+    IDS_TEXT_CONTEXT_MISSING "文章補正モデルが未準備または検証に失敗したため原文を表示します。「文章補正モデルを準備（試作）」を開いて確認してください。"
+END
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+STRINGTABLE
+BEGIN
+    IDS_TEXT_CONTEXT_CREATE "Correct this original text (trial)"
+    IDS_TEXT_CONTEXT_PREPARE "Prepare text correction model (trial)"
+    IDS_TEXT_CONTEXT_WAITING "Text correction waits for the original to be saved. The pending request can be cancelled."
+    IDS_TEXT_CONTEXT_METADATA "Original ASR provenance metadata is missing. Text correction was not run; the original is retained."
+    IDS_TEXT_CONTEXT_PROTECTED "Protected numbers, names or critical terms changed. Original and candidate are retained."
+    IDS_TEXT_CONTEXT_CANCELLED "Pending text correction cancelled. Original retained."
+    IDS_TEXT_CONTEXT_MISSING "Text correction model is missing or rejected. The original is shown. Open Prepare text correction model (trial)."
+END
+
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+STRINGTABLE
+BEGIN
+    IDS_API_OPEN "APIで文章を改善"
+    IDS_API_READY "送信前確認です。キー設定だけでは送信しません。"
+    IDS_API_ESTIMATE "確認時の単価による事前概算（Standard/Short/USD）"
+    IDS_API_BUDGET "今回の予算"
+    IDS_API_WORKING "API操作を処理中です。取消し後も送信済み要求の課金停止は保証しません。"
+    IDS_API_BUSY "受付できません。履歴保存または進行中の操作が終わってから再操作してください。"
+    IDS_API_FAILED "API操作に失敗しました。原文と前の採用結果を保持しています。"
+    IDS_API_KEY_READY "登録済み（変更は適用、空白だけで適用すると削除）"
+    IDS_API_KEY_MISSING "キー未設定"
+    IDS_API_SAVE_FAILED "保存に失敗しました。同じ結果の再保存はAPIへ送信しません。"
+    IDS_API_SAVED "API操作の結果を保存済み。候補と採用済み本文の出所を下の情報で確認できます。"
+    IDS_API_ADOPTED "採用したAPI補正文（時刻・話者対応なし）"
+    IDS_API_NOTICE "OpenAI / api.openai.com / 選択モデル / medium。本文中の氏名等も選択行の全文のまま送信対象です。API入力は明示opt-inしない限り学習に使われません。store:falseでも保存一切なしやZDRを保証しません。監視logは既定最大30日、prompt cacheは別途あり得ます。Pro契約と回答・料金・creditの一致は未確認。概算は実課金・税・換算を含まず、課金hard limitではありません。表面検査は意味品質保証ではありません。"
+END
+
+IDD_API_TEXT DIALOGEX 0, 0, 530, 365
+STYLE DS_SETFONT | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+CAPTION "APIで文章を改善"
+FONT 9, "ＭＳ ゴシック"
+BEGIN
+    LTEXT "", IDC_API_SUMMARY, 8, 8, 514, 28
+    LTEXT "確認した全文だけをOpenAIへ送信します。音声は送信しません。", -1, 8, 39, 514, 12
+    CONTROL "", IDC_API_TABS, WC_TABCONTROL, WS_TABSTOP, 8, 58, 514, 224
+    EDITTEXT IDC_API_PREVIEW, 14, 79, 502, 197, ES_MULTILINE | ES_READONLY | ES_AUTOVSCROLL | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT IDC_API_CANDIDATE, 14, 79, 502, 197, ES_MULTILINE | ES_READONLY | ES_AUTOVSCROLL | WS_VSCROLL | WS_TABSTOP
+    LTEXT "", IDC_API_REPORT, 8, 288, 514, 25
+    PUSHBUTTON "この全文を送信", IDC_API_SEND, 8, 320, 102, 22
+    PUSHBUTTON "改善案を採用", IDC_API_ADOPT, 117, 320, 90, 22
+    PUSHBUTTON "取消し", IDC_API_CANCEL, 214, 320, 64, 22
+    PUSHBUTTON "その他…", IDC_API_MORE, 285, 320, 68, 22
+    PUSHBUTTON "API設定…", IDC_API_SETTINGS_OPEN, 360, 320, 76, 22
+    PUSHBUTTON "閉じる", IDCANCEL, 443, 320, 79, 22
+END
+
+IDD_API_SETTINGS DIALOGEX 0, 0, 450, 285
+STYLE DS_SETFONT | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "API文章改善の設定"
+FONT 9, "ＭＳ ゴシック"
+BEGIN
+    LTEXT "行の「APIで文章を改善」で文字起こし全文をOpenAIへ送信します。", IDC_API_NOTICE_LABEL, 8, 8, 434, 23
+    LTEXT "Secret key", IDC_API_KEY_LABEL, 8, 39, 76, 13
+    EDITTEXT IDC_API_KEY, 88, 36, 354, 18, ES_PASSWORD | ES_AUTOHSCROLL | WS_TABSTOP
+    CONTROL "このWindowsユーザーに保存（新規登録時はOFF）", IDC_API_PERSIST, "BUTTON", BS_AUTOCHECKBOX | WS_TABSTOP, 88, 60, 354, 14
+    LTEXT "キー未設定", IDC_API_KEY_STATE, 88, 79, 354, 13
+    LTEXT "利用モデル", IDC_API_MODEL_LABEL, 8, 103, 76, 13
+    COMBOBOX IDC_API_MODEL, 88, 99, 354, 150, CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT "単価（USD / 100万token）", IDC_API_PRICES_LABEL, 8, 126, 248, 13
+    PUSHBUTTON "モデル・単価を更新", IDC_API_REFRESH, 290, 122, 152, 20
+    CONTROL "モデルのStandard単価", IDC_API_PRICES, "SysListView32", LVS_REPORT | LVS_SINGLESEL | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP, 8, 146, 434, 48
+    LTEXT "", IDC_API_METADATA, 8, 199, 434, 42
+    LTEXT "", IDC_API_REPORT, 8, 240, 434, 12
+    PUSHBUTTON "詳細…", IDC_API_DETAILS, 8, 253, 70, 22
+    PUSHBUTTON "適用", IDC_API_SETTINGS_APPLY, 284, 253, 74, 22
+    PUSHBUTTON "閉じる", IDCANCEL, 366, 253, 76, 22
+END
+
+STRINGTABLE
+BEGIN
+    IDS_API_STATE_PENDING "準備済み・まだ全文完了していません"
+    IDS_API_STATE_SENDING "送信試行中・課金結果は不明です"
+    IDS_API_STATE_READY "全文候補の生成完了（採用・保存状態は別表示）"
+    IDS_API_STATE_INCOMPLETE "一部のみ取得。全文候補として採用できません"
+    IDS_API_STATE_FAILED "API補正に失敗しました"
+    IDS_API_STATE_CANCELLED "取消し。送信後の課金停止は保証しません"
+    IDS_API_STATE_INTERRUPTED "前回中断。送信有無・課金結果が不明な場合があります。自動再送しません"
+    IDS_API_NOT_SENT "未送信"
+    IDS_API_BILLING_UNKNOWN "送信試行済み・課金結果不明"
+    IDS_API_USAGE_OBSERVED "利用量を取得済み（提供元の実課金額ではありません）"
+    IDS_API_USAGE_MISSING "応答を取得済み・利用量未通知"
+    IDS_API_INPUT_TOKENS "入力token"
+    IDS_API_OUTPUT_TOKENS "出力token（推論を含む）"
+    IDS_API_CACHED_TOKENS "キャッシュ入力token"
+    IDS_API_REASONING_TOKENS "推論token（出力の内訳）"
+    IDS_API_CACHE_WRITES "キャッシュ書込tokenは未確認"
+    IDS_API_COST_RANGE "利用量に基づく概算USD範囲"
+    IDS_API_ADOPTED_SAVED "採用した補正文を保存済み。原文も保持しています。"
+END
+
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+STRINGTABLE
+BEGIN
+    IDS_API_PREPARING "確認済み原文と今回の予算を検証中"
+    IDS_API_AWAITING "APIへ送信・応答待ち（取消しても課金停止は保証しません）"
+    IDS_API_PERSISTING "API状態・取得済み本文を保存中（率は確定したchunk数に基づきます）"
+END
+
+// ADR1402: 通常のWin32枠で非同期metadata取得を示し、同じ要求だけを取り消します
+IDD_API_CATALOG_PROGRESS DIALOGEX 0, 0, 300, 100
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "モデル情報の取得"
+FONT 9, "ＭＳ ゴシック"
+BEGIN
+    LTEXT "モデル情報・単価を取得しています。", IDC_API_CATALOG_MESSAGE, 12, 14, 276, 18
+    CONTROL "", IDC_API_CATALOG_PROGRESS, PROGRESS_CLASS, PBS_MARQUEE, 12, 42, 276, 12
+    PUSHBUTTON "キャンセル", IDCANCEL, 216, 68, 72, 22
+END
+
+// ADR1345 / 0.1.0 Shunji Ogawa 2026/11/08: metadataと動的単価を同じ画面に表示
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+STRINGTABLE
+BEGIN
+    IDS_API_CATALOG_WORKING "OpenAIのモデル一覧・公開単価を取得しています…"
+    IDS_API_CATALOG_READY "モデル・単価の確認が完了しました。利用可否は下の状態をご確認ください。"
+    IDS_API_CATALOG_FAILED "モデル・単価を取得できませんでした。下の取得状態をご確認ください。"
+    IDS_API_CATALOG_CANCELLED "モデル情報・単価の取得を取り消しました。"
+    IDS_API_CATALOG_SAVE_FAILED "取得値は保持しましたがcacheを保存できませんでした。"
+    IDS_API_CATALOG_SOURCE "単価: developers.openai.com/api/docs/pricing.md / Standard・Short・USD/100万token。24時間有効。失敗時は前回日時を保持。"
+    IDS_API_PRICE_TIME "単価取得日時"
+    IDS_API_MODEL_TIME "モデル一覧取得日時"
+    IDS_API_PRICE_COLUMNS "入力/出力/cache入力/30分書込/12時間書込（?は未掲載）"
+    IDS_API_SEND_PREVIOUS "前回取得の単価で、このテキストを送信"
+    IDS_API_SEND_CURRENT "このテキストを送信"
+    IDS_API_MODEL_AVAILABLE "送信条件確認済み（実API成功は未保証）"
+    IDS_API_MODEL_INCOMPATIBLE "この文章補正の対象外"
+    IDS_API_MODEL_UNVERIFIED "Responses text互換性未確認・送信不可"
+    IDS_API_MODEL_PRICE_MISSING "必要単価なし・送信不可"
+    IDS_API_MODEL_UNAVAILABLE "未取得・期限超過・キー利用資格未確認・現在利用不可"
+    IDS_API_MODEL_SHUTDOWN "提供終了日到達・送信不可"
+    IDS_API_SCOPE_UNKNOWN "実model/tier相違・料金不明・後続停止"
+    IDS_API_TIER_MISSING "要求Standard・実tierは通知値を参照（未通知はStandard仮定の参考額）"
+    IDS_API_SHUTDOWN_DATE "終了予定日"
+    IDS_API_META_MISSING "未取得"
+    IDS_API_META_EXPIRED "期限超過・時刻不明（送信不可）"
+    IDS_API_META_AUTH_DENIED "認証拒否（送信不可）"
+    IDS_API_META_PREVIOUS "更新失敗・24時間以内の前回値"
+    IDS_API_META_READY "取得済み・24時間以内"
+    IDS_API_META_FAILED "取得失敗（前回値なし）"
+    IDS_API_META_KEY_MISSING "キー未設定・利用資格は未確認"
+    IDS_API_UNKNOWN_RESERVATION "実tier/料金不明時の予約額（参考額とは別）"
+END
+
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+STRINGTABLE
+BEGIN
+    IDS_API_PROVENANCE_MODEL "補正モデル:"
+    IDS_API_REQUESTED_MODEL "要求モデル"
+    IDS_API_ACTUAL_MODEL "実応答モデル"
+    IDS_API_MODEL_NOT_REPORTED "未通知"
+    IDS_API_MODEL_NOT_VERIFIED "未確認（既知ID以外）"
+    IDS_API_MODEL_MULTIPLE "複数（chunk間で相違）"
+    IDS_API_PROVENANCE_ADOPTED "採用済み"
+    IDS_API_PROVENANCE_CANDIDATE "未採用の試行・候補"
+    IDS_API_PROVENANCE_ORIGINAL "表示中: 原文（API補正文ではありません）"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_API_SETTINGS_TITLE "API文章改善…"
+    IDS_TABLE_NAME "ファイル名"
+    IDS_TABLE_DURATION "長さ"
+    IDS_TABLE_STATE "認識"
+    IDS_TABLE_CORRECTION "改善"
+    IDS_TABLE_MODEL "補正モデル"
+    IDS_API_SETUP_NEEDED "API設定でキーとモデルを準備してください。原文・保存済み改善案は閲覧できます。"
+    IDS_API_COMPACT_NOTICE "確認した全文だけをOpenAIへ送信します。音声は送信しません。"
+    IDS_API_ORIGINAL_TAB "原文（送信全文）"
+    IDS_API_CANDIDATE_TAB "改善案"
+    IDS_API_IDLE "未実行"
+    IDS_API_SETTINGS_SAVED "設定を保存しました。本文は送信していません。"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_API_PRICE_SIMPLE "入力 / 出力（USD・100万token）:"
+    IDS_API_MORE_COPY "改善案をコピー"
+    IDS_API_MORE_SAVE "改善案をTXT保存…"
+    IDS_API_MORE_RETRY "同じ結果を再保存"
+    IDS_API_MORE_ORIGINAL "原文を表示"
+    IDS_API_MORE_CORRECTED "採用本文を表示"
+    IDS_API_MORE_DISCARD "最新の未採用候補を破棄"
+    IDS_API_MORE_DETAILS "詳細・提供元の保存条件…"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_API_NEXT_MODEL "次回送信モデル"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_API_RATE_RANGE "Standard"
+    IDS_API_RATE_INPUT "入力"
+    IDS_API_RATE_OUTPUT "出力"
+    IDS_API_RATE_CACHE "cache入力"
+    IDS_API_RATE_WRITE30 "30分書込"
+    IDS_API_RATE_WRITE12 "12時間書込"
+    IDS_API_RATE_SHORT "Short"
+    IDS_API_RATE_LONG "Long"
+    IDS_API_RATE_MISSING "未掲載"
+    IDS_API_RATE_SOURCE "公式出典: developers.openai.com/api/docs/pricing"
+    IDS_API_PARTIAL_APPLY "キーは変更済みです。モデル設定の保存に失敗しました。"
+    IDS_API_RATE_POLICY "現在の送信: Standard / Short（Longは未使用）"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_API_HTTP_429 "API文章改善: 利用制限(HTTP429)。API残高・利用上限・送信頻度/量を確認。原文保持"
+    IDS_API_HTTP_401 "API文章改善: 認証失敗(HTTP401)。API設定を確認。原文保持"
+    IDS_API_HTTP_403 "API文章改善: 権限拒否(HTTP403)。利用権限を確認。原文保持"
+    IDS_API_HTTP_400 "API文章改善: 要求拒否(HTTP400)。原文保持"
+    IDS_API_HTTP_503 "API文章改善: サービス利用不可(HTTP503)。原文保持"
+    IDS_API_HTTP_FAILED "API文章改善: HTTP要求失敗。原文保持"
+    IDS_API_TRANSPORT_FAILED "API文章改善: 通信失敗。原文保持"
+    IDS_API_PREFLIGHT_FAILED "API文章改善: 送信前の確認に失敗。原文保持"
+    IDS_API_EMPTY_GENERATION "API文章改善: 完全な改善文を取得できませんでした。原文保持"
+    IDS_API_PARTIAL_GENERATION "API文章改善: 不完全な改善文。採用不可。原文保持"
+    IDS_API_CANCELLED_STATUS "API文章改善: 取消し。原文保持。送信後の課金停止は保証しません"
+    IDS_API_PRIOR_RETAINED "前の採用結果も保持しています。"
+    IDS_API_HTTP_DETAIL_RATE "API診断: 送信頻度・トークン利用量の制限。"
+    IDS_API_HTTP_DETAIL_CREDIT "API診断: プリペイド残高制限。"
+    IDS_API_HTTP_DETAIL_ORG_SPEND "API診断: 組織の支出上限。"
+    IDS_API_HTTP_DETAIL_PROJECT_SPEND "API診断: プロジェクトの支出上限。"
+    IDS_API_HTTP_DETAIL_ORG_USAGE "API診断: 組織の利用上限。"
+    IDS_API_HTTP_DETAIL_QUOTA "API診断: 利用枠不足（内訳不明）。"
+    IDS_API_HTTP_DETAIL_OVERLOADED "API診断: サービス過負荷。"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_API_ORIGINAL_SAVED "API文章改善: 原文表示を保存しました。"
+    IDS_API_CORRECTED_SHOWN "API文章改善: 保存済み改善文を表示しています。"
+    IDS_API_DISCARDED "API文章改善: 未採用候補を破棄しました。原文保持。"
+END
+
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+STRINGTABLE
+BEGIN
+    IDS_API_PROGRESS_TITLE "API改善"
+    IDS_API_STEPS_COMPLETE "工程完了"
+    IDS_API_UNITS_COMPLETE "区間完了"
+    IDS_API_UNITS_RECEIVED "区間受信"
+    IDS_API_PHASE_PREPARING "原文・設定を確認中"
+    IDS_API_PHASE_AUTHORIZING "認証資格を確認中"
+    IDS_API_PHASE_RESERVING "送信の準備を保存中"
+    IDS_API_PHASE_AWAITING "区間目の応答待ち"
+    IDS_API_PHASE_RESPONSE "応答を受信・保存中"
+    IDS_API_PHASE_ADOPTING "全文の採用を保存中"
+    IDS_API_PHASE_CANCELLING "取消しを待機中"
+    IDS_API_ELAPSED "経過"
+    IDS_API_SPEAKER_NOTICE "改善文の話者は本文中のラベルに基づく表示です。音声との対応は原文で確認してください。"
+    IDS_API_NEUTRAL "話者未確定"
+    IDS_API_COMPARE "比較"
+    IDS_API_COMPARE_ORIGINAL "原文"
+    IDS_API_COMPARE_CORRECTED "改善文"
+    IDS_API_COMPARE_SCOPE "比較中のコピー・TXT保存: 採用済み改善文（比較表の選択コピーは選択範囲）"
+END
+
+// ADR1354: 内容は現在のUI言語resourceから再設定します
+IDD_SETTINGS DIALOGEX 0, 0, 590, 420
+STYLE DS_SETFONT | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+EXSTYLE WS_EX_CONTROLPARENT
+CAPTION "設定"
+FONT 9, "ＭＳ ゴシック"
+BEGIN
+    CONTROL "", IDC_SETTINGS_TABS, WC_TABCONTROL, WS_TABSTOP, 8, 8, 574, 365
+    LTEXT "", IDC_SETTINGS_UI_LABEL, 16, 40, 90, 16
+    COMBOBOX IDC_SETTINGS_UI, 120, 40, 400, 120, CBS_DROPDOWNLIST | WS_TABSTOP
+    CONTROL "", IDC_SETTINGS_UPDATE, "BUTTON", BS_AUTOCHECKBOX | WS_TABSTOP, 16, 80, 540, 20
+    LTEXT "", IDC_SETTINGS_UPDATE_NOTE, 16, 108, 540, 72
+    LTEXT "", IDC_MODEL_LABEL, 16, 40, 90, 16
+    COMBOBOX IDC_ASR_MODEL, 120, 40, 400, 120, CBS_DROPDOWNLIST | WS_TABSTOP
+    LTEXT "", IDC_ASR_LABEL, 16, 76, 90, 16
+    COMBOBOX IDC_ASR_PROFILE, 120, 76, 400, 120, CBS_DROPDOWNLIST | WS_TABSTOP
+    LTEXT "", IDC_SETTINGS_BACKEND_LABEL, 16, 110, 90, 16
+    COMBOBOX IDC_BACKEND, 120, 110, 400, 120, CBS_DROPDOWNLIST | WS_TABSTOP
+    LTEXT "", IDC_SETTINGS_LANGUAGE_LABEL, 16, 145, 90, 16
+    COMBOBOX IDC_LANGUAGE, 120, 145, 400, 120, CBS_DROPDOWNLIST | WS_TABSTOP
+    CONTROL "", IDC_SPEECH_FILTER, "BUTTON", BS_AUTOCHECKBOX | WS_TABSTOP, 16, 180, 480, 20
+    CONTROL "", IDC_DIARIZE, "BUTTON", BS_AUTOCHECKBOX | WS_TABSTOP, 16, 40, 480, 20
+    LTEXT "", IDC_SETTINGS_COUNT_LABEL, 16, 76, 90, 16
+    COMBOBOX IDC_COUNT, 120, 76, 400, 150, CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT "", IDC_SETTINGS_METHOD_LABEL, 16, 110, 90, 16
+    COMBOBOX IDC_SETTINGS_METHOD, 120, 110, 400, 120, CBS_DROPDOWNLIST | WS_TABSTOP
+    LTEXT "", IDC_AUDIO_INFO, 16, 248, 552, 78
+    PUSHBUTTON "", IDC_AUDIO_REFRESH, 16, 330, 210, 22
+    PUSHBUTTON "", IDC_AUDIO_KEYS, 236, 330, 330, 22
+    LTEXT "", IDC_SETTINGS_NOTE, 8, 382, 370, 26
+    PUSHBUTTON "", IDC_SETTINGS_APPLY, 400, 382, 80, 24
+    PUSHBUTTON "", IDCANCEL, 490, 382, 90, 24
+END
+
+IDD_RENAME DIALOGEX 0, 0, 360, 100
+STYLE DS_SETFONT | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "話者名を変更"
+FONT 9, "ＭＳ ゴシック"
+BEGIN
+    COMBOBOX IDC_SPEAKER, 8, 12, 88, 180, CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT IDC_NAME, 104, 12, 248, 20, ES_AUTOHSCROLL | WS_TABSTOP
+    DEFPUSHBUTTON "適用", IDC_RENAME, 184, 64, 80, 24
+    PUSHBUTTON "閉じる", IDCANCEL, 272, 64, 80, 24
+END
+
+IDR_MAIN_ACCEL ACCELERATORS
+BEGIN
+    "O", IDC_OPEN, VIRTKEY, CONTROL
+    "S", IDC_SAVE, VIRTKEY, CONTROL
+END
+
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+STRINGTABLE
+BEGIN
+    IDS_MAIN_SPLITTER "音声一覧と本文の幅調整（左右矢印、Escでドラッグ取消し）"
+END
+
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+STRINGTABLE
+BEGIN
+    IDS_MAIN_SPLITTER "Resize audio list and text (Left/Right arrows, Esc cancels drag)"
+END
+
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+STRINGTABLE
+BEGIN
+    IDS_TABLE_STATE "ASR"
+    IDS_TABLE_CORRECTION "Text"
+END
+
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+STRINGTABLE
+BEGIN
+    IDS_TABLE_MODEL_UNVERIFIED "未確認"
+    IDS_TABLE_MODEL_MULTIPLE "複数"
+    IDS_TABLE_IMPROVEMENT_PRESENT "採用・保存済みの改善文あり"
+    IDS_TABLE_IMPROVEMENT_ABSENT "採用・保存済みの改善文なし"
+END
+
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+STRINGTABLE
+BEGIN
+    IDS_TABLE_MODEL_UNVERIFIED "Unverified"
+    IDS_TABLE_MODEL_MULTIPLE "Multiple"
+    IDS_TABLE_IMPROVEMENT_PRESENT "Adopted, saved improvement available"
+    IDS_TABLE_IMPROVEMENT_ABSENT "No adopted, saved improvement"
+END
+
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+STRINGTABLE
+BEGIN
+    IDS_API_COMPARE_LEGACY "旧結果: 本文の一致で表示位置を調整・未対応は反対側が空欄（話者は各列のラベル）"
+END
+
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+STRINGTABLE
+BEGIN
+    IDS_API_COMPARE_LEGACY "Saved result: text-based display alignment; blank opposite unpaired cards (speakers follow each column's labels)"
+END

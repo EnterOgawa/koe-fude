@@ -1,0 +1,40 @@
+//------------------------------------------------------------------------------
+/**
+ * Copyright (c) 2026 Shunji Ogawa.
+ * SPDX-License-Identifier: MIT
+ *
+ * @file whisper_cpu_runtime_manifest.h
+ * @brief 検証済み完成CPU DLLのcompiled pinを保持します
+ * @version 1.0.0
+ * @date 2026/10/21
+ * @author Shunji Ogawa
+ * @par 更新履歴
+ * <pre>
+ * 0.1.0 Shunji Ogawa 2026/10/21 新規作成
+ * 0.1.0 Shunji Ogawa 2026/10/21 ADR1301の明示slotと固定receiptを追加
+ * 1.0.0 Shunji Ogawa 2026/11/11 ADR1410の生成C++識別子を所有宣言へ整合
+ * 1.0.0 Shunji Ogawa 2026/11/12 ADR1433の更新履歴を新規作成からの昇順・末尾追記へ統一
+ * 1.0.0 Shunji Ogawa 2026/11/12 ADR1437のコメント行末・終端の句点を省略
+ * </pre>
+ */
+//------------------------------------------------------------------------------
+#pragma once
+#include <cstdint>
+namespace koefude::whisper_cpu::manifest {
+// falseは明示portable専用構成です
+inline constexpr bool K_SLOT_PRESENT = @WC_SLOT@;
+// 固定basename以外を探索しません
+inline constexpr wchar_t K_DLL_NAME[] = L"KoeFude.WhisperCpu.Avx2.dll";
+// 同じfolderに置く完成receiptです
+inline constexpr wchar_t K_RECEIPT_NAME[] = L"KoeFude.WhisperCpu.Avx2.runtime.json";
+// 検証済みDLLの全byte数です
+inline constexpr std::uint64_t K_DLL_BYTES = @WC_DLL_BYTES@ULL;
+// 検証済みDLLの全byte digestです
+inline constexpr char K_DLL_SHA256[] = "@WC_DLL_SHA256@";
+// receipt全byteのdigestです
+inline constexpr char K_RECEIPT_SHA256[] = "@WC_RECEIPT_SHA256@";
+// 共有する私有ABI headerのdigestです
+inline constexpr char K_ABI_HEADER_SHA256[] = "@WC_ABI_SHA256@";
+// native DLLと同じ構成を要求します
+inline constexpr char K_CONFIGURATION[] = "@WC_CONFIGURATION@";
+} // namespace koefude::whisper_cpu::manifest

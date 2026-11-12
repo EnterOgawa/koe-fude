@@ -1,0 +1,436 @@
+//------------------------------------------------------------------------------
+/**
+ * @file ui_en.rcinc
+ * @brief 言語別のUI文字列と標準menuを定義します。
+ * @version 1.0.0
+ * @date 2026/09/09
+ * @author Shunji Ogawa
+ * @copyright Copyright (c) 2026 Shunji Ogawa. MIT License.
+ * @par 更新履歴
+ * <pre>
+ * 1.0.0 Shunji Ogawa 2026/11/10 ADR1382の案内fontをMS ゴシックへ統一。
+ * 1.0.0 Shunji Ogawa 2026/11/10 ADR1380の短い状態と一回の詳細通知を追加。
+ * 1.0.0 Shunji Ogawa 2026/11/10 ADR1378の明示更新境界を追加。
+ * 0.1.0 Shunji Ogawa 2026/11/10 ADR1375の適用済み選好の保存と復元を追加。
+ * 0.1.0 Shunji Ogawa 2026/11/10 ADR1370の文脈分割と明示途中再開を接続。
+ * 0.1.0 Shunji Ogawa 2026/11/09 ADR1367のGPU優先/CPU自動表示を明確化。
+ * 0.1.0 Shunji Ogawa 2026/11/09 ADR1360の話者区切り検証案内を追加。
+ * 0.1.0 Shunji Ogawa 2026/11/09 ADR1354の縦一覧と統合設定menuへ変更。
+ * 0.1.0 Shunji Ogawa 2026/10/04 保存済み整形の表示選択と版/件数/字幕案内を追加。
+ * 0.1.0 Shunji Ogawa 2026/10/02 WAVの画面接続・入力説明と検証を追加。
+ * 0.1.0 Shunji Ogawa 2026/10/02 MP3の対応範囲と入力案内を追加。
+ * 0.1.0 Shunji Ogawa 2026/10/02 native FLACの対応範囲と入力案内を追加。
+ * 0.1.0 Shunji Ogawa 2026/10/02 M4A内ALACの対応属性と範囲外案内を追加。
+ * 0.1.0 Shunji Ogawa 2026/10/02 HE-AACの対応属性と編集情報等の非対応範囲を案内。
+ * 0.1.0 Shunji Ogawa 2026/09/11 複数候補の理由と時間範囲を英語で表示。
+ * 0.1.0 Shunji Ogawa 2026/09/09 初期デスクトップresourceを追加。
+ * 0.1.0 Shunji Ogawa 2026/09/09 品質優先modelと無音除外の選択を表示。
+ * 0.1.0 Shunji Ogawa 2026/09/09 常設品質欄と同梱modelの案内へ変更。
+ * 0.1.0 Shunji Ogawa 2026/09/09 モデル系統とモデル別品質の選択を表示。
+ * 0.1.0 Shunji Ogawa 2026/09/09 表示言語と話者フィルターを追加。
+ * 0.1.0 Shunji Ogawa 2026/09/09 履歴の右クリックから再実行する操作を追加。
+ * 0.1.0 Shunji Ogawa 2026/09/09 音声長と実測処理時間の表示を追加。
+ * 0.1.0 Shunji Ogawa 2026/09/10 永続履歴の管理と保存状態の表示を追加。
+ * 0.1.0 Shunji Ogawa 2026/09/10 長時間処理と一時領域の失敗案内を追加。
+ * 0.1.0 Shunji Ogawa 2026/09/10 採用した日本語CTCの推奨表示と一つのCPU構成を追加。
+ * 0.1.0 Shunji Ogawa 2026/09/11 CTCの品質優先FP32、軽量INT8、CUDAとCPU再試行を表示。
+ * 0.1.0 Shunji Ogawa 2026/09/13 不足モデルの明示取得と準備状態を英語で表示。
+ * 0.1.0 Shunji Ogawa 2026/09/27 設定欄のアクセシビリティ目的名を追加。
+ * 0.1.0 Shunji Ogawa 2026/11/09 ADR1368の明示音声APIと従来経路の境界を接続。
+ * </pre>
+ */
+//------------------------------------------------------------------------------
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+
+STRINGTABLE
+BEGIN
+    IDS_MESSAGE_OK "OK"
+    IDS_MESSAGE_YES "&Yes"
+    IDS_MESSAGE_NO "&No"
+    IDS_MESSAGE_CANCEL "Cancel"
+    IDS_PREP_TITLE "Prepare models"
+    IDS_PREP_INTRO "Download only the missing files for the selected configuration. Transcription works offline after preparation.\r\nYou can view, copy and save results during preparation. Closing this window keeps the download running."
+    IDS_PREP_STORAGE "Model location:"
+    IDS_PREP_CAPACITY "Model size (different from GPU memory usage):"
+    IDS_PREP_TRANSFER "Additional download:"
+    IDS_PREP_DISK "Additional free space needed (including temporary files):"
+    IDS_PREP_HOSTS "HTTPS destinations (including distribution redirects):"
+    IDS_PREP_TERMS "Distribution terms: The license and source for each model are listed below. See the included THIRD_PARTY_NOTICES.md and licenses for details. Audio, transcripts and file names are never sent."
+    IDS_PREP_SOURCE "Source and terms:"
+    IDS_PREP_ROLE_VAD "Speech activity detection"
+    IDS_PREP_ROLE_ASR "Transcription and supporting data"
+    IDS_PREP_DOWNLOAD "&Download and use"
+    IDS_PREP_RECHECK "&Check again (offline)"
+    270 "Checking local models. You can cancel this operation."
+    271 "Preparation is needed. Review the terms and size, then download. You can add audio files once ready."
+    272 "Copying existing models to the model location."
+    273 "Downloading models."
+    274 "Verifying file sizes and SHA-256."
+    275 "Preparing models from verified data."
+    276 "Models are ready. Close this window and add an audio file."
+    277 "Cancelling. Waiting for the current operation and temporary file cleanup."
+    278 "Cancelled. Verified models will be reused next time. Check again to continue."
+    279 "Preparation failed. Check free space, folder permissions and your connection, then retry. Diagnostic:"
+END
+
+IDR_MAIN_MENU MENU
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "&Add audio…\tCtrl+O", IDC_OPEN
+        MENUITEM "&Save transcript…\tCtrl+S", IDC_SAVE
+        MENUITEM "&Transcribe again", IDC_RETRANSCRIBE
+        MENUITEM "Improve text with &API", IDC_API_TEXT_OPEN
+        MENUITEM "&Cancel", IDC_CANCEL
+        MENUITEM SEPARATOR
+        MENUITEM "Retry history storage", IDC_HISTORY_RETRY
+        MENUITEM "E&xit", IDC_EXIT
+    END
+    POPUP "&Edit"
+    BEGIN
+        MENUITEM "&Copy full text", IDC_COPY
+        MENUITEM "Rename &speaker…", IDC_RENAME
+        MENUITEM "&Remove selected history\tDelete", IDC_HISTORY_REMOVE
+        MENUITEM "C&lear history", IDC_CLEAR
+    END
+    POPUP "&Settings"
+    BEGIN
+        MENUITEM "&Settings…", IDC_SETTINGS_OPEN
+        MENUITEM SEPARATOR
+        MENUITEM "Check for &updates…", IDC_UPDATE_CHECK
+        MENUITEM "Download update…", IDC_UPDATE_INSTALL
+        MENUITEM "Cancel update", IDC_UPDATE_CANCEL
+    END
+END
+
+STRINGTABLE
+BEGIN
+    IDS_UPDATE_STARTUP "Check for updates at startup (GitHub)"
+    IDS_UPDATE_PRIVACY "Startup only checks public release information. You choose when to download and install.\r\nHosts: api.github.com, github.com, release-assets.githubusercontent.com. Signature verification may contact certificate authorities. Audio, text, names, paths and API keys are never sent."
+    IDS_UPDATE_CHECKING "Checking updates. Transcription can continue."
+    IDS_UPDATE_AVAILABLE "A newer version is available. Choose Download update in Settings."
+    IDS_UPDATE_CURRENT "Checked successfully. No newer public version is available."
+    IDS_UPDATE_UNAVAILABLE "Could not check updates. The release may be unpublished or the connection unavailable or limited. Transcription can continue."
+    IDS_UPDATE_DOWNLOADING "Downloading and verifying the update. You can cancel just the update from Settings."
+    IDS_UPDATE_READY "Update ready. Finish processing and saving, then choose Exit and update in Settings."
+    IDS_UPDATE_FAILED "Update download, verification or launch failed. The app and saved results are retained. Check for updates again."
+    IDS_UPDATE_CANCELLED "Update cancelled. Transcription and saved results are retained."
+    IDS_UPDATE_GET_PROMPT "Download the newer KoeFude and verify its signature? Installation starts only after you later choose Exit and update."
+    IDS_UPDATE_CLOSE_PROMPT "Close KoeFude normally and open the verified setup wizard? Continue in the setup window. History, settings and models are retained."
+    IDS_UPDATE_BUSY "Finish transcription, API work, model preparation and saving, and close Settings before choosing Exit and update. Current work will continue."
+    IDS_UPDATE_GET "Download update…"
+    IDS_UPDATE_INSTALL "Exit and update…"
+    IDS_UPDATE_PORTABLE "This is a portable copy. Its folder will be retained and a normal per-user installation will be opened."
+END
+
+STRINGTABLE
+BEGIN
+    IDS_TITLE "KoeFude"
+    IDS_SPECTRAL_METHOD "Speaker method: new (experimental)"
+    IDS_LEGACY_METHOD "Speaker method: legacy"
+    IDS_NO_DIARIZATION "Speaker separation off"
+    IDS_ASR_QUALITY "Model: Whisper large-v3 FP16 (quality)"
+    IDS_ASR_STANDARD "Model: Whisper large-v3-turbo Q8 (lightweight)"
+    IDS_SPEECH_FILTER_ON "Speech detection: on"
+    IDS_SPEECH_FILTER_OFF "Speech detection: off"
+    IDS_QUALITY_LABEL "Quality"
+    IDS_QUALITY_CHOICE "Quality (large-v3 FP16)"
+    IDS_STANDARD_CHOICE "Lightweight (turbo Q8)"
+    IDS_MODEL_LABEL "Model"
+    IDS_MODEL_WHISPER "Whisper (multilingual)"
+    IDS_MODEL_KOTOBA "Kotoba v2.0 (Japanese)"
+    IDS_MODEL_PARAKEET "Parakeet (Japanese, recommended)"
+    IDS_PARAKEET_CHOICE "Lightweight (CTC INT8 · CPU)"
+    IDS_ASR_PARAKEET "Model: Parakeet Japanese CTC INT8"
+    IDS_PARAKEET_FP32_CHOICE "Quality (CTC FP32)"
+    IDS_ASR_PARAKEET_FP32 "Model: Parakeet Japanese CTC FP32"
+    IDS_CUDA_USED "Backend: CUDA"
+    IDS_CPU_RETRIED "Backend: CPU (same model retried)"
+    IDS_KOTOBA_QUALITY_CHOICE "Quality (FP16)"
+    IDS_KOTOBA_STANDARD_CHOICE "Lightweight (Q5)"
+    IDS_ASR_KOTOBA_QUALITY "Model: Kotoba-Whisper v2.0 FP16 (quality)"
+    IDS_ASR_KOTOBA_STANDARD "Model: Kotoba-Whisper v2.0 Q5 (lightweight)"
+    IDS_SUBTITLE "Turn voice into words. Audio stays on this PC."
+    IDS_OPEN "Add audio…"
+    IDS_CLEAR "Clear all"
+    IDS_COPY "Copy all"
+    IDS_SAVE "Save…"
+    IDS_CANCEL "Cancel"
+    IDS_DIARIZE "Speakers"
+    IDS_AUTO_GPU "Auto (GPU first / CPU)"
+    IDS_CPU "CPU only"
+    IDS_JAPANESE "Japanese"
+    IDS_AUTO_LANGUAGE "Auto language"
+    IDS_AUTO_SPEAKERS "Speakers: auto"
+    IDS_SPEAKER_COUNT " speakers"
+    IDS_HINT "Drop an audio file here\r\n\r\nTranscribe audio with timestamps and speaker labels.\r\nYou can also choose File > Add audio or Ctrl+O.\r\nChoose the model and quality in Settings > Settings, Transcription.\r\n\r\nThe file list and results are saved on this PC and restored when you reopen the app.\r\nRight-click a file for save, full copy, cancel, retranscribe, speaker names, or history removal.\r\nDeleting history keeps the original audio and exported files.\r\n\r\nIf models are missing, open Prepare models to download the required files.\r\nSupported input: M4A (AAC-LC / ALAC / HE-AAC), WAV (16-bit PCM, mono/stereo, 8–192 kHz), MP3 (MPEG-1/2 Layer III, mono/stereo), FLAC (native, 16/24-bit, mono/stereo, 8–192 kHz, known total samples).\r\nALAC: single audio track, version 0, 16/24-bit, mono/stereo, 8–48 kHz, known total samples. No edit list, encryption, fragmented container, or multiple tracks.\r\nHE-AAC v1: mono/stereo; v2: stereo; 44.1/48 kHz; a single audio track (explicit signaling, version 0). No edit list, encryption, fragmented container, external reference, or multiple tracks.\r\nTranscription and speaker separation support recordings over one hour, with no fixed recording-duration cap."
+    IDS_READY "Add an audio file to start transcription."
+    IDS_QUEUED "Queued"
+    IDS_COMPLETED "Transcription complete"
+    IDS_WARNING "Transcription complete · Speaker separation failed; speakers are shown as unknown."
+    IDS_NO_TEXT "No text was recognized. Check the audio content."
+    IDS_CANCELLING "Cancelling · Waiting for a step that cannot be interrupted."
+    IDS_CANCELLED "Cancelled"
+    IDS_STOPPING "Closing · Waiting for audio processing to stop safely."
+    IDS_FULL "The limit is 8 pending jobs and 32 history entries. Wait for completion or delete unneeded history."
+    IDS_ERROR "Could not complete the operation"
+    IDS_MODEL_HELP "Models could not be verified. Open Prepare models and check again; download any missing or damaged files. Also check folder permissions and free space."
+    IDS_INVALID "Cannot process this input. Select a regular M4A, WAV, MP3, or FLAC audio file stored on this PC. Folders, URLs, and network files are not supported."
+    IDS_PROCESS_ERROR "Audio processing failed. Check the models. If using a GPU, select “CPU only” and add the file again."
+    IDS_SAVED "Saved"
+    IDS_SAVE_ERROR "Could not save. Check the format and extension, folder permissions, and free disk space."
+    IDS_RENAME "Rename"
+    IDS_NAME_HINT "Display name (blank resets it)"
+    IDS_SPEAKER "Speaker "
+    IDS_GPU_USED "Backend: GPU"
+    IDS_CPU_USED "Backend: CPU"
+    IDS_ESTIMATE "Estimated speakers: "
+    IDS_OPEN_PICK "Select audio to transcribe"
+    IDS_SAVE_PICK "Save transcription"
+    IDS_FORMAT_TEXT "Text (UTF-8)"
+    IDS_FORMAT_SRT "SubRip subtitles"
+    IDS_FORMAT_VTT "WebVTT subtitles"
+    IDS_AUDIO_FILTER "M4A / WAV / MP3 / FLAC audio"
+    IDS_FILES "Audio files"
+    IDS_CONVERSATION "Transcription"
+    IDS_ACCESS_BACKEND "Execution backend"
+    IDS_ACCESS_LANGUAGE "Recognition language"
+    IDS_ACCESS_COUNT "Speaker count"
+    IDS_ACCESS_SPEAKER "Speaker to rename"
+    IDS_ACCESS_NAME "Speaker display name"
+    IDS_SETTINGS "Recognition settings"
+    IDS_MENU_FILE "File"
+    160 "Validating input and models"
+    161 "Decoding audio"
+    162 "Loading transcription model"
+    163 "Transcribing"
+    164 "Identifying speakers"
+    165 "Combining speakers and timestamps"
+    166 "Saving"
+    167 "Complete"
+    IDS_FILTER_LABEL "Show"
+    IDS_FILTER_ALL "All speakers"
+    IDS_UNKNOWN "Unknown speaker"
+    IDS_MIXED "Multiple candidates"
+    IDS_MIXED_SUFFIX " (mixed)"
+    IDS_ATTR_UNAVAILABLE_SUFFIX " (reason not recorded)"
+    IDS_ATTR_UNASSIGNED_SUFFIX " (unassigned)"
+    IDS_ATTR_CHANGE_SUFFIX " (speaker change; attribution unresolved)"
+    IDS_ATTR_OVERLAP_SUFFIX " (estimated overlap; attribution unresolved)"
+    IDS_ATTR_RANGES "Estimated intervals (text attribution unresolved): "
+    IDS_SPEAKER_SEPARATOR " / "
+    IDS_FILTER_EMPTY "No speech matches this filter."
+    IDS_EXPORT_SCOPE "Save and Copy all include all speakers."
+    IDS_LANGUAGE_SAVE_ERROR "The display language was changed for this session only. Could not save the setting."
+    IDS_INTERNAL_ERROR "An internal error occurred. Restart the app."
+    IDS_SINGLE_SPEAKER_COUNT " speaker"
+    IDS_RETRANSCRIBE "&Retranscribe with current settings"
+    IDS_RETRANSCRIBE_BUSY "Retranscribe (this audio is being processed)"
+    IDS_RETRANSCRIBE_LIMIT "Retranscribe (queue or history limit reached)"
+    IDS_TIMING_TOTAL "Total processing (excludes queue): "
+    IDS_TIMING_AUDIO "Audio length: "
+    IDS_TIMING_DECODE "Decode: "
+    IDS_TIMING_ASR "Transcription: "
+    IDS_TIMING_DIARIZATION "Speakers / assembly: "
+    IDS_TIMING_SKIPPED "Skipped"
+    IDS_TIMING_WARNING " (warning)"
+    IDS_TIMING_NOTE "Times are h:m:s. Includes model loading and validation."
+    IDS_TIMING_UNAVAILABLE "Unavailable"
+    IDS_HISTORY_LOADING "Loading saved history"
+    IDS_HISTORY_SAVING "Saving history"
+    IDS_HISTORY_SAVED "History saved"
+    IDS_HISTORY_LOAD_ERROR "Cannot load history. Check its folder, then retry history access in Settings."
+    IDS_HISTORY_SAVE_ERROR "Cannot save history. Check free space and its folder, then retry in Settings."
+    IDS_HISTORY_IN_USE "Another KoeFude is using this history. Use that window, or close it and retry in Settings."
+    IDS_HISTORY_INTERRUPTED "Incomplete · The previous process was interrupted. Right-click to retranscribe."
+    IDS_HISTORY_REMOVE "&Delete from history"
+    IDS_HISTORY_REMOVE_BUSY "Delete from history (cancel processing first)"
+    IDS_HISTORY_CLEAR_CONFIRM "Delete all history and transcription results?\r\n\r\nOriginal audio and exported TXT, SRT and VTT files will be kept."
+    IDS_HISTORY_RETRY "Retry history access"
+    IDS_HISTORY_EXIT_FAILED "History changes have not been saved. Retry saving?\r\n\r\nYes: retry saving\r\nNo: discard unsaved changes and exit\r\nCancel: return to the app (use Save to export any needed results)"
+    IDS_HISTORY_CORRUPT "Saved history is damaged. The original file is unchanged. Check its folder and retry in Settings."
+    IDS_HISTORY_VERSION "This history uses an unsupported format. It is unchanged. Open it with a compatible KoeFude version."
+    IDS_HISTORY_TOO_LARGE "History exceeds its entry or storage limit. Export needed results and delete unneeded history."
+    IDS_HISTORY_REMOVED "History entry deleted"
+    IDS_TEMPORARY_STORAGE_ERROR "Temporary processing storage is unavailable. Check free disk space and access permissions, then retry. The original audio has not been changed."
+END
+
+STRINGTABLE
+BEGIN
+    IDS_INPUT_CODEC "This audio format is unsupported. Convert to M4A (AAC-LC / ALAC / HE-AAC), WAV (16-bit PCM, mono/stereo, 8–192 kHz), MP3 (MPEG-1/2 Layer III, mono/stereo), or FLAC (native, 16/24-bit, mono/stereo, 8–192 kHz, known total samples), then add it again."
+    IDS_INPUT_DECODE "Could not read the audio. Check for file damage or inconsistent format data, then save it again in a supported format. Partial audio was not saved as a result."
+    IDS_INPUT_LIMIT "The input exceeds memory, format rules, or numeric limits. Close other apps or split the audio, then add it again. There is no fixed recording-duration cap."
+    IDS_INPUT_TIMELINE "Audio timing or length is inconsistent. Save it again in a supported format, then add it again. Partial audio was not saved as a result."
+END
+
+// 保存済み結果の表示選択。生成操作ではありません。
+STRINGTABLE
+BEGIN
+    IDS_READING_LABEL "Text view"
+    IDS_READING_AUTO "Automatic (prefer formatted)"
+    IDS_READING_ORIGINAL "Original"
+    IDS_READING_FORMATTED "Formatted"
+    IDS_READING_TITLE "Formatted text (original times and speakers)"
+    IDS_READING_COUNTS "Changed lines: "
+    IDS_READING_RETAINED_COUNT " / Original retained: "
+    IDS_READING_FAILED "Could not prepare the text view. Saved results are retained. Select the history item again or change the text view to try again."
+    IDS_READING_PREPARING "Preparing the text view."
+    IDS_READING_TEXT_ONLY "Formatted text can be saved as TXT. Select Original to save SRT/VTT."
+    IDS_READING_CREATE "Create formatted text"
+    IDS_READING_RECREATE "Recreate formatted text"
+    IDS_READING_UNAVAILABLE "No approved, ready formatting profile is available. The original and previous formatted result are retained."
+    IDS_READING_QUEUED "Formatting queued (original and previous result retained)"
+    IDS_READING_LOADING "Loading the formatting profile"
+    IDS_READING_FORMATTING "Creating formatted text"
+    IDS_READING_VALIDATING "Validating formatted text against the original"
+    IDS_READING_CANCELLING "Cancelling formatting (waiting for the synchronous operation)"
+    IDS_READING_DONE "Formatted text created (original retained)"
+    IDS_READING_GENERATION_FAILED "Could not create formatted text. The original and previous formatted result are retained."
+    IDS_READING_CANCELLED "Formatting cancelled (original and previous result retained)"
+    IDS_READING_INTERRUPTED "Previous formatting was interrupted (original and previous result retained; no regeneration)"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_SETTINGS_TITLE "Settings"
+    IDS_SETTINGS_GENERAL "General"
+    IDS_SETTINGS_ASR "Transcription"
+    IDS_SETTINGS_SPEAKERS "Speakers"
+    IDS_SETTINGS_IMPROVEMENT "Text improvement"
+    IDS_SETTINGS_UI "Display language"
+    IDS_SETTINGS_METHOD "Speaker method"
+    IDS_SETTINGS_VAD "Recognize speech regions only"
+    IDS_SETTINGS_APPLY "Apply"
+    IDS_SETTINGS_CLOSE "Close"
+    IDS_SETTINGS_NOTE "Apply affects future audio. Close discards unapplied edits."
+    IDS_RENAME_MENU "Rename speaker…"
+    IDS_API_SPEAKER_STRUCTURE_FAILED "API text improvement: Speaker boundaries were not preserved. The result was not adopted. The original and previous improvement are retained."
+    IDS_API_TURN_NOTICE "Speaker blocks follow the original turn IDs. Check the original for their relation to the audio."
+END
+
+STRINGTABLE
+BEGIN
+    IDS_AUDIO_MODEL "OpenAI API (gpt-transcribe)"
+    IDS_AUDIO_PROFILE "Context first (target 90 sec)"
+    IDS_AUDIO_DEVICE "OpenAI audio recognition / local CPU speakers"
+    IDS_AUDIO_NOTICE "After Apply, new audio is sent to OpenAI. Endpoint: https://api.openai.com/v1/audio/transcriptions\nEstimate uses sent audio duration. At $0.0045/min, 100 minutes is $0.45; actual billing may differ.\nThe API does not supply word times or speakers. Local CPU estimates and sent interval times are shown."
+    IDS_AUDIO_KEY_SHARED "Shared API key (also used for text improvement)..."
+    IDS_AUDIO_REFRESH "Refresh audio API metadata"
+    IDS_AUDIO_PRICE_MISSING "Audio price is missing or unlisted. Refresh metadata and configure the shared key."
+    IDS_AUDIO_PRICE_STALE "Audio price is expired. It is refreshed before a new send."
+    IDS_AUDIO_PREPARING "Audio API: preparing"
+    IDS_AUDIO_INTENT "Audio API: saving send intent"
+    IDS_AUDIO_AWAITING "Audio API: awaiting response"
+    IDS_AUDIO_PREFIX_SAVE "Audio API: saving interval"
+    IDS_AUDIO_FINAL_SAVE "Audio API: saving result"
+    IDS_AUDIO_DONE "Audio API: all intervals and result saved"
+    IDS_AUDIO_NO_SPEECH "Audio API: no speech detected (not sent)"
+    IDS_AUDIO_EMPTY "Audio API: every complete response contained empty text"
+    IDS_AUDIO_CANCELLED "Audio API: cancelled (billing for attempted sends may still apply)"
+    IDS_AUDIO_INTERRUPTED "Audio API: previous run interrupted (no automatic resend)"
+    IDS_AUDIO_AUTH "Audio API: authentication failed. Check the shared key."
+    IDS_AUDIO_FORBIDDEN "Audio API: access denied. Check entitlement."
+    IDS_AUDIO_MODEL_MISSING "Audio API: requested model unavailable."
+    IDS_AUDIO_SIZE "Audio API: upload size rejected."
+    IDS_AUDIO_LIMIT "Audio API: usage limit. Balance, limits and rate details are unknown."
+    IDS_AUDIO_SERVICE "Audio API: service failure. No automatic resend."
+    IDS_AUDIO_FAILED "Audio API: transport or response validation failed. No automatic resend."
+    IDS_AUDIO_SAVE_FAILED "Audio API: history save failed. Acquired text retained; further sends stopped."
+    IDS_AUDIO_PARTIAL "Partial original. Some audio remains unprocessed or unavailable."
+    IDS_AUDIO_ORIGIN "Requested model / actual model not reported:"
+    IDS_AUDIO_TIME_BASIS "Times describe sent audio intervals, not word synchronization."
+    IDS_AUDIO_SEND_DURATION "Planned / attempted send duration:"
+    IDS_AUDIO_ESTIMATE "Pre-send estimate (not actual billing):"
+    IDS_AUDIO_USAGE_UNKNOWN "Missing usage or unknown send outcome is not zero cost. Actual billing is unverified."
+    IDS_AUDIO_NOT_READY "Audio API is not ready. Review endpoint, price and shared key in transcription settings."
+END
+
+STRINGTABLE
+BEGIN
+    IDS_AUDIO_CANCELLING "Audio API: cancellation pending (awaiting safe request/save completion)"
+    IDS_AUDIO_SECONDS "s"
+    IDS_AUDIO_PRICE_UNIT " / minute; "
+    IDS_AUDIO_HUNDRED_MIN "100 min estimate: $"
+    IDS_AUDIO_ACTUAL_VERIFIED "Actual model (exact match): gpt-transcribe"
+    IDS_AUDIO_ACTUAL_UNVERIFIED "Actual model is unverified; price application is withheld."
+    IDS_AUDIO_USAGE_OBSERVED "Observed duration usage (not billing): "
+END
+
+STRINGTABLE
+BEGIN
+    IDS_AUDIO_STANDARD "Speaker boundaries (legacy)"
+    IDS_AUDIO_RESUME "Resume audio API from saved progress"
+    IDS_AUDIO_RESUME_UNCERTAIN "The billing outcome of the next incomplete interval is unknown. Sending it again may cause a duplicate charge. Saved complete responses will not be sent again. Resume?"
+    IDS_AUDIO_CONTEXT_NOTICE "Context first: target 90 sec, maximum 120 sec. Windows cross short silences and speaker changes; internal silence counts toward sent duration. Text correspondence for multiple speakers remains unresolved and neutral. Choose Speaker boundaries in the quality field to prioritize the legacy speaker display."
+    IDS_AUDIO_STANDARD_NOTICE "Speaker boundaries (legacy): up to 600 sec for one candidate, 26 sec for multiple candidates. Uses the same gpt-transcribe model; frequent speaker changes shorten context."
+    IDS_AUDIO_RESUME_PREP_FAILED "Audio API: resume preparation failed. No audio was sent in this operation. The saved original is retained."
+    IDS_AUDIO_ATTEMPT "Operation / key revision / complete range / attempted sec / microUSD per min / UTC:"
+    IDS_AUDIO_REMAINING "Remaining estimate at the current price (excludes previous attempts):"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_TRANSCRIPTION_LOADING "Restoring transcription settings. Please try again after restoration completes."
+    IDS_TRANSCRIPTION_LOAD_FAILED "Cannot load transcription settings. Audio intake and settings Apply are blocked. Close the app, move LocalAppData/koefude/settings/transcription-settings-v1.bin to a backup name, then restart. The original file was preserved."
+    IDS_TRANSCRIPTION_SAVING "Saving transcription settings. They become applied after saving completes."
+    IDS_TRANSCRIPTION_SAVED "Transcription settings were saved and will be restored next time. API settings have a separate save result."
+    IDS_TRANSCRIPTION_SAVE_FAILED "Cannot save transcription settings. Previous applied settings were retained. Keep the draft open and press Apply to retry. API settings have a separate save result."
+END
+
+STRINGTABLE
+BEGIN
+    IDS_TRANSCRIPTION_LOAD_BUSY "Transcription settings are in use by another KoeFude instance. Close that instance, then restart. Settings were preserved."
+    IDS_TRANSCRIPTION_LOAD_IO "Cannot read transcription settings. Check folder access, available space, and the local storage location, then restart. Settings were preserved."
+    IDS_TRANSCRIPTION_EXIT_FAILED "Saving transcription settings failed. Yes retries only settings storage; No exits with previous settings; Cancel returns to the draft. API settings will not be resent."
+END
+
+STRINGTABLE
+BEGIN
+    IDS_PARAKEET_API_OFFER "Parakeet transcription is complete. You can improve the text with the API.\n\nThe full transcript will be sent to OpenAI. API charges apply. Audio will not be sent."
+    IDS_PARAKEET_API_IMPROVE "Improve text"
+    IDS_PARAKEET_API_LATER "Not now"
+    IDS_PARAKEET_API_SETUP "Check the API key and model, then Apply to improve this transcript. Closing cancels continuation (within 10 minutes)."
+    IDS_PARAKEET_API_EXPIRED "Continuation for this transcript has ended. To improve it, choose API text improvement from its row menu."
+END
+
+STRINGTABLE
+BEGIN
+    IDS_SHORT_READY "Ready"
+    IDS_SHORT_QUEUED "Queued"
+    IDS_SHORT_DONE "Completed"
+    IDS_SHORT_WARNING "Warning"
+    IDS_SHORT_NO_TEXT "No text"
+    IDS_SHORT_CANCELLING "Cancelling"
+    IDS_SHORT_CANCELLED "Cancelled"
+    IDS_SHORT_INTERRUPTED "Interrupted"
+    IDS_SHORT_STOPPING "Stopping"
+    IDS_SHORT_VALIDATING "Validating"
+    IDS_SHORT_DECODING "Decoding"
+    IDS_SHORT_LOADING "Loading model"
+    IDS_SHORT_TRANSCRIBING "Transcribing"
+    IDS_SHORT_DIARIZING "Diarizing"
+    IDS_SHORT_COMBINING "Combining"
+    IDS_SHORT_SAVING "Saving"
+    IDS_SHORT_SAVED "Saved"
+    IDS_SHORT_PREPARING "Preparing"
+    IDS_SHORT_GENERATING "Generating"
+    IDS_SHORT_FAILED "Failed"
+    IDS_SHORT_ATTENTION "Attention"
+    IDS_SHORT_AWAITING "Awaiting response"
+    IDS_SHORT_HISTORY_LOADING "Loading history"
+    IDS_SHORT_HISTORY_SAVING "Saving history"
+    IDS_SHORT_HISTORY_SAVED "History saved"
+    IDS_SHORT_HISTORY_UNSAVED "History unsaved"
+    IDS_SHORT_IMPROVED "Improved"
+    IDS_SHORT_NOT_IMPROVED "No improvement"
+    IDS_SHORT_UPDATE_CHECKING "Checking updates"
+    IDS_SHORT_UPDATE_AVAILABLE "Update available"
+    IDS_SHORT_UPDATE_CURRENT "Up to date"
+    IDS_SHORT_UPDATE_UNCONFIRMED "Update unchecked"
+    IDS_SHORT_UPDATE_DOWNLOADING "Downloading update"
+    IDS_SHORT_UPDATE_READY "Update ready"
+    IDS_SHORT_UPDATE_FAILED "Update failed"
+    IDS_SHORT_API "API text"
+    IDS_SHORT_AUDIO "Audio API"
+    IDS_SHORT_REMOVED "Removed"
+END

@@ -1,0 +1,437 @@
+//------------------------------------------------------------------------------
+/**
+ * @file ui_ja.rcinc
+ * @brief 言語別のUI文字列と標準menuを定義します。
+ * @version 1.0.0
+ * @date 2026/09/09
+ * @author Shunji Ogawa
+ * @copyright Copyright (c) 2026 Shunji Ogawa. MIT License.
+ * @par 更新履歴
+ * <pre>
+ * 1.0.0 Shunji Ogawa 2026/11/10 ADR1385のWhisper表示を中立化。
+ * 1.0.0 Shunji Ogawa 2026/11/10 ADR1382の案内fontをMS ゴシックへ統一。
+ * 1.0.0 Shunji Ogawa 2026/11/10 ADR1380の短い状態と一回の詳細通知を追加。
+ * 1.0.0 Shunji Ogawa 2026/11/10 ADR1378の明示更新境界を追加。
+ * 0.1.0 Shunji Ogawa 2026/11/10 ADR1375の適用済み選好の保存と復元を追加。
+ * 0.1.0 Shunji Ogawa 2026/11/10 ADR1370の文脈分割と明示途中再開を接続。
+ * 0.1.0 Shunji Ogawa 2026/11/09 ADR1367のGPU優先/CPU自動表示を明確化。
+ * 0.1.0 Shunji Ogawa 2026/11/09 ADR1360の話者区切り検証案内を追加。
+ * 0.1.0 Shunji Ogawa 2026/11/09 ADR1354の縦一覧と統合設定menuへ変更。
+ * 0.1.0 Shunji Ogawa 2026/10/04 保存済み整形の表示選択と版/件数/字幕案内を追加。
+ * 0.1.0 Shunji Ogawa 2026/10/02 WAVの画面接続・入力説明と検証を追加。
+ * 0.1.0 Shunji Ogawa 2026/10/02 MP3の対応範囲と入力案内を追加。
+ * 0.1.0 Shunji Ogawa 2026/10/02 native FLACの対応範囲と入力案内を追加。
+ * 0.1.0 Shunji Ogawa 2026/10/02 M4A内ALACの対応属性と範囲外案内を追加。
+ * 0.1.0 Shunji Ogawa 2026/10/02 HE-AACの対応属性と編集情報等の非対応範囲を案内。
+ * 0.1.0 Shunji Ogawa 2026/09/11 複数候補の理由と時間範囲を日本語で表示。
+ * 0.1.0 Shunji Ogawa 2026/09/09 初期デスクトップresourceを追加。
+ * 0.1.0 Shunji Ogawa 2026/09/09 品質優先modelと無音除外の選択を表示。
+ * 0.1.0 Shunji Ogawa 2026/09/09 常設品質欄と同梱modelの案内へ変更。
+ * 0.1.0 Shunji Ogawa 2026/09/09 モデル系統とモデル別品質の選択を表示。
+ * 0.1.0 Shunji Ogawa 2026/09/09 表示言語と話者フィルターを追加。
+ * 0.1.0 Shunji Ogawa 2026/09/09 履歴の右クリックから再実行する操作を追加。
+ * 0.1.0 Shunji Ogawa 2026/09/09 音声長と実測処理時間の表示を追加。
+ * 0.1.0 Shunji Ogawa 2026/09/10 永続履歴の管理と保存状態の表示を追加。
+ * 0.1.0 Shunji Ogawa 2026/09/10 長時間処理と一時領域の失敗案内を追加。
+ * 0.1.0 Shunji Ogawa 2026/09/10 採用した日本語CTCの推奨表示と一つのCPU構成を追加。
+ * 0.1.0 Shunji Ogawa 2026/09/11 CTCの品質優先FP32、軽量INT8、CUDAとCPU再試行を表示。
+ * 0.1.0 Shunji Ogawa 2026/09/13 不足モデルの明示取得と準備状態を日本語で表示。
+ * 0.1.0 Shunji Ogawa 2026/09/27 設定欄のアクセシビリティ目的名を追加。
+ * 0.1.0 Shunji Ogawa 2026/11/09 ADR1368の明示音声APIと従来経路の境界を接続。
+ * </pre>
+ */
+//------------------------------------------------------------------------------
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+
+STRINGTABLE
+BEGIN
+    IDS_MESSAGE_OK "OK"
+    IDS_MESSAGE_YES "はい(&Y)"
+    IDS_MESSAGE_NO "いいえ(&N)"
+    IDS_MESSAGE_CANCEL "キャンセル"
+    IDS_PREP_TITLE "モデルを準備"
+    IDS_PREP_INTRO "選択した構成の不足分だけを取得します。準備後はオフラインで文字起こしできます。\r\n取得中も結果の閲覧・コピー・保存ができます。この画面を閉じても取得は続きます。"
+    IDS_PREP_STORAGE "使用する保存先:"
+    IDS_PREP_CAPACITY "モデル容量（GPUメモリ使用量とは異なります）:"
+    IDS_PREP_TRANSFER "追加ダウンロード:"
+    IDS_PREP_DISK "準備に必要な追加空き容量（一時領域を含む）:"
+    IDS_PREP_HOSTS "通信先（HTTPS。配布先からの転送先を含む）:"
+    IDS_PREP_TERMS "配布条件: 各モデルの条件と配布元を以下に示します。詳細は同梱のTHIRD_PARTY_NOTICES.mdとlicensesを参照してください。音声・文字起こし・ファイル名は送信しません。"
+    IDS_PREP_SOURCE "配布元・条件:"
+    IDS_PREP_ROLE_VAD "発話区間の検出"
+    IDS_PREP_ROLE_ASR "文字起こし・補助データ"
+    IDS_PREP_DOWNLOAD "ダウンロードして使用(&D)"
+    IDS_PREP_RECHECK "再確認（通信なし）(&R)"
+    270 "モデルを確認中です。キャンセルできます。"
+    271 "準備が必要です。条件と容量を確認して取得してください。準備後に音声を追加できます。"
+    272 "既存モデルを保存先へコピーしています。"
+    273 "モデルをダウンロードしています。"
+    274 "容量とSHA-256を検証しています。"
+    275 "検証済みデータからモデルを準備しています。"
+    276 "準備ができました。画面を閉じて音声を追加してください。"
+    277 "キャンセル中です。実行中の処理と一時ファイルの回収を待っています。"
+    278 "キャンセルしました。検証済みのモデルは次回再利用します。再確認して続けられます。"
+    279 "準備できませんでした。空き容量・保存先の権限・通信接続を確認して再試行してください。診断:"
+END
+
+IDR_MAIN_MENU MENU
+BEGIN
+    POPUP "ファイル(&F)"
+    BEGIN
+        MENUITEM "音声を追加(&O)…\tCtrl+O", IDC_OPEN
+        MENUITEM "文字起こしを保存(&S)…\tCtrl+S", IDC_SAVE
+        MENUITEM "再実行(&R)", IDC_RETRANSCRIBE
+        MENUITEM "APIで文章を改善(&A)", IDC_API_TEXT_OPEN
+        MENUITEM "取消し(&C)", IDC_CANCEL
+        MENUITEM SEPARATOR
+        MENUITEM "履歴の保存・読込を再試行(&H)", IDC_HISTORY_RETRY
+        MENUITEM "終了(&X)", IDC_EXIT
+    END
+    POPUP "編集(&E)"
+    BEGIN
+        MENUITEM "全文コピー(&C)", IDC_COPY
+        MENUITEM "話者名を変更(&N)…", IDC_RENAME
+        MENUITEM "選択した履歴を削除(&D)\tDelete", IDC_HISTORY_REMOVE
+        MENUITEM "履歴を全削除(&L)", IDC_CLEAR
+    END
+    POPUP "設定(&S)"
+    BEGIN
+        MENUITEM "設定(&S)…", IDC_SETTINGS_OPEN
+        MENUITEM SEPARATOR
+        MENUITEM "更新を確認(&U)…", IDC_UPDATE_CHECK
+        MENUITEM "更新を取得…", IDC_UPDATE_INSTALL
+        MENUITEM "更新処理を取消し", IDC_UPDATE_CANCEL
+    END
+END
+
+STRINGTABLE
+BEGIN
+    IDS_UPDATE_STARTUP "起動時に更新を確認する（GitHub）"
+    IDS_UPDATE_PRIVACY "起動時は公開版の情報だけを確認します。取得・インストールは自分で選びます。\r\n送信先: api.github.com、github.com、release-assets.githubusercontent.com。署名検証時は証明書発行元の失効情報を照会します。音声・本文・ファイル名・パス・APIキーは送りません。"
+    IDS_UPDATE_CHECKING "更新情報を確認中です。文字起こしは続けられます。"
+    IDS_UPDATE_AVAILABLE "新しい版があります。設定メニューから更新を取得できます。"
+    IDS_UPDATE_CURRENT "更新情報を確認しました。この版より新しい公開版はありません。"
+    IDS_UPDATE_UNAVAILABLE "更新を確認できませんでした。未公開・通信制限・オフライン等が考えられます。文字起こしは続けられます。"
+    IDS_UPDATE_DOWNLOADING "更新を取得・署名検証中です。設定メニューから更新だけを取消せます。"
+    IDS_UPDATE_READY "更新を準備しました。処理と保存を終え、設定メニューの「終了して更新」から進めます。"
+    IDS_UPDATE_FAILED "更新の取得・検証・起動に失敗しました。アプリと保存結果は保持しています。更新を再確認してください。"
+    IDS_UPDATE_CANCELLED "更新処理を取消しました。文字起こしと保存結果は保持しています。"
+    IDS_UPDATE_GET_PROMPT "新しいKoeFudeを取得して署名を検証します。インストールは、準備後に「終了して更新」を選んで進めます。取得しますか？"
+    IDS_UPDATE_CLOSE_PROMPT "KoeFudeを正常終了し、署名確認済みセットアップを開きます。通常の画面で更新してください。履歴・設定・モデルは保持します。続けますか？"
+    IDS_UPDATE_BUSY "文字起こし・API・モデル準備・保存を終え、設定画面を閉じてから「終了して更新」を選んでください。実行中の処理は終了しません。"
+    IDS_UPDATE_GET "更新を取得…"
+    IDS_UPDATE_INSTALL "終了して更新…"
+    IDS_UPDATE_PORTABLE "現在はポータブル版です。このフォルダーは変更せず、利用者専用の通常インストールを行います。"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_TITLE "KoeFude"
+    IDS_SPECTRAL_METHOD "話者推定：新方式（試用）"
+    IDS_LEGACY_METHOD "話者推定：従来方式"
+    IDS_NO_DIARIZATION "話者分離なし"
+    IDS_ASR_QUALITY "認識モデル：Whisper large-v3 FP16（品質優先）"
+    IDS_ASR_STANDARD "認識モデル：Whisper large-v3-turbo Q8（軽量）"
+    IDS_SPEECH_FILTER_ON "発話区間検出：有効"
+    IDS_SPEECH_FILTER_OFF "発話区間検出：無効"
+    IDS_QUALITY_LABEL "品質"
+    IDS_QUALITY_CHOICE "品質優先（large-v3 FP16）"
+    IDS_STANDARD_CHOICE "軽量（turbo Q8）"
+    IDS_MODEL_LABEL "モデル"
+    IDS_MODEL_WHISPER "Whisper"
+    IDS_MODEL_KOTOBA "Kotoba v2.0（日本語）"
+    IDS_MODEL_PARAKEET "Parakeet（日本語・推奨）"
+    IDS_PARAKEET_CHOICE "軽量（CTC INT8・CPU）"
+    IDS_ASR_PARAKEET "認識モデル：Parakeet 日本語 CTC INT8"
+    IDS_PARAKEET_FP32_CHOICE "品質優先（CTC FP32）"
+    IDS_ASR_PARAKEET_FP32 "認識モデル：Parakeet 日本語 CTC FP32"
+    IDS_CUDA_USED "実行：CUDA"
+    IDS_CPU_RETRIED "実行：CPU（同じモデルで再試行）"
+    IDS_KOTOBA_QUALITY_CHOICE "品質優先（FP16）"
+    IDS_KOTOBA_STANDARD_CHOICE "軽量（Q5）"
+    IDS_ASR_KOTOBA_QUALITY "認識モデル：Kotoba-Whisper v2.0 FP16（品質優先）"
+    IDS_ASR_KOTOBA_STANDARD "認識モデル：Kotoba-Whisper v2.0 Q5（軽量）"
+    IDS_SUBTITLE "声を、読み返せる言葉に。  ·  音声の処理はこのPCの中で完結します"
+    IDS_OPEN "音声追加…"
+    IDS_CLEAR "履歴を全削除"
+    IDS_COPY "全文コピー"
+    IDS_SAVE "保存…"
+    IDS_CANCEL "取り消す"
+    IDS_DIARIZE "話者を分ける"
+    IDS_AUTO_GPU "自動（GPU優先 / CPU）"
+    IDS_CPU "CPUのみ"
+    IDS_JAPANESE "日本語"
+    IDS_AUTO_LANGUAGE "言語を自動判定"
+    IDS_AUTO_SPEAKERS "話者数：自動"
+    IDS_SPEAKER_COUNT "人"
+    IDS_HINT "ここに M4A / WAV / MP3 / FLAC をドラッグ\r\n\r\n音声を文字に起こし、時刻と話者ごとに表示します。\r\n「ファイル → 音声を追加」またはCtrl+Oからも選べます。\r\n構成は「設定 → 設定」の各タブで選べます。\r\n\r\n一覧と結果はこのPCへ自動保存し、再起動後も表示します。\r\n左の一覧の右クリックから保存・全文コピー・取消し・再実行・話者名変更・履歴の削除ができます。\r\n履歴を削除しても、元の音声と書き出したファイルは残ります。\r\n\r\nモデルが未準備なら「モデルを準備」から必要分を取得します。\r\n対応：M4A（AAC-LC / ALAC / HE-AAC）、WAV（16bit PCM・モノラル/ステレオ・8～192kHz）、MP3（MPEG-1/2 Layer III・モノラル/ステレオ）、FLAC（native・16/24bit・モノラル/ステレオ・8～192kHz・既知総sample数）\r\nALAC：単一音声トラック・version 0・16/24bit・モノラル/ステレオ・8–48kHz・既知総sample数。edit list、暗号化、fragmented、複数トラックは未対応。\r\nHE-AAC v1：モノラル/ステレオ、v2：ステレオ、44.1/48kHz、単一音声トラック（明示形式・version 0）。編集情報、暗号化、分割型コンテナー、外部参照、複数トラックは未対応。\r\n1時間を超える録音も文字起こし・話者分離できます。録音時間による固定制限はありません。"
+    IDS_READY "音声を追加すると文字起こしを始めます。"
+    IDS_QUEUED "順番待ち"
+    IDS_COMPLETED "文字起こし完了"
+    IDS_WARNING "文字起こし完了 · 話者分離に失敗したため話者不明で表示しています。"
+    IDS_NO_TEXT "認識されたテキストがありません。音声の内容を確認してください。"
+    IDS_CANCELLING "取り消し中 · 中断できない処理の終了を待っています。"
+    IDS_CANCELLED "取り消しました"
+    IDS_STOPPING "終了処理中 · 音声処理の安全な終了を待っています。"
+    IDS_FULL "処理の受付は8件、履歴は32件までです。完了を待つか、不要な履歴を削除してください。"
+    IDS_ERROR "処理を完了できませんでした"
+    IDS_MODEL_HELP "モデルを確認できません。「モデルを準備」で再確認し、不足・破損している場合は再取得してください。保存先の権限と空き容量も確認してください。"
+    IDS_INVALID "この入力を処理できません。PC内に保存した通常のM4A、WAV、MP3またはFLAC音声を選択してください。フォルダー、URL、ネットワーク上のファイルは使用できません。"
+    IDS_PROCESS_ERROR "音声処理に失敗しました。モデルを確認し、GPU利用時は「CPUのみ」で再度ファイルを追加してください。"
+    IDS_SAVED "保存しました"
+    IDS_SAVE_ERROR "保存できませんでした。出力形式と拡張子、フォルダーの書込み権限、空き容量を確認してください。"
+    IDS_RENAME "話者名を変更"
+    IDS_NAME_HINT "表示名（空欄で既定名）"
+    IDS_SPEAKER "話者"
+    IDS_GPU_USED "実行：GPU"
+    IDS_CPU_USED "実行：CPU"
+    IDS_ESTIMATE "推定話者数："
+    IDS_OPEN_PICK "文字起こしする音声を選択"
+    IDS_SAVE_PICK "文字起こしを保存"
+    IDS_FORMAT_TEXT "テキスト（UTF-8）"
+    IDS_FORMAT_SRT "SubRip字幕"
+    IDS_FORMAT_VTT "WebVTT字幕"
+    IDS_AUDIO_FILTER "M4A / WAV / MP3 / FLAC音声"
+    IDS_FILES "音声ファイル"
+    IDS_CONVERSATION "文字起こし"
+    IDS_ACCESS_BACKEND "実行方式"
+    IDS_ACCESS_LANGUAGE "認識言語"
+    IDS_ACCESS_COUNT "話者数"
+    IDS_ACCESS_SPEAKER "名前を変更する話者"
+    IDS_ACCESS_NAME "話者の表示名"
+    IDS_SETTINGS "認識設定"
+    IDS_MENU_FILE "ファイル"
+    160 "入力とモデルを検証中"
+    161 "音声を読み込み中"
+    162 "文字起こしモデルを読み込み中"
+    163 "文字起こし中"
+    164 "話者を推定中"
+    165 "話者と時刻を整理中"
+    166 "保存中"
+    167 "完了"
+    IDS_FILTER_LABEL "表示"
+    IDS_FILTER_ALL "全話者"
+    IDS_UNKNOWN "話者不明"
+    IDS_MIXED "複数候補"
+    IDS_MIXED_SUFFIX "（混在）"
+    IDS_ATTR_UNAVAILABLE_SUFFIX "（理由未記録）"
+    IDS_ATTR_UNASSIGNED_SUFFIX "（割当未確定）"
+    IDS_ATTR_CHANGE_SUFFIX "（話者交代・割当未確定）"
+    IDS_ATTR_OVERLAP_SUFFIX "（重なり推定・割当未確定）"
+    IDS_ATTR_RANGES "推定区間（本文との対応は未確定）: "
+    IDS_SPEAKER_SEPARATOR "・"
+    IDS_FILTER_EMPTY "この条件に該当する発言はありません。"
+    IDS_EXPORT_SCOPE "保存・全文コピーは全話者が対象です。"
+    IDS_LANGUAGE_SAVE_ERROR "表示言語をこの起動中だけ変更しました。設定の保存に失敗しました。"
+    IDS_INTERNAL_ERROR "内部エラーが発生しました。アプリを再起動してください。"
+    IDS_SINGLE_SPEAKER_COUNT "人"
+    IDS_RETRANSCRIBE "現在の設定で再度文字起こし(&R)"
+    IDS_RETRANSCRIBE_BUSY "再度文字起こし（同じ音声を処理中）"
+    IDS_RETRANSCRIBE_LIMIT "再度文字起こし（受付・履歴件数が上限）"
+    IDS_TIMING_TOTAL "合計処理時間（待機を除く）："
+    IDS_TIMING_AUDIO "音声の長さ："
+    IDS_TIMING_DECODE "読込："
+    IDS_TIMING_ASR "文字起こし："
+    IDS_TIMING_DIARIZATION "話者分離・整理："
+    IDS_TIMING_SKIPPED "未実施"
+    IDS_TIMING_WARNING "（警告あり）"
+    IDS_TIMING_NOTE "時間は 時:分:秒。モデル読込・検証を含みます。"
+    IDS_TIMING_UNAVAILABLE "未計測"
+    IDS_HISTORY_LOADING "保存された履歴を読み込み中"
+    IDS_HISTORY_SAVING "履歴を保存中"
+    IDS_HISTORY_SAVED "履歴は保存済み"
+    IDS_HISTORY_LOAD_ERROR "履歴を読み込めません。保存先を確認し、設定から履歴の読込を再試行してください。"
+    IDS_HISTORY_SAVE_ERROR "履歴を保存できません。空き容量と保存先を確認し、設定から再試行してください。"
+    IDS_HISTORY_IN_USE "同じ履歴を別のKoeFudeが使用中です。先に開いた画面を使うか、閉じてから設定で再試行してください。"
+    IDS_HISTORY_INTERRUPTED "未完了 · 前回の処理が途中で終了しました。右クリックから再実行できます。"
+    IDS_HISTORY_REMOVE "履歴から削除(&D)"
+    IDS_HISTORY_REMOVE_BUSY "履歴から削除（処理を取り消してから削除）"
+    IDS_HISTORY_CLEAR_CONFIRM "すべての履歴と文字起こし結果を削除しますか？\r\n\r\n元の音声と、TXT・SRT・VTTで保存したファイルは残ります。"
+    IDS_HISTORY_RETRY "履歴の保存・読込を再試行"
+    IDS_HISTORY_EXIT_FAILED "履歴の変更を保存できていません。保存を再試行しますか？\r\n\r\n［はい］保存を再試行\r\n［いいえ］未保存の変更を破棄して終了\r\n［キャンセル］画面に戻る（必要な結果は「保存」から書き出せます）"
+    IDS_HISTORY_CORRUPT "履歴の保存内容に破損があります。元の履歴は変更していません。保存先を確認し、設定から再試行してください。"
+    IDS_HISTORY_VERSION "この版では読み込めない形式の履歴です。元の履歴を保持しています。対応するKoeFudeで開いてください。"
+    IDS_HISTORY_TOO_LARGE "履歴の件数・容量が上限を超えています。必要な結果を書き出し、不要な履歴を削除してください。"
+    IDS_HISTORY_REMOVED "履歴を削除しました"
+    IDS_TEMPORARY_STORAGE_ERROR "一時処理領域を使用できません。PCの空き容量とアクセス権を確認してから再実行してください。元の音声は変更していません。"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_INPUT_CODEC "この音声形式には対応していません。M4A（AAC-LC / ALAC / HE-AAC）、WAV（16bit PCM・モノラル/ステレオ・8～192kHz）、MP3（MPEG-1/2 Layer III・モノラル/ステレオ）またはFLAC（native・16/24bit・モノラル/ステレオ・8～192kHz・既知総sample数）へ変換して追加してください。"
+    IDS_INPUT_DECODE "音声を読み込めません。ファイルの破損や形式の不整合を確認し、対応形式で保存し直して追加してください。途中までの音声は結果として保存していません。"
+    IDS_INPUT_LIMIT "入力がメモリ、形式の規則、または数値の上限を超えています。他のアプリを閉じるか、音声を分割して再度追加してください。録音時間による固定制限はありません。"
+    IDS_INPUT_TIMELINE "音声の時刻や長さに不整合があります。対応形式で保存し直して追加してください。途中までの音声は結果として保存していません。"
+END
+
+// 保存済み結果の表示選択。生成操作ではありません。
+STRINGTABLE
+BEGIN
+    IDS_READING_LABEL "本文表示"
+    IDS_READING_AUTO "自動（整形文を優先）"
+    IDS_READING_ORIGINAL "原文"
+    IDS_READING_FORMATTED "整形文"
+    IDS_READING_TITLE "整形文（時刻・話者は原文に基づく）"
+    IDS_READING_COUNTS "変更行: "
+    IDS_READING_RETAINED_COUNT " / 原文保持行: "
+    IDS_READING_FAILED "表示を準備できませんでした。保存済み結果は保持しています。履歴を選び直すか、本文表示を切り替えて再度表示してください。"
+    IDS_READING_PREPARING "表示を準備しています。"
+    IDS_READING_TEXT_ONLY "整形文はTXTで保存できます。SRT/VTTを保存するには原文表示へ切り替えてください。"
+    IDS_READING_CREATE "整形文を作成"
+    IDS_READING_RECREATE "整形文を再作成"
+    IDS_READING_UNAVAILABLE "採用・準備済みの整形方式がありません。原文と前回の整形結果は保持しています。"
+    IDS_READING_QUEUED "整形待機中（原文・前回結果は保持）"
+    IDS_READING_LOADING "整形方式を読み込んでいます"
+    IDS_READING_FORMATTING "整形文を作成しています"
+    IDS_READING_VALIDATING "整形文の原文対応を検証しています"
+    IDS_READING_CANCELLING "整形を取り消しています（同期処理の終了待ち）"
+    IDS_READING_DONE "整形文を作成しました（原文を保持）"
+    IDS_READING_GENERATION_FAILED "整形文を作成できませんでした。原文と前回の整形結果は保持しています。"
+    IDS_READING_CANCELLED "整形を取り消しました（原文・前回結果を保持）"
+    IDS_READING_INTERRUPTED "前回の整形は未完了でした（原文・前回結果を保持、再生成なし）"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_SETTINGS_TITLE "設定"
+    IDS_SETTINGS_GENERAL "一般"
+    IDS_SETTINGS_ASR "文字起こし"
+    IDS_SETTINGS_SPEAKERS "話者"
+    IDS_SETTINGS_IMPROVEMENT "文章改善"
+    IDS_SETTINGS_UI "表示言語"
+    IDS_SETTINGS_METHOD "話者の推定方法"
+    IDS_SETTINGS_VAD "発話がある区間だけ認識"
+    IDS_SETTINGS_APPLY "適用"
+    IDS_SETTINGS_CLOSE "閉じる"
+    IDS_SETTINGS_NOTE "適用は次の音声から反映。閉じると未適用の変更を破棄します。"
+    IDS_RENAME_MENU "話者名を変更…"
+    IDS_API_SPEAKER_STRUCTURE_FAILED "API文章改善: 話者区切りを保持できなかったため採用しませんでした。原文・前回の改善文を保持しています。"
+    IDS_API_TURN_NOTICE "話者区切りは原文の発言IDに対応しています。音声との対応は原文で確認してください。"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_AUDIO_MODEL "OpenAI API（gpt-transcribe）"
+    IDS_AUDIO_PROFILE "文脈優先（90秒目標）"
+    IDS_AUDIO_DEVICE "OpenAIで音声認識 / 話者はlocal CPU"
+    IDS_AUDIO_NOTICE "適用後の新規音声はOpenAIへ送信します。送信先: https://api.openai.com/v1/audio/transcriptions\n料金は送信音声時間から概算。100分・$0.0045/分の場合$0.45。実請求は別です。\nAPIは語時刻・話者を返しません。local CPUの推定と送信区間の時刻を表示します。"
+    IDS_AUDIO_KEY_SHARED "共有APIキー（文章改善と共用）…"
+    IDS_AUDIO_REFRESH "音声APIの情報を更新"
+    IDS_AUDIO_PRICE_MISSING "音声API料金は未取得・未掲載です。明示更新と共有キー設定を確認してください。"
+    IDS_AUDIO_PRICE_STALE "音声API料金は期限切れです。新規送信前に更新します。"
+    IDS_AUDIO_PREPARING "音声API: 送信準備"
+    IDS_AUDIO_INTENT "音声API: 送信intentを保存中"
+    IDS_AUDIO_AWAITING "音声API: 応答待ち"
+    IDS_AUDIO_PREFIX_SAVE "音声API: 区間を保存中"
+    IDS_AUDIO_FINAL_SAVE "音声API: 結果を保存中"
+    IDS_AUDIO_DONE "音声API: 全区間と結果を保存済み"
+    IDS_AUDIO_NO_SPEECH "音声API: 発話を検出しませんでした（送信なし）"
+    IDS_AUDIO_EMPTY "音声API: 全区間の応答は空本文でした"
+    IDS_AUDIO_CANCELLED "音声API: 取り消しました（送信済み分の課金停止は保証されません）"
+    IDS_AUDIO_INTERRUPTED "音声API: 前回は中断しました（自動再送なし）"
+    IDS_AUDIO_AUTH "音声API: 認証できません。共有キーを確認してください。"
+    IDS_AUDIO_FORBIDDEN "音声API: このキーでは利用できません。利用権限を確認してください。"
+    IDS_AUDIO_MODEL_MISSING "音声API: 指定モデルを利用できません。"
+    IDS_AUDIO_SIZE "音声API: 送信容量を受け付けられませんでした。"
+    IDS_AUDIO_LIMIT "音声API: 利用制限です。上限・残高・頻度の内訳はこの情報だけでは分かりません。"
+    IDS_AUDIO_SERVICE "音声API: サービス側の失敗です。自動再送していません。"
+    IDS_AUDIO_FAILED "音声API: 通信または応答の検証に失敗しました。自動再送していません。"
+    IDS_AUDIO_SAVE_FAILED "音声API: 履歴に保存できませんでした。取得済み本文を保持し後続送信を停止しました。"
+    IDS_AUDIO_PARTIAL "部分原文。未処理または未取得の音声があります。"
+    IDS_AUDIO_ORIGIN "要求モデル / 実モデルは未通知（要求名で補完しません）:"
+    IDS_AUDIO_TIME_BASIS "時刻は送信した音声区間です。語ごとの同期ではありません。"
+    IDS_AUDIO_SEND_DURATION "plan送信時間 / 試行済み時間:"
+    IDS_AUDIO_ESTIMATE "送信前概算（実請求ではありません）:"
+    IDS_AUDIO_USAGE_UNKNOWN "usage未通知・送信後不明は0料金ではありません。請求額は未確認です。"
+    IDS_AUDIO_NOT_READY "音声APIは未準備です。文字起こし設定で送信先・単価と共有キーを確認してください。"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_AUDIO_CANCELLING "音声API: 取消し待ち（応答/保存の安全な終了待ち）"
+    IDS_AUDIO_SECONDS "秒"
+    IDS_AUDIO_PRICE_UNIT " / 分; "
+    IDS_AUDIO_HUNDRED_MIN "100分概算: $"
+    IDS_AUDIO_ACTUAL_VERIFIED "実モデル（厳密一致）: gpt-transcribe"
+    IDS_AUDIO_ACTUAL_UNVERIFIED "実モデルは未検証です。料金適用は保留します。"
+    IDS_AUDIO_USAGE_OBSERVED "観測usage（実請求ではありません）: "
+END
+
+STRINGTABLE
+BEGIN
+    IDS_AUDIO_STANDARD "話者区切り優先（従来）"
+    IDS_AUDIO_RESUME "音声APIの続きから再開"
+    IDS_AUDIO_RESUME_UNCERTAIN "次に送る未完了区間は、前回の課金結果が不明です。この区間の再送で重複課金される可能性があります。保存済みの完全応答は再送しません。続きから再開しますか？"
+    IDS_AUDIO_CONTEXT_NOTICE "文脈優先: 90秒目標・最大120秒。短い無音と話者交代を跨ぎ、内部の無音も送信時間に含みます。複数話者の全文対応は未確定で中立表示です。従来の話者表示を優先する場合は品質欄で「話者区切り優先」を選べます。"
+    IDS_AUDIO_STANDARD_NOTICE "話者区切り優先（従来）: 単独候補は最大600秒、複数候補は最大26秒。同じgpt-transcribeを使い、短い話者交代では文脈が短くなります。"
+    IDS_AUDIO_RESUME_PREP_FAILED "音声API: 再開準備を完了できませんでした。今回の送信はありません。保存済み原文を保持しています。"
+    IDS_AUDIO_ATTEMPT "操作 / キーrevision / 成功範囲 / 試行秒 / 単価microUSD毎分 / UTC:"
+    IDS_AUDIO_REMAINING "現在の単価による今回残量概算（過去試行を含みません）:"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_TRANSCRIPTION_LOADING "文字起こし設定を復元しています。完了後にもう一度操作してください。"
+    IDS_TRANSCRIPTION_LOAD_FAILED "文字起こし設定を読み込めません。音声受付と設定適用を停止しました。アプリを終了し、LocalAppData/koefude/settings/transcription-settings-v1.binを別名へ退避してから再起動してください。原fileは変更していません。"
+    IDS_TRANSCRIPTION_SAVING "文字起こし設定を保存しています。完了後に適用済みになります。"
+    IDS_TRANSCRIPTION_SAVED "文字起こし設定を保存しました。次回起動にも引き継ぎます。API設定は別の保存結果に従います。"
+    IDS_TRANSCRIPTION_SAVE_FAILED "文字起こし設定を保存できませんでした。以前の適用済み設定を保持しています。草稿を開いたまま適用を押して再試行してください。API設定は別の保存結果に従います。"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_TRANSCRIPTION_LOAD_BUSY "文字起こし設定は別のKoeFudeで使用中です。別のKoeFudeを終了してから再起動してください。設定fileは変更していません。"
+    IDS_TRANSCRIPTION_LOAD_IO "文字起こし設定を読み込めません。保存先のアクセス権・空き容量・local保存先を確認し、再起動してください。設定fileは変更していません。"
+    IDS_TRANSCRIPTION_EXIT_FAILED "文字起こし設定の保存に失敗しました。「はい」で設定の保存だけを再試行、「いいえ」で以前の設定のまま終了、「キャンセル」で草稿へ戻ります。API設定は再送しません。"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_PARAKEET_API_OFFER "Parakeetの文字起こしが完了しました。APIで文章を改善できます。\n\nOpenAIへ文字起こし全文を送信し、API利用料がかかります。音声は送りません。"
+    IDS_PARAKEET_API_IMPROVE "改善する"
+    IDS_PARAKEET_API_LATER "今はしない"
+    IDS_PARAKEET_API_SETUP "APIキーとモデルを確認して適用すると、この原文の改善を続けます。閉じると続行を取り消します（10分以内）。"
+    IDS_PARAKEET_API_EXPIRED "この原文への続行は終了しました。改善する場合は、対象行のメニューから「APIで文章改善」を選んでください。"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_SHORT_READY "待機中"
+    IDS_SHORT_QUEUED "順番待ち"
+    IDS_SHORT_DONE "完了"
+    IDS_SHORT_WARNING "警告あり"
+    IDS_SHORT_NO_TEXT "本文なし"
+    IDS_SHORT_CANCELLING "取消し待ち"
+    IDS_SHORT_CANCELLED "取消済み"
+    IDS_SHORT_INTERRUPTED "中断"
+    IDS_SHORT_STOPPING "終了待ち"
+    IDS_SHORT_VALIDATING "検証中"
+    IDS_SHORT_DECODING "音声読込中"
+    IDS_SHORT_LOADING "モデル読込中"
+    IDS_SHORT_TRANSCRIBING "文字起こし中"
+    IDS_SHORT_DIARIZING "話者処理中"
+    IDS_SHORT_COMBINING "結合中"
+    IDS_SHORT_SAVING "保存中"
+    IDS_SHORT_SAVED "保存済み"
+    IDS_SHORT_PREPARING "準備中"
+    IDS_SHORT_GENERATING "文章生成中"
+    IDS_SHORT_FAILED "失敗"
+    IDS_SHORT_ATTENTION "要確認"
+    IDS_SHORT_AWAITING "応答待ち"
+    IDS_SHORT_HISTORY_LOADING "履歴読込中"
+    IDS_SHORT_HISTORY_SAVING "履歴保存中"
+    IDS_SHORT_HISTORY_SAVED "履歴保存済み"
+    IDS_SHORT_HISTORY_UNSAVED "履歴未保存"
+    IDS_SHORT_IMPROVED "改善あり"
+    IDS_SHORT_NOT_IMPROVED "改善なし"
+    IDS_SHORT_UPDATE_CHECKING "更新確認中"
+    IDS_SHORT_UPDATE_AVAILABLE "新版あり"
+    IDS_SHORT_UPDATE_CURRENT "最新版"
+    IDS_SHORT_UPDATE_UNCONFIRMED "更新未確認"
+    IDS_SHORT_UPDATE_DOWNLOADING "更新取得中"
+    IDS_SHORT_UPDATE_READY "更新準備済み"
+    IDS_SHORT_UPDATE_FAILED "更新失敗"
+    IDS_SHORT_API "API改善"
+    IDS_SHORT_AUDIO "音声API"
+    IDS_SHORT_REMOVED "削除済み"
+END

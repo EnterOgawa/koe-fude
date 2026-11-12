@@ -1,0 +1,7 @@
+/build/
+/third_party/
+/work/
+/out/
+/release/
+__pycache__/
+*.pyc
