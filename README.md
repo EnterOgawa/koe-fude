@@ -34,7 +34,7 @@ flowchart LR
 
 ## 🚀 はじめて使う
 
-インストーラーとZIP版は[リリース](https://github.com/EnterOgawa/koe-fude/releases/latest)から取得します。
+公開ソースを利用できます。署名済みインストーラーとZIP版は準備中です。配布開始後は[リリース](https://github.com/EnterOgawa/koe-fude/releases)から取得できます。
 
 1. インストーラーで導入するか、ZIP版をフォルダーへ一式展開し、`KoeFude.exe`を開きます。
 2. 音声を本文欄へドラッグするか、「ファイル → 音声を追加…」（Ctrl+O）で選びます。
