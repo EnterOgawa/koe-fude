@@ -2,7 +2,7 @@
 /**
  * @file ui_ja.rcinc
  * @brief 言語別のUI文字列と標準menuを定義します。
- * @version 1.1.0
+ * @version 1.1.1
  * @date 2026/09/09
  * @author Shunji Ogawa
  * @copyright Copyright (c) 2026 Shunji Ogawa. MIT License.
@@ -40,6 +40,7 @@
  * 0.1.0 Shunji Ogawa 2026/11/09 ADR1368の明示音声APIと従来経路の境界を接続。
  * 1.0.0 Shunji Ogawa 2026/11/17 ADR1447の任意録音開始時刻と連続話者見出しを接続
  * 1.1.0 Shunji Ogawa 2026/11/17 ADR1448の録音開始時刻対応版1.1.0へ版を整合
+ * 1.1.1 Shunji Ogawa 2026/11/17 ADR1449の未対応履歴を保護した更新案内を追加
  * </pre>
  */
 //------------------------------------------------------------------------------
@@ -252,7 +253,7 @@ BEGIN
     IDS_HISTORY_RETRY "履歴の保存・読込を再試行"
     IDS_HISTORY_EXIT_FAILED "履歴の変更を保存できていません。保存を再試行しますか？\r\n\r\n［はい］保存を再試行\r\n［いいえ］未保存の変更を破棄して終了\r\n［キャンセル］画面に戻る（必要な結果は「保存」から書き出せます）"
     IDS_HISTORY_CORRUPT "履歴の保存内容に破損があります。元の履歴は変更していません。保存先を確認し、設定から再試行してください。"
-    IDS_HISTORY_VERSION "この版では読み込めない形式の履歴です。元の履歴を保持しています。対応するKoeFudeで開いてください。"
+    IDS_HISTORY_VERSION "この版では読み込めない形式の履歴です。元の履歴を保持しています。設定メニューの「更新を確認」から最新版へ更新してください。"
     IDS_HISTORY_TOO_LARGE "履歴の件数・容量が上限を超えています。必要な結果を書き出し、不要な履歴を削除してください。"
     IDS_HISTORY_REMOVED "履歴を削除しました"
     IDS_TEMPORARY_STORAGE_ERROR "一時処理領域を使用できません。PCの空き容量とアクセス権を確認してから再実行してください。元の音声は変更していません。"
@@ -424,6 +425,7 @@ BEGIN
     IDS_SHORT_HISTORY_SAVING "履歴保存中"
     IDS_SHORT_HISTORY_SAVED "履歴保存済み"
     IDS_SHORT_HISTORY_UNSAVED "履歴未保存"
+    IDS_SHORT_HISTORY_UNREAD "履歴未読"
     IDS_SHORT_IMPROVED "改善あり"
     IDS_SHORT_NOT_IMPROVED "改善なし"
     IDS_SHORT_UPDATE_CHECKING "更新確認中"

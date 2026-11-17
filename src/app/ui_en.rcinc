@@ -2,7 +2,7 @@
 /**
  * @file ui_en.rcinc
  * @brief 言語別のUI文字列と標準menuを定義します。
- * @version 1.1.0
+ * @version 1.1.1
  * @date 2026/09/09
  * @author Shunji Ogawa
  * @copyright Copyright (c) 2026 Shunji Ogawa. MIT License.
@@ -39,6 +39,7 @@
  * 0.1.0 Shunji Ogawa 2026/11/09 ADR1368の明示音声APIと従来経路の境界を接続。
  * 1.0.0 Shunji Ogawa 2026/11/17 ADR1447の任意録音開始時刻と連続話者見出しを接続
  * 1.1.0 Shunji Ogawa 2026/11/17 ADR1448の録音開始時刻対応版1.1.0へ版を整合
+ * 1.1.1 Shunji Ogawa 2026/11/17 ADR1449の未対応履歴を保護した更新案内を追加
  * </pre>
  */
 //------------------------------------------------------------------------------
@@ -251,7 +252,7 @@ BEGIN
     IDS_HISTORY_RETRY "Retry history access"
     IDS_HISTORY_EXIT_FAILED "History changes have not been saved. Retry saving?\r\n\r\nYes: retry saving\r\nNo: discard unsaved changes and exit\r\nCancel: return to the app (use Save to export any needed results)"
     IDS_HISTORY_CORRUPT "Saved history is damaged. The original file is unchanged. Check its folder and retry in Settings."
-    IDS_HISTORY_VERSION "This history uses an unsupported format. It is unchanged. Open it with a compatible KoeFude version."
+    IDS_HISTORY_VERSION "This history uses an unsupported format and is unchanged. Choose Check for updates in the Settings menu to update KoeFude."
     IDS_HISTORY_TOO_LARGE "History exceeds its entry or storage limit. Export needed results and delete unneeded history."
     IDS_HISTORY_REMOVED "History entry deleted"
     IDS_TEMPORARY_STORAGE_ERROR "Temporary processing storage is unavailable. Check free disk space and access permissions, then retry. The original audio has not been changed."
@@ -423,6 +424,7 @@ BEGIN
     IDS_SHORT_HISTORY_SAVING "Saving history"
     IDS_SHORT_HISTORY_SAVED "History saved"
     IDS_SHORT_HISTORY_UNSAVED "History unsaved"
+    IDS_SHORT_HISTORY_UNREAD "History unread"
     IDS_SHORT_IMPROVED "Improved"
     IDS_SHORT_NOT_IMPROVED "No improvement"
     IDS_SHORT_UPDATE_CHECKING "Checking updates"

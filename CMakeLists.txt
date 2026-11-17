@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.25)
-project(KoeFude VERSION 1.1.0 LANGUAGES C CXX RC)
+project(KoeFude VERSION 1.1.1 LANGUAGES C CXX RC)
 
 if(NOT WIN32 OR NOT MSVC OR NOT CMAKE_SIZEOF_VOID_P EQUAL 8)
     message(FATAL_ERROR "KoeFude requires Windows, MSVC, and an x64 toolchain.")

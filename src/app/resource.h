@@ -6,7 +6,7 @@
  *
  * @file resource.h
  * @brief UI表示resourceとcontrol IDを定義します
- * @version 1.1.0
+ * @version 1.1.1
  *
  * @date 2026/09/09
  * @author Shunji Ogawa
@@ -65,6 +65,7 @@
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1437のコメント行末・終端の句点を省略
  * 1.0.0 Shunji Ogawa 2026/11/17 ADR1447の任意録音開始時刻と連続話者見出しを接続
  * 1.1.0 Shunji Ogawa 2026/11/17 ADR1448の録音開始時刻対応版1.1.0へ版を整合
+ * 1.1.1 Shunji Ogawa 2026/11/17 ADR1449の未対応履歴と更新の個別状態を追加
  * </pre>
  */
 
@@ -1275,6 +1276,7 @@
 #define IDS_SHORT_UPDATE_DOWNLOADING 3552 // 詳細とは独立した短い状態
 #define IDS_SHORT_UPDATE_READY 3553 // 詳細とは独立した短い状態
 #define IDS_SHORT_UPDATE_FAILED 3554 // 詳細とは独立した短い状態
+#define IDS_SHORT_HISTORY_UNREAD 3555 // 更新中も保護している未読履歴
 #define IDS_SHORT_API 3560 // API文章改善の用途
 #define IDS_SHORT_AUDIO 3561 // 音声APIの用途
 #define IDS_SHORT_REMOVED 3562 // 履歴削除成功

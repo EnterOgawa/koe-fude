@@ -5,7 +5,7 @@
  *
  * @file main_window.cpp
  * @brief 対応音声を投入して話者付き文字起こしを読むWin32画面を実装します
- * @version 1.1.0
+ * @version 1.1.1
  * @date 2026/09/09
  * @author Shunji Ogawa
  * @par 更新履歴
@@ -83,6 +83,7 @@
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1437のコメント行末・終端の句点を省略
  * 1.0.0 Shunji Ogawa 2026/11/17 ADR1447の任意録音開始時刻と連続話者見出しを接続
  * 1.1.0 Shunji Ogawa 2026/11/17 ADR1448の録音開始時刻対応版1.1.0へ版を整合
+ * 1.1.1 Shunji Ogawa 2026/11/17 ADR1449の未対応履歴を保持した更新表示と協調終了を接続
  * </pre>
  * @note UIはengineを所有せず、worker終了まで通知先Windowを維持します
  */
@@ -2140,13 +2141,23 @@ class MainWindow final {
 		historyReady_ = false ;
 		historyFailed_ = false ;
 		historyStopRequested_ = false ;
-		history_ = std::make_unique<HistoryController>( makeFileHistoryStorage( historyRoot_),
-													   [target = window_]
-													   {
-														   // 所有snapshotはcontroller内に保持する
-														   // UIへは起床だけを通知する
-														   PostMessageW( target, K_WAKE_MESSAGE, 0, 0) ;
-													   }) ;
+#if defined(KOEFUDE_WINDOW_TESTING)
+		// 自所有試験だけで合成load失敗と保存0を観測し、通常の履歴には接続しない
+		auto storage = testHooks_.historyStorage ? testHooks_.historyStorage() : makeFileHistoryStorage( historyRoot_) ;
+#else
+		auto storage = makeFileHistoryStorage( historyRoot_) ; // 通常版は従来の固定保存先を使う
+#endif
+		history_ = std::make_unique<HistoryController>( std::move( storage),
+			//------------------------------------------------------------------------------
+			/**
+			 * @brief 所有snapshotをcontroller内に保持したまま、自Windowへ値なしの起床通知を送ります
+			 * @note HWNDはcontroller停止まで有効で、履歴本文や借用pointerをmessageへ載せません
+			 */
+			//------------------------------------------------------------------------------
+			[target = window_]
+			{
+				PostMessageW( target, K_WAKE_MESSAGE, 0, 0) ;
+			}) ;
 	}
 	//------------------------------------------------------------------------------
 	/**
@@ -2788,16 +2799,30 @@ class MainWindow final {
 	}
 	//------------------------------------------------------------------------------
 	/**
-	 * @brief 更新が通常仕事を中断せず終了できるかを確認します
-	 * @return 全仕事/保存がidle
+	 * @brief 未対応形式の読込拒否後に、履歴を書き換えず更新を案内できるか返します
+	 * @return 履歴controllerを所有し、VERSIONで未読・未編集・revision 0・カードなしならtrue
+	 * @note controllerの停止と排他解放は更新終了の判定で別に確認します
+	 */
+	//------------------------------------------------------------------------------
+	bool historyVersionRecovery() const noexcept
+	{
+		return history_ && !historyReady_ && historyFailed_ && historyError_ == HistoryErrorKind::VERSION &&
+			   !historyDirty_ && historyRevision_ == 0 && cards_.empty() ;
+	}
+	//------------------------------------------------------------------------------
+	/**
+	 * @brief 全仕事と保存がidleか、未対応履歴を未編集のまま保護して更新終了できるか返します
+	 * @return 正常履歴、またはVERSION読込失敗のcontroller停止と排他解放を確認し、未保存仕事がなければtrue
 	 */
 	//------------------------------------------------------------------------------
 	bool updateIdle() const
 	{
-		return !settingsWindow_.opened() && historyReady_ && !historyDirty_ && !historyFailed_ &&
-			   transcriptionSettingsReady_ && !transcriptionSettingsOperation_ && !transcriptionSettingsCloseFailed_ &&
-			   !modelDownloadActive_ && !wholeTextPreparationWindow_.busy() && !apiTextWindow_.busy() &&
-			   !parakeetFollowup_.pending() && saves_.empty() &&
+		const bool historySafe = (historyReady_ && !historyFailed_) ||
+								 (historyVersionRecovery() && history_->stopped()) ; // 未読履歴は排他解放まで待つ
+		return !settingsWindow_.opened() && historySafe && !historyDirty_ && transcriptionSettingsReady_ &&
+			   !transcriptionSettingsOperation_ && !transcriptionSettingsCloseFailed_ && !modelDownloadActive_ &&
+			   !wholeTextPreparationWindow_.busy() && !apiTextWindow_.busy() && !parakeetFollowup_.pending() &&
+			   saves_.empty() &&
 			   std::none_of( cards_.begin(), cards_.end(),
 							//------------------------------------------------------------------------------
 							/**
@@ -2910,6 +2935,12 @@ class MainWindow final {
 				status.update = *event ;
 				queueStatusNotice( StatusNoticeKind::UPDATE, event->operation, status) ;
 			}
+		}
+		// 履歴の失敗と更新応答の到着順が逆でも、排他解放後に未表示の段階だけを反映する
+		if( !closing_ && historyVersionRecovery() && updateIdle() && updateEvent_.operation &&
+		   (!currentStatus_.update || currentStatus_.update->operation != updateEvent_.operation ||
+			currentStatus_.update->state != updateEvent_.state)) {
+			setUpdateStatus() ;
 		}
 		updateMenu() ;
 	}
@@ -4542,7 +4573,9 @@ class MainWindow final {
 		std::wstring owned = status.compactText() ; // 詳細は型付きDTOと通知へ保持
 		std::wstring history ; // 補助状態は幅不足時に一単位で省きます
 		// 読込前・読込失敗時には、新規入力より先に既存履歴の状態を示す
-		if( !historyReady_) {
+		if( !historyReady_ && historyVersionRecovery() && status.update) {
+			history = resource( IDS_SHORT_HISTORY_UNREAD) ; // H3の本文案内を保持し、更新の実段階を隠さない
+		} else if( !historyReady_) {
 			owned = resource( historyFailed_ ? IDS_SHORT_FAILED : IDS_SHORT_HISTORY_LOADING) ;
 		}
 		// 処理の進捗で未保存の警告を隠さない
