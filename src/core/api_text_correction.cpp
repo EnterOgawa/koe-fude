@@ -5,7 +5,7 @@
  *
  * @file api_text_correction.cpp
  * @brief API補正の有限plan、Responses検証、同意付き直列処理を実装します
- * @version 1.0.0
+ * @version 1.1.0
  * @date 2026/11/08
  * @author Shunji Ogawa
  * @par 更新履歴
@@ -27,6 +27,8 @@
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1431の各関数へ役割・全引数・戻り値を直接記載
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1433の更新履歴を新規作成からの昇順・末尾追記へ統一
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1437のコメント行末・終端の句点を省略
+ * 1.0.0 Shunji Ogawa 2026/11/17 ADR1447の任意録音開始時刻と連続話者見出しを接続
+ * 1.1.0 Shunji Ogawa 2026/11/17 ADR1448の録音開始時刻対応版1.1.0へ版を整合
  * </pre>
  */
 //------------------------------------------------------------------------------
@@ -567,11 +569,9 @@ std::optional<std::pair<std::uint64_t, std::uint64_t>> apiTextUsageCost( const A
 		//------------------------------------------------------------------------------
 		[&]( std::uint64_t write) -> std::optional<std::uint64_t>
 	{
-		const std::pair<std::uint64_t, std::uint64_t> terms[]{{normal, *p.rates[0]},
-															  {writes, write},
-															  {*u.cached, *p.rates[2]},
-															  {*u.output, *p.rates[1]}} ; // 分離済み内訳
-		std::uint64_t								  total = 0 ; // scaled numerator
+		const std::pair<std::uint64_t, std::uint64_t> terms[]{
+			{normal, *p.rates[0]}, {writes, write}, {*u.cached, *p.rates[2]}, {*u.output, *p.rates[1]}} ; // 分離済み内訳
+		std::uint64_t total = 0 ; // scaled numerator
 		// 各項をoverflow前に確認します
 		for( const auto &[tokens, rate] : terms) {
 			// 乗算と加算をcheckedにします
@@ -874,6 +874,10 @@ ApiTextJobCompletion runApiTextJob( const ApiTextCorrectionJobRequest &request, 
 								   IApiCatalogTransport *metadata)
 {
 	const auto progressStarted = progressMonotonicMs() ; // 今回worker操作の実開始
+	// 表示専用metadataと全文を他の操作や有料要求へ混入させない
+	if( request.renderedExport && request.action != ApiTextAction::EXPORT) {
+		reject() ;
+	}
 	// API送信だけに専用進捗を付け、HTTP0の選好保存へ旧opを混ぜません
 	if( request.action == ApiTextAction::IMPROVE || request.action == ApiTextAction::SEND) {
 		apiProgress( progress, ApiTextPhase::PREPARING, 0, 0, 0, progressStarted) ;
@@ -1054,7 +1058,25 @@ ApiTextJobCompletion runApiTextJob( const ApiTextCorrectionJobRequest &request, 
 		if( !record.latest || record.latest->candidate.empty()) {
 			reject() ;
 		}
-		saveRenderedTranscript( record.latest->candidate, request.exportPath, ExportFormat::PLAIN_TEXT) ;
+		// 保存候補の改変や他sourceの表示全文を同じ出力へ流用しない
+		if( record.latest->candidateSha != apiTextDigest( record.latest->candidate)) {
+			reject() ;
+		}
+		// 文書workerが固定した同じ候補ownerとsourceだけを借用する
+		if( request.renderedExport) {
+			const auto &rendered = *request.renderedExport ; // job寿命内の共有所有borrow
+			// 分値・source・candidate ownerを確認し、時計の再解釈や再生成をしない
+			if( rendered.source != request.key || !rendered.candidate ||
+			   rendered.candidate.get() != record.latest.get() || rendered.candidate.owner_before( record.latest) ||
+			   record.latest.owner_before( rendered.candidate) ||
+			   (rendered.recordingStartMinutes && *rendered.recordingStartMinutes >= 1440)) {
+				reject() ;
+			}
+			saveRenderedTranscript( rendered.text, request.exportPath, ExportFormat::PLAIN_TEXT) ;
+		} else {
+			// 独立した旧候補画面の明示保存は従来候補を保持する
+			saveRenderedTranscript( record.latest->candidate, request.exportPath, ExportFormat::PLAIN_TEXT) ;
+		}
 		return completion ;
 	}
 	// 保存系操作はHTTPを呼びません

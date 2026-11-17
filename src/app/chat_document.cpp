@@ -5,7 +5,7 @@
  *
  * @file chat_document.cpp
  * @brief 標準Rich Editへ話者別の背景を持つ発言ブロックを描画します
- * @version 1.0.0
+ * @version 1.1.0
  * @date 2026/09/09
  * @author Shunji Ogawa
  * @par 更新履歴
@@ -36,6 +36,8 @@
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1431の各関数へ役割・全引数・戻り値を直接記載
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1433の更新履歴を新規作成からの昇順・末尾追記へ統一
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1437のコメント行末・終端の句点を省略
+ * 1.0.0 Shunji Ogawa 2026/11/17 ADR1447の任意録音開始時刻と連続話者見出しを接続
+ * 1.1.0 Shunji Ogawa 2026/11/17 ADR1448の録音開始時刻対応版1.1.0へ版を整合
  * </pre>
  */
 //------------------------------------------------------------------------------
@@ -389,6 +391,30 @@ struct ApiSpeakerHeading {
 }
 //------------------------------------------------------------------------------
 /**
+ * @brief 現在の表示名と元区間から時計または従来相対時刻の見出しを作ります
+ * @param[in] line 元話者とoffsetを持つ借用行。本文は複製しません
+ * @param[in] source 同じ音声の現編集名
+ * @param[in] startMs group先頭offset（ms）
+ * @param[in] endMs group終端offset（ms）。未設定時だけ表示します
+ * @param[in] minutes 任意の録音開始分（0..1439）
+ * @return 所有UTF-16見出し
+ * @throws OperationError 不正な時計metadataまたはoffset
+ */
+//------------------------------------------------------------------------------
+[[nodiscard]] std::wstring speechHeading( const TranscriptLine &line, const Transcript &source,
+										 const std::int64_t startMs, const std::int64_t endMs,
+										 const std::optional<std::uint16_t> minutes)
+{
+	const auto name = uiSpeakerLabel( line, source) ; // 現在の表示名を反映する小さい所有値
+	// 設定された音声の見出しだけ話者をbracketで囲み時計を隣接する
+	if( minutes) {
+		return L"[" + name + L"] " + toWide( formatRecordingClock( startMs, *minutes)) ;
+	}
+	return name + L"  " + toWide( formatTimestamp( startMs)) + L" - " + toWide( formatTimestamp( endMs)) ;
+}
+
+//------------------------------------------------------------------------------
+/**
  * @brief 一つの検証済み話者blockを元paletteで出力します
  * @param[in] body UTF-16本文
  * @param[in] speaker 実在単一ID、0は中立
@@ -396,10 +422,11 @@ struct ApiSpeakerHeading {
  * @param[in] widthTwips pane幅
  * @param[in,out] rtf 有界出力
  * @param[in] stop 協調取消し
+ * @param[in] heading 任意の生成済み時計見出し。空なら従来の話者表示を使います
  */
 //------------------------------------------------------------------------------
 void appendApiSpeakerBlock( std::wstring_view body, int speaker, const Transcript &source, int widthTwips,
-						   std::string &rtf, std::stop_token stop)
+						   std::string &rtf, std::stop_token stop, std::wstring_view heading = {})
 {
 	checkCancelled( stop) ;
 	const int		 color = speaker ? 2 + (speaker - 1) % 6 : 8 ; // 原文と同じ安定palette
@@ -408,7 +435,8 @@ void appendApiSpeakerBlock( std::wstring_view body, int speaker, const Transcrip
 	rtf += "\\trowd\\trgaph140\\trleft0\\trpaddl160\\trpaddr160"
 		   "\\trpaddt100\\trpaddb100\\trpaddfl3\\trpaddfr3\\trpaddft3\\trpaddfb3\\clcbpat" +
 		   std::to_string( color) + "\\cellx" + std::to_string( widthTwips) + "\\pard\\intbl\\sa120\\sb100\\b\\fs20 " +
-		   escapeRtf( name) + "\\b0\\line\\fs22 " + escapeRtf( body) + "\\cell\\row\\pard\\fs8\\sa0\\sb0\\par " ;
+		   escapeRtf( heading.empty() ? std::wstring_view( name) : heading) + "\\b0\\line\\fs22 " + escapeRtf( body) +
+		   "\\cell\\row\\pard\\fs8\\sa0\\sb0\\par " ;
 	// 元候補を黙切断せず、表示容量超過を全体失敗にします
 	if( rtf.size() > 16 * K_MAXIMUM_TEXT_BYTES) {
 		throw OperationError( ErrorKind::RESULT_TOO_LARGE) ;
@@ -422,10 +450,11 @@ void appendApiSpeakerBlock( std::wstring_view body, int speaker, const Transcrip
  * @param[in] widthTwips pane幅
  * @param[in,out] rtf 有界出力
  * @param[in] stop part/block間の協調取消し
+ * @param[in] recordingStartMinutes 任意の開始分（0..1439）。元行対応だけから時刻を作ります
  */
 //------------------------------------------------------------------------------
 void appendApiTurnBlocks( const ApiTextAttempt &attempt, const Transcript &source, int widthTwips, std::string &rtf,
-						 std::stop_token stop)
+						 std::stop_token stop, const std::optional<std::uint16_t> recordingStartMinutes)
 {
 	// 外部保存値の候補/投影と原文の対応を描画入口でも確認します
 	if( attempt.draft.projection != apiTextSpeakerProjection( source) ||
@@ -433,7 +462,8 @@ void appendApiTurnBlocks( const ApiTextAttempt &attempt, const Transcript &sourc
 	   apiTextCombinedCandidate( attempt) != attempt.candidate) {
 		throw OperationError( ErrorKind::INVALID_INPUT, K_API_TEXT_SPEAKER_STRUCTURE_ERROR) ;
 	}
-	const auto flush =
+	std::size_t firstSourceLine = 0 ; // 連続groupの最初の元行だけを時計の根拠にする
+	const auto	flush =
 		//------------------------------------------------------------------------------
 		/**
 		 * @brief 完成blockを同じ元話者の表示へ出力します
@@ -443,7 +473,11 @@ void appendApiTurnBlocks( const ApiTextAttempt &attempt, const Transcript &sourc
 		//------------------------------------------------------------------------------
 		[&]( std::wstring_view body, int id)
 		{
-			appendApiSpeakerBlock( body, id, source, widthTwips, rtf, stop) ;
+			const auto heading =
+				recordingStartMinutes
+					? toWide( formatSpeechHeading( source.lines[firstSourceLine], source, recordingStartMinutes))
+					: std::wstring{} ; // legacyの本文位置照合から時刻を作らない
+			appendApiSpeakerBlock( body, id, source, widthTwips, rtf, stop, heading) ;
 		} ;
 	std::wstring block ; // 次の話者までの有限本文
 	int			 speaker = 0 ; // 不明/複数は個人の色にしません
@@ -466,11 +500,20 @@ void appendApiTurnBlocks( const ApiTextAttempt &attempt, const Transcript &sourc
 			}
 			const auto &speakers = source.lines[part.sourceLine].speakers ; // 元音声処理の正本
 			const int	next = speakers.size() == 1 ? speakers.front() : 0 ; // 個人色は単一だけ
-			const bool	same = started && (next ? speaker == next : !speaker && sourceLine == part.sourceLine) ;
+			const bool	same =
+				started && (next ? speaker == next &&
+									   source.lines[firstSourceLine].attribution.kind ==
+										   source.lines[part.sourceLine].attribution.kind &&
+									   source.lines[part.sourceLine].startMs >= source.lines[firstSourceLine].startMs
+								 : !speaker && sourceLine == part.sourceLine) ; // 通常原文groupと同じ安全条件
 			// 再登場/交代を正しく分け、連続同一話者と長発言partだけをまとめます
 			if( started && !same) {
 				flush( block, speaker) ;
 				block.clear() ;
+			}
+			// 同じgroupの再登場partで見出し時刻を進めない
+			if( !same) {
+				firstSourceLine = part.sourceLine ;
 			}
 			// 同じblockの発言/partは改行でつなぎます
 			if( same) {
@@ -617,8 +660,7 @@ void appendComparisonRow( std::string_view left, std::string_view right, int col
 						 bool heading = false, int rightColor = -1)
 {
 	const auto cell = "\\clvertalt\\clcbpat" + std::to_string( color) ; // 左は元帰属
-	const auto otherCell =
-		"\\clvertalt\\clcbpat" + std::to_string( rightColor < 0 ? color : rightColor) ; // 右は保存帰属
+	const auto otherCell = "\\clvertalt\\clcbpat" + std::to_string( rightColor < 0 ? color : rightColor) ; // 右は保存帰属
 	const std::string paragraph =
 		heading ? "\\pard\\intbl\\sa40\\sb80\\b\\fs20 " : "\\pard\\intbl\\sa80\\sb0\\b0\\fs22 " ; // 左右で同じ段落条件
 	constexpr std::size_t K_LIMIT = 16 * K_MAXIMUM_TEXT_BYTES ; // 全表示の既存RTF上限
@@ -662,6 +704,40 @@ void appendComparisonRow( std::string_view left, std::string_view right, int col
 	}
 	return request.speakerText->windows[chunks[line]].parts ;
 }
+/** @brief 原byteを複製せず同じ元行の連続単一話者だけをまとめた表示範囲です */
+struct ProjectionDisplayPart {
+	/// 元UTF-8の半開範囲先頭
+	std::size_t byteBegin = 0 ;
+	/// 元UTF-8の半開範囲終端
+	std::size_t byteEnd = 0 ;
+	/// 元投影の正ID。中立は-1
+	int			speaker = -1 ;
+} ;
+//------------------------------------------------------------------------------
+/**
+ * @brief filter前の投影partを隣接する同じ正IDだけでgroup化します
+ * @param[in] request 同sourceの共有所有要求
+ * @param[in] line 元送信窓の原文行番号
+ * @return 本文を借用する有限範囲一覧。不明や別話者を跨ぎません
+ * @throws OperationError 元行と保存投影の対応が不正
+ */
+//------------------------------------------------------------------------------
+[[nodiscard]] std::vector<ProjectionDisplayPart> projectionDisplayParts( const ChatDocumentRequest &request,
+																		const std::size_t		   line)
+{
+	std::vector<ProjectionDisplayPart> groups ; // 小さいbyte範囲だけを所有するworker DTO
+	// 保存された全partを順に処理してから表示filterを適用する
+	for( const auto &part : projectionPartsForLine( request, line)) {
+		// 同じ正IDの隣接byte以外は見出しをまとめない
+		if( !groups.empty() && part.speaker > 0 && groups.back().speaker == part.speaker &&
+		   groups.back().byteEnd == part.byteBegin) {
+			groups.back().byteEnd = part.byteEnd ;
+		} else {
+			groups.push_back( {part.byteBegin, part.byteEnd, part.speaker}) ;
+		}
+	}
+	return groups ;
+}
 //------------------------------------------------------------------------------
 /**
  * @brief 原byteと対象の現表示名だけをセル内部の色付き段落へします
@@ -675,7 +751,7 @@ void appendComparisonRow( std::string_view left, std::string_view right, int col
 	std::string out ; // 一つの既存左cell内だけで使うRTF
 	const auto &original = request.source->lines[line] ; // APIの元chunk本文
 	// 当chunkの全partitionを原順に既存左cell内へ描く
-	for( const auto &part : projectionPartsForLine( request, line)) {
+	for( const auto &part : projectionDisplayParts( request, line)) {
 		const auto text =
 			std::string_view( original.text).substr( part.byteBegin, part.byteEnd - part.byteBegin) ; // 原byte
 		const int color = part.speaker > 0 ? 2 + (part.speaker - 1) % 6 : 8 ; // 中立に隣話者の色を移さない
@@ -688,7 +764,12 @@ void appendComparisonRow( std::string_view left, std::string_view right, int col
 			if( part.speaker > 0) {
 				label.speakers = {part.speaker} ;
 			}
-			out += "\\b " + escapeRtf( uiSpeakerLabel( label, *request.source)) + "\\b0\\line " ;
+			out +=
+				"\\b " +
+				escapeRtf( request.recordingStartMinutes ? speechHeading( label, *request.source, original.startMs,
+																		original.endMs, request.recordingStartMinutes)
+														: uiSpeakerLabel( label, *request.source)) +
+				"\\b0\\line " ;
 		}
 		out += escapeRtf( toWide( text)) + "\\par " ;
 	}
@@ -708,14 +789,17 @@ bool appendProjectionCards( const ChatDocumentRequest &request, const std::size_
 	bool		displayed = false ; // 取消し/filterで本文を削った原文を保存しない
 	const auto &original = request.source->lines[line] ; // 元送信窓の原byte
 	// 部分ごとの語時刻は作らず、元送信窓の時刻だけを共通見出しへ残します
-	rtf += "\\pard\\highlight0\\fs18 " +
-		   escapeRtf( toWide( formatTimestamp( original.startMs)) + L" - " + toWide( formatTimestamp( original.endMs))) +
-		   "\\par " ;
+	// 時計設定時は各話者見出しへ同じ元窓時刻を置き、part固有時刻を作らない
+	if( !request.recordingStartMinutes) {
+		rtf += "\\pard\\highlight0\\fs18 " +
+			   escapeRtf( toWide( formatTimestamp( original.startMs)) + L" - " + toWide( formatTimestamp( original.endMs))) +
+			   "\\par " ;
+	}
 	// 当chunkのpartsをfilterへ照合し、原byteの順序を保つ
-	for( const auto &part : projectionPartsForLine( request, line)) {
-		const bool matches = request.filter == K_ALL_SPEAKERS ||
-							 (part.speaker > 0 ? request.filter == part.speaker
-											   : request.filter < 0) ; // 中立は不明/混在の両filterで残す
+	for( const auto &part : projectionDisplayParts( request, line)) {
+		const bool matches =
+			request.filter == K_ALL_SPEAKERS ||
+			(part.speaker > 0 ? request.filter == part.speaker : request.filter < 0) ; // 中立は不明/混在の両filterで残す
 		// filterに合わない装飾/本文を表示へ混入しない
 		if( !matches) {
 			continue ;
@@ -736,8 +820,10 @@ bool appendProjectionCards( const ChatDocumentRequest &request, const std::size_
 		}
 		rtf += "\\trowd\\trgaph140\\trpaddl160\\trpaddr160\\clcbpat" + std::to_string( color) + "\\cellx" +
 			   std::to_string( request.widthTwips) + "\\pard\\intbl\\b\\fs20 " +
-			   escapeRtf( uiSpeakerLabel( label, *request.source)) + "\\b0\\line\\fs22 " + escapeRtf( toWide( text)) +
-			   "\\cell\\row\\pard\\fs8\\par " ;
+			   escapeRtf( request.recordingStartMinutes ? speechHeading( label, *request.source, original.startMs,
+																	   original.endMs, request.recordingStartMinutes)
+													   : uiSpeakerLabel( label, *request.source)) +
+			   "\\b0\\line\\fs22 " + escapeRtf( toWide( text)) + "\\cell\\row\\pard\\fs8\\par " ;
 		// RTF展開量も通常文書の固定上限内へ抑える
 		if( rtf.size() > 16 * K_MAXIMUM_TEXT_BYTES) {
 			throw OperationError( ErrorKind::RESULT_TOO_LARGE) ;
@@ -803,8 +889,7 @@ void appendLegacyComparison( const ChatDocumentRequest &request, const ReadingVi
 		const auto	   &first = *view.lines()[group.lineIndices.front()].original ; // 元帰属
 		ComparisonBlock block ; // 一つの原文カード
 		block.color = first.speakers.empty() ? 8 : first.speakers.size() > 1 ? 9 : 2 + (first.speakers.front() - 1) % 6 ;
-		block.heading = uiSpeakerLabel( first, view.source()) + L"  " + toWide( formatTimestamp( group.startMs)) + L" - " +
-						toWide( formatTimestamp( group.endMs)) ;
+		block.heading = speechHeading( first, view.source(), group.startMs, group.endMs, request.recordingStartMinutes) ;
 		// 元行の実境界だけを保持し、本文を類似性に合わせて編集しません
 		for( const auto index : group.lineIndices) {
 			checkCancelled( stop) ;
@@ -924,10 +1009,13 @@ void appendLegacyComparison( const ChatDocumentRequest &request, const ReadingVi
 		const int	color = first.speakers.empty()		? 8
 							: first.speakers.size() > 1 ? 9
 														: 2 + (first.speakers.front() - 1) % 6 ;
-		const auto leftHeading = uiSpeakerLabel( first, view.source()) + L"  " + toWide( formatTimestamp( group.startMs)) +
-								 L" - " + toWide( formatTimestamp( group.endMs)) ; // 元時刻は左だけ
-		appendComparisonRow( escapeRtf( leftHeading), escapeRtf( uiSpeakerNames( first.speakers, view.source())), color,
-							request.widthTwips, rtf, true) ;
+		const auto	leftHeading =
+			speechHeading( first, view.source(), group.startMs, group.endMs,
+						  request.recordingStartMinutes) ; // v3は検証済み元行から両列共通の時刻を作る
+		const auto rightHeading = request.recordingStartMinutes
+									  ? leftHeading
+									  : uiSpeakerNames( first.speakers, view.source()) ; // 未設定は従来表示
+		appendComparisonRow( escapeRtf( leftHeading), escapeRtf( rightHeading), color, request.widthTwips, rtf, true) ;
 		// 各機械IDを一つの2セル行へ対応させ、文長差を次の元行へ伝播させません
 		for( const auto index : group.lineIndices) {
 			checkCancelled( stop) ;
@@ -944,6 +1032,68 @@ void appendLegacyComparison( const ChatDocumentRequest &request, const ReadingVi
 		}
 	}
 	return rtf + "\\pard\\par}" ;
+}
+
+//------------------------------------------------------------------------------
+/**
+ * @brief 検証済みv3の元行対応から時計付きTXT全文をworkerで生成します
+ * @param[in] request 同sourceと採用candidateの共有所有要求
+ * @param[in] view filter前の原文group。呼出し中だけ借用します
+ * @param[in] stop partとgroup間の協調取消し
+ * @return 所有UTF-8全文。未設定または旧候補は保存candidateの本文を保持します
+ * @throws OperationError 元行構造不整合・取消し・出力上限超過
+ */
+//------------------------------------------------------------------------------
+[[nodiscard]] std::string apiExportText( const ChatDocumentRequest &request, const ReadingViewSnapshot &view,
+										const std::stop_token stop)
+{
+	const auto &attempt = *request.apiText ; // prepare入口でsourceと候補SHAを確認済み
+	// 確定元行のないlegacy本文や未設定音声へ時計を推測追加しない
+	if( !request.recordingStartMinutes || !apiTextSpeakerProfile( attempt.draft.catalogSnapshot)) {
+		return attempt.candidate ;
+	}
+	// 元投影・全応答・再構築候補を一緒に照合して保存後改変を拒否する
+	if( attempt.draft.projection != apiTextSpeakerProjection( view.source()) ||
+	   attempt.results.size() != attempt.draft.chunks.size() ||
+	   apiTextCombinedCandidate( attempt) != attempt.candidate) {
+		throw OperationError( ErrorKind::INVALID_INPUT, K_API_TEXT_SPEAKER_STRUCTURE_ERROR) ;
+	}
+	std::vector<std::string> lines( view.lines().size()) ; // 機械IDごとの本文だけを所有
+	// 各完全応答のpartsを同じ元行へ連結し、part境界に改行を作らない
+	for( std::size_t index = 0; index < attempt.results.size(); ++index) {
+		checkCancelled( stop) ;
+		const auto &result = attempt.results[index] ; // 保存応答のborrow
+		// 不完全な生成を明示保存で完全本文へ変えない
+		if( !result.complete) {
+			throw OperationError( ErrorKind::INVALID_INPUT, K_API_TEXT_SPEAKER_STRUCTURE_ERROR) ;
+		}
+		// 検証済み元行以外へ本文を分配しない
+		for( const auto &part : parseApiTextSpeakerParts( attempt.draft, index, result.text)) {
+			checkCancelled( stop) ;
+			// 範囲外IDを隣の元行へ読み替えない
+			if( part.sourceLine >= lines.size()) {
+				throw OperationError( ErrorKind::INVALID_INPUT, K_API_TEXT_SPEAKER_STRUCTURE_ERROR) ;
+			}
+			lines[part.sourceLine] += part.text ;
+		}
+	}
+	std::string output ; // 時計は候補保存値と独立した表示出力へだけ追加
+	// filter前のgroupを共用し、別話者・不明・複数を跨がない
+	for( const auto &group : view.groups()) {
+		checkCancelled( stop) ;
+		const auto &first = *view.lines()[group.lineIndices.front()].original ; // group先頭の元時刻
+		output += formatSpeechHeading( first, view.source(), request.recordingStartMinutes) + "\n" ;
+		// 同じ単一話者の元行間だけ改行し、本文の内部改行を保持する
+		for( const auto index : group.lineIndices) {
+			output += lines[index] + "\n" ;
+		}
+		output += "\n" ;
+		// 名前と時計の増分も既存TXT容量へ含めて途中切断を拒否する
+		if( output.size() > 4 * K_MAXIMUM_TEXT_BYTES) {
+			throw OperationError( ErrorKind::RESULT_TOO_LARGE) ;
+		}
+	}
+	return output ;
 }
 
 //------------------------------------------------------------------------------
@@ -978,7 +1128,8 @@ PreparedChatDocument prepareChatDocument( const ChatDocumentRequest &request, co
 	checkCancelled( stop) ;
 	// HWND/元音声なしの要求でも、ID・幅・言語と元本文を確認する
 	if( !request.source || request.historyId == 0 || request.widthTwips < 1800 || request.widthTwips > 1'000'000 ||
-	   request.heading.size() > 65536 || !setUiLanguage( request.language)) {
+	   request.heading.size() > 65536 || (request.recordingStartMinutes && *request.recordingStartMinutes >= 1440) ||
+	   !setUiLanguage( request.language)) {
 		throw OperationError( ErrorKind::INVALID_INPUT) ;
 	}
 	ReadingSourceKey key{request.historyId, {}} ; // 検証をworkerで行う元の履歴key
@@ -1009,7 +1160,11 @@ PreparedChatDocument prepareChatDocument( const ChatDocumentRequest &request, co
 		   request.apiText->candidateSha != apiTextDigest( request.apiText->candidate)) {
 			throw OperationError( ErrorKind::INVALID_INPUT) ;
 		}
-		document.correctedFullText = toWide( request.apiText->candidate) ;
+		document.renderedExport.source = key ;
+		document.renderedExport.candidate = request.apiText ;
+		document.renderedExport.recordingStartMinutes = request.recordingStartMinutes ;
+		document.renderedExport.text = apiExportText( request, view, stop) ;
+		document.correctedFullText = toWide( document.renderedExport.text) ;
 		document.fullText = document.correctedFullText ;
 		// 比較は二文書の同期ではなく、単一表の同じ行へ左右を構築します
 		if( request.compareApiText) {
@@ -1026,7 +1181,8 @@ PreparedChatDocument prepareChatDocument( const ChatDocumentRequest &request, co
 					   "\\par " ;
 		// 新規v3は機械ID、legacyは保存本文の明示ラベルだけで表示します
 		if( apiTextSpeakerProfile( request.apiText->draft.catalogSnapshot)) {
-			appendApiTurnBlocks( *request.apiText, *request.source, request.widthTwips, document.rtf, stop) ;
+			appendApiTurnBlocks( *request.apiText, *request.source, request.widthTwips, document.rtf, stop,
+								request.recordingStartMinutes) ;
 		} else {
 			appendApiSpeakerBlocks( document.correctedFullText, *request.source, request.widthTwips, document.rtf, stop) ;
 		}
@@ -1096,7 +1252,8 @@ PreparedChatDocument prepareChatDocument( const ChatDocumentRequest &request, co
 		if( document.rtf.size() > 16 * K_MAXIMUM_TEXT_BYTES) {
 			throw OperationError( ErrorKind::RESULT_TOO_LARGE) ;
 		}
-		document.fullText = toWide( renderTranscript( *request.source, ExportFormat::PLAIN_TEXT)) ;
+		document.fullText =
+			toWide( renderTranscript( *request.source, ExportFormat::PLAIN_TEXT, request.recordingStartMinutes)) ;
 		checkCancelled( stop) ;
 		return document ;
 	}
@@ -1137,12 +1294,13 @@ PreparedChatDocument prepareChatDocument( const ChatDocumentRequest &request, co
 		const int color = first.speakers.empty()	  ? 8
 						  : first.speakers.size() > 1 ? 9
 													  : 2 + (first.speakers.front() - 1) % 6 ; // 同じ番号は同じ色
-		document.rtf += "\\trowd\\trgaph140\\trleft0\\trpaddl160\\trpaddr160"
-						"\\trpaddt100\\trpaddb100\\trpaddfl3\\trpaddfr3\\trpaddft3\\trpaddfb3\\clcbpat" +
-						std::to_string( color) + "\\cellx" + std::to_string( request.widthTwips) +
-						"\\pard\\intbl\\sa120\\sb100\\b\\fs20 " + escapeRtf( uiSpeakerLabel( first, view.source())) +
-						"  \\b0\\fs18 " + formatTimestamp( group.startMs) + " - " + formatTimestamp( group.endMs) +
-						"\\line\\fs22 " ;
+		document.rtf +=
+			"\\trowd\\trgaph140\\trleft0\\trpaddl160\\trpaddr160"
+			"\\trpaddt100\\trpaddb100\\trpaddfl3\\trpaddfr3\\trpaddft3\\trpaddfb3\\clcbpat" +
+			std::to_string( color) + "\\cellx" + std::to_string( request.widthTwips) +
+			"\\pard\\intbl\\sa120\\sb100\\b\\fs20 " +
+			escapeRtf( speechHeading( first, view.source(), group.startMs, group.endMs, request.recordingStartMinutes)) +
+			"\\b0\\fs18 " + "\\line\\fs22 " ;
 		bool firstLine = true ; // 同じ話者の反復も一行ずつ残す
 		// 元indexを保ち、置換/原文の本文だけを投影する
 		for( const auto index : group.lineIndices) {
@@ -1175,6 +1333,7 @@ PreparedChatDocument prepareChatDocument( const ChatDocumentRequest &request, co
 	exportRequest.sourceKey = key ;
 	exportRequest.formatted = request.formatted ;
 	exportRequest.display = request.display ;
+	exportRequest.recordingStartMinutes = request.recordingStartMinutes ;
 	document.fullText = toWide( renderReadingExport( exportRequest)) ;
 	checkCancelled( stop) ;
 	return document ;

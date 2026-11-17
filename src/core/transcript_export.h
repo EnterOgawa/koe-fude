@@ -5,7 +5,7 @@
  *
  * @file transcript_export.h
  * @brief 文字起こしの明示保存と表示文字列の生成を宣言します
- * @version 1.0.0
+ * @version 1.1.0
  * @date 2026/09/09
  * @author Shunji Ogawa
  * @par 更新履歴
@@ -19,12 +19,16 @@
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1428の関数ヘッダーを上下区切り線と複数行へ統一
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1433の更新履歴を新規作成からの昇順・末尾追記へ統一
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1437のコメント行末・終端の句点を省略
+ * 1.0.0 Shunji Ogawa 2026/11/17 ADR1447の任意録音開始時刻と連続話者見出しを接続
+ * 1.1.0 Shunji Ogawa 2026/11/17 ADR1448の録音開始時刻対応版1.1.0へ版を整合
  * </pre>
  */
 //------------------------------------------------------------------------------
 #pragma once
 
+#include <cstdint>
 #include <filesystem>
+#include <optional>
 #include <span>
 #include <string>
 #include <string_view>
@@ -53,6 +57,30 @@ enum class ExportFormat {
  */
 //------------------------------------------------------------------------------
 [[nodiscard]] std::string				  formatTimestamp( std::int64_t milliseconds, bool comma = false) ;
+
+//------------------------------------------------------------------------------
+/**
+ * @brief 録音開始分と元offsetから日跨ぎを保持した時計時刻を作ります
+ * @param[in] milliseconds 元音声先頭からの非負offset（ms）。分未満は切り捨てます
+ * @param[in] startMinutes 0時からの開始分（0..1439）
+ * @return 所有UTF-8のHH:mm。翌日以降は (+N日) を付けます
+ * @throws OperationError 負offsetまたは範囲外の開始分。部分時刻は返しません
+ */
+//------------------------------------------------------------------------------
+[[nodiscard]] std::string				  formatRecordingClock( std::int64_t milliseconds, std::uint16_t startMinutes) ;
+
+//------------------------------------------------------------------------------
+/**
+ * @brief 表示metadataがあれば時計付き話者見出しを、なければ従来の相対見出しを作ります
+ * @param[in] line 元時刻・話者の借用。変更しません
+ * @param[in] transcript 同じ音声の表示名。変更しません
+ * @param[in] startMinutes 任意の録音開始分（0..1439）
+ * @return 所有UTF-8見出し。本文や保存identityは変更しません
+ * @throws OperationError 不正な開始分またはoffset
+ */
+//------------------------------------------------------------------------------
+[[nodiscard]] std::string				  formatSpeechHeading( const TranscriptLine &line, const Transcript &transcript,
+															  std::optional<std::uint16_t> startMinutes) ;
 
 //------------------------------------------------------------------------------
 /**
@@ -89,11 +117,13 @@ enum class ExportFormat {
  * @brief 表示とcopyに使うUTF-8文字列を生成します
  * @param[in] transcript 所有結果の借用参照
  * @param[in] format 出力形式
+ * @param[in] startMinutes 任意の録音開始分（0..1439）。TXTだけへ反映します
  * @return 所有UTF-8文字列
  * @throws OperationError 未定義形式・出力上限超過
  */
 //------------------------------------------------------------------------------
-[[nodiscard]] std::string renderTranscript( const Transcript &transcript, ExportFormat format) ;
+[[nodiscard]] std::string renderTranscript( const Transcript &transcript, ExportFormat format,
+										   std::optional<std::uint16_t> startMinutes = std::nullopt) ;
 
 //------------------------------------------------------------------------------
 /**

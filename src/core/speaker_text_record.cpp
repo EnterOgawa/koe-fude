@@ -5,7 +5,7 @@
  *
  * @file speaker_text_record.cpp
  * @brief 独立投影の固定来歴、再読検証、原byte exportを実装します
- * @version 1.0.0
+ * @version 1.1.0
  * @date 2026/11/10
  * @author Shunji Ogawa
  * @par 更新履歴
@@ -20,11 +20,14 @@
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1431の各関数へ役割・全引数・戻り値を直接記載
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1433の更新履歴を新規作成からの昇順・末尾追記へ統一
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1437のコメント行末・終端の句点を省略
+ * 1.0.0 Shunji Ogawa 2026/11/17 ADR1447の任意録音開始時刻と連続話者見出しを接続
+ * 1.1.0 Shunji Ogawa 2026/11/17 ADR1448の録音開始時刻対応版1.1.0へ版を整合
  * </pre>
  */
 //------------------------------------------------------------------------------
 #include "core/speaker_text_record.h"
 #include "core/reading_view.h"
+#include "core/transcript_export.h"
 #include "core/speaker_text_json.h"
 #include "inference/model_store.h"
 #include "platform/win_helpers.h"
@@ -571,13 +574,19 @@ bool speakerTextHasContent( const std::string_view body)
  * @param[in] source 現原文/表示名
  * @param[in] audio 原音声record
  * @param[in] projection 採用
+ * @param[in] recordingStartMinutes 任意の録音開始分（0..1439）。元窓開始offsetだけを加算します
  * @return 全中立も含むUTF-8。通常copy/TXTとは別の明示出力です
  * @see koefude::renderSpeakerTextExport
  */
 //------------------------------------------------------------------------------
 std::string renderSpeakerTextExport( const Transcript &source, const ApiAudioRecord &audio,
-									const SpeakerTextProjectionRecord &projection)
+									const SpeakerTextProjectionRecord &projection,
+									const std::optional<std::uint16_t> recordingStartMinutes)
 {
+	// 無設定以外は時計metadataも原byte出力前に検証する
+	if( recordingStartMinutes && *recordingStartMinutes >= 1440) {
+		throw OperationError( ErrorKind::INVALID_INPUT) ;
+	}
 	validateSpeakerTextRecord( projection, source, audio, false) ;
 	std::string out = "話者はPC内の音響推定と本文対応です。APIの語時刻ではありません。\r\n" ; // 明示exportの説明
 	const auto	chunks = speakerTextSourceChunks( audio) ; // 空完全応答の正しい対応
@@ -603,7 +612,12 @@ std::string renderSpeakerTextExport( const Transcript &source, const ApiAudioRec
 					const auto found = source.speakerNames.find( speaker) ;
 					name = found == source.speakerNames.end() ? "話者" + std::to_string( speaker) : found->second ;
 				}
-				out += "[" + name + "]\r\n" ;
+				out += "[" + name + "]" ;
+				// part固有時刻は作らず、元送信窓の開始だけを各見出しへ示す
+				if( recordingStartMinutes) {
+					out += " " + formatRecordingClock( original.startMs, *recordingStartMinutes) ;
+				}
+				out += "\r\n" ;
 				out += text ;
 				out += "\r\n\r\n" ;
 			} ; // 同期原byte借用
@@ -612,10 +626,19 @@ std::string renderSpeakerTextExport( const Transcript &source, const ApiAudioRec
 			append( original.speakers.front(), original.text) ;
 			continue ;
 		}
-		// 混在窓は中立も含む全partsの原byteを順に出す
-		for( const auto &part : projection.windows[chunk].parts) {
-			append( part.speaker,
-				   std::string_view( audio.chunks[chunk].text).substr( part.byteBegin, part.byteEnd - part.byteBegin)) ;
+		const auto &parts = projection.windows[chunk].parts ; // 同元窓の検証済み全partition
+		// 同じ正IDの隣接partだけを一見出しにし、不明・別話者を跨がない
+		for( std::size_t first = 0; first < parts.size();) {
+			std::size_t end = first + 1 ; // 一つの表示groupの半開part終端
+			// 隣接byteかつ同一正IDの間だけgroupを延長する
+			while( end < parts.size() && parts[first].speaker > 0 && parts[end].speaker == parts[first].speaker &&
+				  parts[end - 1].byteEnd == parts[end].byteBegin) {
+				++end ;
+			}
+			append( parts[first].speaker,
+				   std::string_view( audio.chunks[chunk].text)
+					   .substr( parts[first].byteBegin, parts[end - 1].byteEnd - parts[first].byteBegin)) ;
+			first = end ;
 		}
 		require( out.size() <= 16 * K_MAXIMUM_TEXT_BYTES) ;
 	}

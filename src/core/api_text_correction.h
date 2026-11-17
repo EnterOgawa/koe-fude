@@ -5,7 +5,7 @@
  *
  * @file api_text_correction.h
  * @brief 明示選択した原文を送るAPI補正の所有契約を定義します
- * @version 1.0.0
+ * @version 1.1.0
  * @date 2026/11/08
  * @author Shunji Ogawa
  * @par 更新履歴
@@ -27,6 +27,8 @@
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1431の各関数へ役割・全引数・戻り値を直接記載
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1433の更新履歴を新規作成からの昇順・末尾追記へ統一
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1437のコメント行末・終端の句点を省略
+ * 1.0.0 Shunji Ogawa 2026/11/17 ADR1447の任意録音開始時刻と連続話者見出しを接続
+ * 1.1.0 Shunji Ogawa 2026/11/17 ADR1448の録音開始時刻対応版1.1.0へ版を整合
  * </pre>
  */
 //------------------------------------------------------------------------------
@@ -485,38 +487,51 @@ enum class ApiTextAction {
 	/// 行メニュー一回で準備・送信・完全保存後の採用表示
 	IMPROVE
 } ;
+/** @brief 表示workerだけが準備する非永続のAPI TXT出力snapshotです */
+struct ApiTextRenderedExport {
+	/// 元本文を照合するIDとSHA。時計値は含めません
+	ReadingSourceKey					  source ;
+	/// この全文に対応する検証済み候補の不変owner
+	std::shared_ptr<const ApiTextAttempt> candidate ;
+	/// 全文構築時に固定した任意の開始分（0..1439）
+	std::optional<std::uint16_t>		  recordingStartMinutes ;
+	/// workerで生成したUTF-8全文。API送信・保存候補へ流用しません
+	std::string							  text ;
+} ;
 /** @brief 同じJobControllerへ渡す専用要求です */
 struct ApiTextCorrectionJobRequest {
 	/// 準備/送信で選択した全設定
-	std::string							catalogSnapshot ;
+	std::string									 catalogSnapshot ;
 	/// 直接実行受付時の正本世代
-	std::uint64_t						catalogGeneration = 0 ;
+	std::uint64_t								 catalogGeneration = 0 ;
 	/// 直接実行受付時のキー世代
-	std::uint64_t						keyRevision = 0 ;
+	std::uint64_t								 keyRevision = 0 ;
 	/// 明示操作
-	ApiTextAction						action = ApiTextAction::PREPARE ;
+	ApiTextAction								 action = ApiTextAction::PREPARE ;
 	/// 原文owner
-	std::shared_ptr<const Transcript>	source ;
+	std::shared_ptr<const Transcript>			 source ;
 	/// source identity
-	ReadingSourceKey					key ;
+	ReadingSourceKey							 key ;
 	/// submitで発行
-	std::uint64_t						operationId = 0 ;
+	std::uint64_t								 operationId = 0 ;
 	/// 確認全文
-	std::shared_ptr<const ApiTextDraft> draft ;
+	std::shared_ptr<const ApiTextDraft>			 draft ;
 	/// Sendだけで必要
-	ApiTextConsent						consent ;
+	ApiTextConsent								 consent ;
 	/// 採用/再保存で再生成しない
-	ApiTextCorrectionRecord				record ;
+	ApiTextCorrectionRecord						 record ;
 	/// SetKeyだけの非永続lease
-	std::shared_ptr<const ApiKeySecret> secret ;
+	std::shared_ptr<const ApiKeySecret>			 secret ;
 	/// opt-in既定OFF
-	bool								persistKey = false ;
+	bool										 persistKey = false ;
 	/// SetKeyでworkerの現秘密を保持して保存方式だけ変更
-	bool								retainKey = false ;
+	bool										 retainKey = false ;
 	/// USD百万分の一
-	std::uint64_t						budget = 5000000 ;
+	std::uint64_t								 budget = 5000000 ;
 	/// 明示TXT出力、送信bodyへ混ぜない
-	std::filesystem::path				exportPath ;
+	std::filesystem::path						 exportPath ;
+	/// EXPORTだけの共有所有表示全文。受付後の時計変更から独立
+	std::shared_ptr<const ApiTextRenderedExport> renderedExport ;
 } ;
 /** @brief API workerの型付き終端です */
 struct ApiTextJobCompletion {

@@ -5,7 +5,7 @@
  *
  * @file history.cpp
  * @brief 履歴の保存形式と外部byte列の件数・文字・時刻を検証します
- * @version 1.0.0
+ * @version 1.1.0
  * @date 2026/09/10
  * @author Shunji Ogawa
  * @par 更新履歴
@@ -30,6 +30,8 @@
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1431の各関数へ役割・全引数・戻り値を直接記載
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1433の更新履歴を新規作成からの昇順・末尾追記へ統一
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1437のコメント行末・終端の句点を省略
+ * 1.0.0 Shunji Ogawa 2026/11/17 ADR1447の任意録音開始時刻と連続話者見出しを接続
+ * 1.1.0 Shunji Ogawa 2026/11/17 ADR1448の録音開始時刻対応版1.1.0へ版を整合
  * </pre>
  */
 //------------------------------------------------------------------------------
@@ -55,10 +57,9 @@
 namespace koefude {
 namespace {
 constexpr std::uint64_t K_HISTORY_MAGIC = 0x3154534948464f4bULL ; // ASCIIのKOFHIST1識別子
-constexpr std::uint32_t K_HISTORY_VERSION =
-	8 ; // 音声APIの部分原文拡張。PCMと自由全文の独立拡張。形式1〜5の原文・旧整形を保持
-constexpr std::size_t K_MAXIMUM_PATH_BYTES = 32767 * 4 ; // UTF-8で保持できるpathのbyte上限
-constexpr std::size_t K_MAXIMUM_NAME_BYTES = 256 ; // UIが受け付ける64 UTF-16単位のUTF-8上限
+constexpr std::uint32_t K_HISTORY_VERSION = 9 ; // V8末尾へ録音開始分だけを追加し、旧原文と独立拡張を保持
+constexpr std::size_t	K_MAXIMUM_PATH_BYTES = 32767 * 4 ; // UTF-8で保持できるpathのbyte上限
+constexpr std::size_t	K_MAXIMUM_NAME_BYTES = 256 ; // UIが受け付ける64 UTF-16単位のUTF-8上限
 
 //------------------------------------------------------------------------------
 /**
@@ -66,7 +67,7 @@ constexpr std::size_t K_MAXIMUM_NAME_BYTES = 256 ; // UIが受け付ける64 UTF
  * @param[in] valid 成立すべき保存形式の条件
  */
 //------------------------------------------------------------------------------
-void				  requireHistory( const bool valid)
+void					requireHistory( const bool valid)
 {
 	// 検証に失敗した履歴から部分結果を返さない
 	if( !valid) {
@@ -199,6 +200,7 @@ void validateSnapshot( const HistorySnapshot &snapshot)
 	std::uint64_t previousId = 0 ; // 登録順とID再利用を照合する直前ID
 	// 全entryを順に検証してから保存・表示へ進める
 	for( const auto &entry : snapshot.entries) {
+		requireHistory( !entry.recordingStartMinutes || *entry.recordingStartMinutes < 1440) ;
 		requireHistory( entry.id > previousId && entry.id < snapshot.nextId &&
 					   static_cast<unsigned>( entry.state) <= static_cast<unsigned>( HistoryState::INTERRUPTED) &&
 					   static_cast<unsigned>( entry.error) <= static_cast<unsigned>( ErrorKind::TEMPORARY_STORAGE)) ;
@@ -1066,6 +1068,19 @@ void writeHistory( const HistorySnapshot &snapshot, Writer &writer)
 			writer.text( encodeApiAudioRecord( *entry.apiAudio)) ;
 		}
 	}
+	constexpr char CLOCK_DOMAIN[] = "koefude.history_recording_clock.v9" ; // NUL込み末尾識別子
+	writer.raw( {reinterpret_cast<const std::uint8_t *>( CLOCK_DOMAIN), sizeof(CLOCK_DOMAIN)}) ;
+	writer.number( 1) ;
+	writer.number( snapshot.entries.size()) ;
+	// 同じ登録順のIDへ任意の表示metadataだけを束縛する
+	for( const auto &entry : snapshot.entries) {
+		writer.number( entry.id, 8) ;
+		writer.number( entry.recordingStartMinutes.has_value()) ;
+		// 未設定には架空の開始分を保存しない
+		if( entry.recordingStartMinutes) {
+			writer.number( *entry.recordingStartMinutes) ;
+		}
+	}
 }
 
 //------------------------------------------------------------------------------
@@ -1119,7 +1134,7 @@ HistorySnapshot decodeHistory( const std::span<const std::uint8_t> bytes)
 	const auto version = reader.number() ; // 並びが同じ旧版との互換性を確認する版番号
 	// 対応する旧版だけを明示して許可し、未知の新形式を推測で読まない
 	if( version != 1 && version != 2 && version != 3 && version != 4 && version != 5 && version != 6 && version != 7 &&
-	   version != K_HISTORY_VERSION) {
+	   version != 8 && version != K_HISTORY_VERSION) {
 		throw HistoryError( HistoryErrorKind::VERSION) ;
 	}
 	HistorySnapshot snapshot ; // 完全検証後にだけ呼出し元へ返す所有履歴
@@ -1220,6 +1235,27 @@ HistorySnapshot decodeHistory( const std::span<const std::uint8_t> bytes)
 					source->apiAudioWindowTimes = true ;
 					entry.result = std::move( source) ;
 				}
+			}
+		}
+	}
+	// V9は旧原文・API保存値と独立した開始分だけを復元する
+	if( version >= 9) {
+		constexpr char CLOCK_DOMAIN[] = "koefude.history_recording_clock.v9" ; // NUL込み
+		const auto	   rest = reader.remaining() ; // 消費前の有限borrow
+		requireHistory( rest.size() >= sizeof(CLOCK_DOMAIN) &&
+					   std::equal( rest.begin(), rest.begin() + sizeof(CLOCK_DOMAIN),
+								  reinterpret_cast<const std::uint8_t *>( CLOCK_DOMAIN))) ;
+		reader.consume( sizeof(CLOCK_DOMAIN)) ;
+		requireHistory( reader.number() == 1) ;
+		requireHistory( reader.count( K_MAXIMUM_HISTORY, 12) == snapshot.entries.size()) ;
+		// 未知・重複・逆順IDと不正presenceや分値を全体拒否する
+		for( auto &entry : snapshot.entries) {
+			requireHistory( reader.number( 8) == entry.id) ;
+			// 旧履歴と明示解除は未設定のまま維持する
+			if( reader.flag()) {
+				const auto minutes = reader.number() ; // narrow前に全保存値を検証
+				requireHistory( minutes < 1440) ;
+				entry.recordingStartMinutes = static_cast<std::uint16_t>( minutes) ;
 			}
 		}
 	}

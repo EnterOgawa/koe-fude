@@ -5,7 +5,7 @@
  *
  * @file reading_export.cpp
  * @brief 元行と時刻・話者を保持した整形TXTを構築します
- * @version 1.0.0
+ * @version 1.1.0
  * @date 2026/10/04
  * @author Shunji Ogawa
  * @par 更新履歴
@@ -20,6 +20,8 @@
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1431の各関数へ役割・全引数・戻り値を直接記載
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1433の更新履歴を新規作成からの昇順・末尾追記へ統一
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1437のコメント行末・終端の句点を省略
+ * 1.0.0 Shunji Ogawa 2026/11/17 ADR1447の任意録音開始時刻と連続話者見出しを接続
+ * 1.1.0 Shunji Ogawa 2026/11/17 ADR1448の録音開始時刻対応版1.1.0へ版を整合
  * </pre>
  */
 //------------------------------------------------------------------------------
@@ -54,7 +56,7 @@ void appendText( std::string &output, const std::string_view text)
 /**
  * @brief 固定した版の全文をUTF-8へ構築します
  * @param[in] request 所有source/overlayを持つ保存要求。変更しません
- * @return 原文の既存byte列、または元時刻/話者を保つ整形TXT
+ * @return 元offsetに基づく任意の時計付きTXT、または従来相対時刻の字幕
  * @throws OperationError 不整合なsource、未対応形式、容量超過
  * @note worker限定です。元音声・モデルを開きません
  * @see koefude::renderReadingExport
@@ -62,21 +64,26 @@ void appendText( std::string &output, const std::string_view text)
 //------------------------------------------------------------------------------
 std::string renderReadingExport( const ExportJobRequest &request)
 {
+	// 空の結果や整形版でも不正な表示metadataを受理しない
+	if( request.recordingStartMinutes && *request.recordingStartMinutes >= 1440) {
+		throw OperationError( ErrorKind::INVALID_INPUT) ;
+	}
 	// 明示専用操作だけにlabelを出力し、通常raw/copy/字幕の契約を変えない
 	if( request.speakerText) {
 		// 明示話者出力は同sourceのTXTだけに限定する
 		if( !request.source || !request.speakerAudio || request.format != ExportFormat::PLAIN_TEXT) {
 			throw OperationError( ErrorKind::INVALID_INPUT) ;
 		}
-		return renderSpeakerTextExport( *request.source, *request.speakerAudio, *request.speakerText) ;
+		return renderSpeakerTextExport( *request.source, *request.speakerAudio, *request.speakerText,
+									   request.recordingStartMinutes) ;
 	}
 	// 不明な版と原文なしは出力先へ書き込む前に拒否する
 	if( !request.source || static_cast<std::uint32_t>( request.display) > 1) {
 		throw OperationError( ErrorKind::INVALID_INPUT) ;
 	}
-	// 原文は既存rendererの全byteと字幕cueをそのまま使用する
+	// 原文TXTは任意の時計見出しを生成し、字幕は従来の相対cueを維持する
 	if( request.display == ReadingDisplay::ORIGINAL) {
-		return renderTranscript( *request.source, request.format) ;
+		return renderTranscript( *request.source, request.format, request.recordingStartMinutes) ;
 	}
 	// 補正語句の発話時刻を推定した字幕を作らない
 	if( request.format != ExportFormat::PLAIN_TEXT) {
@@ -95,9 +102,13 @@ std::string renderReadingExport( const ExportJobRequest &request)
 						 " / 原文保持行: " + std::to_string( retained) + "\n\n" ; // hashや内部profileは本文へ出さない
 	// 既存投影のgroupを使い、別話者の行を跨いで本文を連結しない
 	for( const auto &group : view.groups()) {
-		const auto &first = view.lines()[group.lineIndices.front()] ; // 元話者/注記の参照行
-		appendText( output, "[" + formatTimestamp( group.startMs) + " - " + formatTimestamp( group.endMs) + "] " +
-							   formatSpeakerLabel( *first.original, view.source()) + "\n") ;
+		const auto	  &first = view.lines()[group.lineIndices.front()] ; // 元話者/注記の参照行
+		TranscriptLine heading ; // 本文を複製せずgroup先頭時刻と話者だけを所有
+		heading.startMs = group.startMs ;
+		heading.endMs = group.endMs ;
+		heading.speakers = first.original->speakers ;
+		heading.attribution.kind = first.original->attribution.kind ;
+		appendText( output, formatSpeechHeading( heading, view.source(), request.recordingStartMinutes) + "\n") ;
 		// 元行順と各行の改行を保持して置換/原文を投影する
 		for( const auto index : group.lineIndices) {
 			appendText( output, view.lines()[index].text) ;

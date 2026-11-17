@@ -6,7 +6,7 @@
  *
  * @file chat_document.h
  * @brief 同一話者をまとめた色付きチャット表示を宣言します
- * @version 1.0.0
+ * @version 1.1.0
  * @date 2026/09/09
  * @author Shunji Ogawa
  * @par 更新履歴
@@ -30,6 +30,8 @@
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1428の関数ヘッダーを上下区切り線と複数行へ統一
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1433の更新履歴を新規作成からの昇順・末尾追記へ統一
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1437のコメント行末・終端の句点を省略
+ * 1.0.0 Shunji Ogawa 2026/11/17 ADR1447の任意録音開始時刻と連続話者見出しを接続
+ * 1.1.0 Shunji Ogawa 2026/11/17 ADR1448の録音開始時刻対応版1.1.0へ版を整合
  * </pre>
  */
 
@@ -53,6 +55,7 @@
 
 #include "core/whole_text_persistence.h"
 
+#include <optional>
 #include <cstddef>
 
 #include <cstdint>
@@ -130,12 +133,14 @@ struct ChatDocumentRequest {
 
 	/// 同targetの不変元record
 	std::shared_ptr<const ApiAudioRecord>			   speakerAudio ;
+	/// 原文identityから独立した任意の録音開始分（0..1439）
+	std::optional<std::uint16_t>					   recordingStartMinutes ;
 
 	//------------------------------------------------------------------------------
 	/**
 	 * @brief 表示要求の重複抑止・文書受領に使う条件を比較します
 	 * @param[in] other 比較する表示要求。呼出し中だけの読取り借用で、保持しません
-	 * @return historyId/display、UTF-16のheading、filter、widthTwips（twip）、language、
+	 * @return historyId/display、UTF-16のheading、filter、widthTwips（twip）、language、任意の開始分、
 	 * 四表示flagが同じで、八shared_ptrの保持pointerもすべて一致すればtrue。それ以外はfalseです
 	 * 両者の空pointerも一致として扱います。文書の構築・保存成功を返す関数ではありません
 	 * @note shared_ptrはget()のpointerだけを比較し、参照先の本文・recordの深い同値を調べません
@@ -164,8 +169,10 @@ struct PreparedChatDocument {
 	/// 全話者の明示copy用UTF-16。UIで作らない
 	std::wstring							   fullText ;
 
-	/// 専用copyの本文無編集UTF-16
+	/// 専用copyのUTF-16。API v3は保存候補を変えず時計見出しだけを派生生成
 	std::wstring							   correctedFullText ;
+	/// API TXT専用。文書ownerへのaliasでworkerへ渡せる非永続snapshot
+	ApiTextRenderedExport					   renderedExport ;
 } ;
 
 //------------------------------------------------------------------------------

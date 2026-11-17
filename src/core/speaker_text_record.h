@@ -5,7 +5,7 @@
  *
  * @file speaker_text_record.h
  * @brief 原APIとは独立した話者表示の所有値、CAS、保存portを定義します
- * @version 1.0.0
+ * @version 1.1.0
  * @date 2026/11/10
  * @author Shunji Ogawa
  * @par 更新履歴
@@ -19,6 +19,8 @@
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1428の関数ヘッダーを上下区切り線と複数行へ統一
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1433の更新履歴を新規作成からの昇順・末尾追記へ統一
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1437のコメント行末・終端の句点を省略
+ * 1.0.0 Shunji Ogawa 2026/11/17 ADR1447の任意録音開始時刻と連続話者見出しを接続
+ * 1.1.0 Shunji Ogawa 2026/11/17 ADR1448の録音開始時刻対応版1.1.0へ版を整合
  * </pre>
  */
 //------------------------------------------------------------------------------
@@ -310,9 +312,11 @@ decodeSpeakerTextRecord( std::string_view bytes, const Transcript &source, const
  * @param[in] source 現原文/表示名
  * @param[in] audio 原音声record
  * @param[in] projection 採用
+ * @param[in] recordingStartMinutes 任意の録音開始分（0..1439）。元窓開始offsetだけを加算します
  * @return 全中立も含むUTF-8。通常copy/TXTとは別の明示出力です
  */
 //------------------------------------------------------------------------------
 [[nodiscard]] std::string			   renderSpeakerTextExport( const Transcript &source, const ApiAudioRecord &audio,
-															   const SpeakerTextProjectionRecord &projection) ;
+															   const SpeakerTextProjectionRecord &projection,
+															   std::optional<std::uint16_t> recordingStartMinutes = std::nullopt) ;
 } // namespace koefude

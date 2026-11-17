@@ -2,7 +2,7 @@
 /**
  * @file koefude.rc
  * @brief 多言語UI、自作アイコン、version情報、manifestを定義します
- * @version 1.0.0
+ * @version 1.1.0
  * @date 2026/09/09
  * @author Shunji Ogawa
  * @copyright Copyright (c) 2026 Shunji Ogawa. MIT License.
@@ -42,6 +42,8 @@
  * 1.0.0 Shunji Ogawa 2026/11/11 ADR1402の通常取得dialogと未確認理由を追加
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1433の更新履歴を新規作成からの昇順・末尾追記へ統一
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1437のコメント行末・終端の句点を省略
+ * 1.0.0 Shunji Ogawa 2026/11/17 ADR1447の任意録音開始時刻と連続話者見出しを接続
+ * 1.1.0 Shunji Ogawa 2026/11/17 ADR1448の録音開始時刻対応版1.1.0へ版を整合
  * </pre>
  */
 //------------------------------------------------------------------------------
@@ -639,4 +641,17 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 STRINGTABLE
 BEGIN
     IDS_API_COMPARE_LEGACY "Saved result: text-based display alignment; blank opposite unpaired cards (speakers follow each column's labels)"
+END
+
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+IDD_RECORDING_CLOCK DIALOGEX 0, 0, 330, 112
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION ""
+FONT 9, "ＭＳ ゴシック"
+BEGIN
+    LTEXT "", IDC_RECORDING_CLOCK_LABEL, 10, 10, 308, 32
+    EDITTEXT IDC_RECORDING_CLOCK_EDIT, 10, 46, 78, 18, ES_AUTOHSCROLL | WS_TABSTOP
+    DEFPUSHBUTTON "", IDOK, 82, 78, 74, 24
+    PUSHBUTTON "", IDC_RECORDING_CLOCK_CLEAR, 164, 78, 74, 24
+    PUSHBUTTON "", IDCANCEL, 246, 78, 74, 24
 END

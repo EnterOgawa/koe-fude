@@ -6,7 +6,7 @@
  *
  * @file history.h
  * @brief 再起動後も保持する履歴の所有値と保存形式の境界を定義します
- * @version 1.0.0
+ * @version 1.1.0
  * @date 2026/09/10
  * @author Shunji Ogawa
  * @par 更新履歴
@@ -25,6 +25,8 @@
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1428の関数ヘッダーを上下区切り線と複数行へ統一
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1433の更新履歴を新規作成からの昇順・末尾追記へ統一
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1437のコメント行末・終端の句点を省略
+ * 1.0.0 Shunji Ogawa 2026/11/17 ADR1447の任意録音開始時刻と連続話者見出しを接続
+ * 1.1.0 Shunji Ogawa 2026/11/17 ADR1448の録音開始時刻対応版1.1.0へ版を整合
  * </pre>
  */
 
@@ -43,6 +45,7 @@
 #include <filesystem>
 
 #include <memory>
+#include <optional>
 
 #include <span>
 
@@ -140,6 +143,8 @@ struct HistoryEntry {
 
 	/// 独立sidecar。V8/rawの符号化対象にしない
 	SpeakerTextRecord					  speakerText ;
+	/// 原文identityと独立した任意の録音開始分（0..1439）
+	std::optional<std::uint16_t>		  recordingStartMinutes ;
 } ;
 
 /** @brief 最大32件の履歴とIDの払い出し位置を所有します */

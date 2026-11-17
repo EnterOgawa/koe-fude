@@ -5,7 +5,7 @@
  *
  * @file transcript_export.cpp
  * @brief 時刻・話者付きtextを生成し、明示出力先へ保存します
- * @version 1.0.0
+ * @version 1.1.0
  * @date 2026/09/09
  * @author Shunji Ogawa
  * @par 更新履歴
@@ -23,6 +23,8 @@
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1431の各関数へ役割・全引数・戻り値を直接記載
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1433の更新履歴を新規作成からの昇順・末尾追記へ統一
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1437のコメント行末・終端の句点を省略
+ * 1.0.0 Shunji Ogawa 2026/11/17 ADR1447の任意録音開始時刻と連続話者見出しを接続
+ * 1.1.0 Shunji Ogawa 2026/11/17 ADR1448の録音開始時刻対応版1.1.0へ版を整合
  * </pre>
  */
 //------------------------------------------------------------------------------
@@ -295,18 +297,83 @@ std::string formatTimestamp( const std::int64_t milliseconds, const bool comma)
 
 //------------------------------------------------------------------------------
 /**
+ * @brief 録音開始分と元offsetから日跨ぎを保持した時計時刻を作ります
+ * @param[in] milliseconds 元音声先頭からの非負offset（ms）。分未満は切り捨てます
+ * @param[in] startMinutes 0時からの開始分（0..1439）
+ * @return 所有UTF-8のHH:mm。翌日以降は (+N日) を付けます
+ * @throws OperationError 負offsetまたは範囲外の開始分。部分時刻は返しません
+ */
+//------------------------------------------------------------------------------
+std::string formatRecordingClock( const std::int64_t milliseconds, const std::uint16_t startMinutes)
+{
+	// 元時刻や表示metadataの破損を正常な時計へ丸めない
+	if( milliseconds < 0 || startMinutes >= 1440) {
+		throw OperationError( ErrorKind::INVALID_INPUT) ;
+	}
+	const auto offsetMinutes = static_cast<std::uint64_t>( milliseconds) / 60000 ; // 分未満切捨て
+	// 加算境界を明示して将来のoffset型変更でもwrapを拒否する
+	if( offsetMinutes > UINT64_MAX - startMinutes) {
+		throw OperationError( ErrorKind::INVALID_TIMELINE) ;
+	}
+	const auto			minutes = offsetMinutes + startMinutes ; // 元音声先頭から加算した総分
+	const auto			minuteOfDay = minutes % 1440 ; // 日付を推定しない24時間内位置
+	std::array<char, 6> buffer{} ; // HH:mmと終端NUL
+	const int			written =
+		std::snprintf( buffer.data(), buffer.size(), "%02u:%02u", static_cast<unsigned>( minuteOfDay / 60),
+					  static_cast<unsigned>( minuteOfDay % 60)) ; // 固定5文字
+	// formatter失敗を切断した時刻として返さない
+	if( written != 5) {
+		throw OperationError( ErrorKind::INTERNAL) ;
+	}
+	std::string output( buffer.data(), 5) ; // 所有UTF-8時刻
+	// 日跨ぎの同じ時刻を当日の発言と混同させない
+	if( minutes >= 1440) {
+		output += " (+" + std::to_string( minutes / 1440) + "日)" ;
+	}
+	return output ;
+}
+
+//------------------------------------------------------------------------------
+/**
+ * @brief 任意の時計metadataから本文を変更せず話者見出しを作ります
+ * @param[in] line 元offsetと話者。呼出し中だけ借用します
+ * @param[in] transcript 同じ音声の編集名。呼出し中だけ借用します
+ * @param[in] startMinutes 任意の開始分（0..1439）。未設定は従来相対表示です
+ * @return 所有UTF-8見出し
+ * @throws OperationError 時計metadataまたはoffsetが不正
+ */
+//------------------------------------------------------------------------------
+std::string formatSpeechHeading( const TranscriptLine &line, const Transcript &transcript,
+								const std::optional<std::uint16_t> startMinutes)
+{
+	const auto label = formatSpeakerLabel( line, transcript) ; // 元IDと現編集名だけから生成
+	// 設定済みの音声だけ指定された時計を話者の隣へ置く
+	if( startMinutes) {
+		return "[" + label + "] " + formatRecordingClock( line.startMs, *startMinutes) ;
+	}
+	return "[" + formatTimestamp( line.startMs) + " - " + formatTimestamp( line.endMs) + "] " + label ;
+}
+
+//------------------------------------------------------------------------------
+/**
  * @brief 表示とcopyに使うUTF-8文字列を生成します
  * @param[in] transcript 所有結果の借用参照
  * @param[in] format 出力形式
+ * @param[in] startMinutes 任意の録音開始分（0..1439）。TXTだけへ反映します
  * @return 所有UTF-8文字列
  * @throws OperationError 未定義形式・出力上限超過
  * @see koefude::renderTranscript
  */
 //------------------------------------------------------------------------------
-std::string renderTranscript( const Transcript &transcript, const ExportFormat format)
+std::string renderTranscript( const Transcript &transcript, const ExportFormat format,
+							 const std::optional<std::uint16_t> startMinutes)
 {
 	// 未定義形式を既定のtext保存へ暗黙変換しない
 	if( format != ExportFormat::PLAIN_TEXT && format != ExportFormat::SRT && format != ExportFormat::VTT) {
+		throw OperationError( ErrorKind::INVALID_INPUT) ;
+	}
+	// 表示metadataの破損を字幕保存でも黙って受理しない
+	if( startMinutes && *startMinutes >= 1440) {
 		throw OperationError( ErrorKind::INVALID_INPUT) ;
 	}
 	std::string output = format == ExportFormat::VTT ? "WEBVTT\n\n" : "" ; // 所有出力文字列
@@ -326,8 +393,7 @@ std::string renderTranscript( const Transcript &transcript, const ExportFormat f
 		const auto annotation = formatAttributionRanges( line, transcript) ; // 元時刻の推定範囲
 		// text形式は原文の改行と句読点を保持する
 		if( format == ExportFormat::PLAIN_TEXT) {
-			output += "[" + formatTimestamp( line.startMs) + " - " + formatTimestamp( line.endMs) + "] " + label + "\n" +
-					  line.text + "\n" ;
+			output += formatSpeechHeading( line, transcript, startMinutes) + "\n" + line.text + "\n" ;
 			// 推定範囲は本文の後の独立した注記として保存する
 			if( !annotation.empty()) {
 				output += annotation + "\n" ;

@@ -5,7 +5,7 @@
  *
  * @file main_window.cpp
  * @brief 対応音声を投入して話者付き文字起こしを読むWin32画面を実装します
- * @version 1.0.0
+ * @version 1.1.0
  * @date 2026/09/09
  * @author Shunji Ogawa
  * @par 更新履歴
@@ -81,6 +81,8 @@
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1431の各関数へ役割・全引数・戻り値を直接記載
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1433の更新履歴を新規作成からの昇順・末尾追記へ統一
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1437のコメント行末・終端の句点を省略
+ * 1.0.0 Shunji Ogawa 2026/11/17 ADR1447の任意録音開始時刻と連続話者見出しを接続
+ * 1.1.0 Shunji Ogawa 2026/11/17 ADR1448の録音開始時刻対応版1.1.0へ版を整合
  * </pre>
  * @note UIはengineを所有せず、worker終了まで通知先Windowを維持します
  */
@@ -578,6 +580,10 @@ struct StatusNotice {
 
 /** @brief 一つの投入fileのUI履歴です。音声PCMは保持しません */
 struct FileCard {
+	/// 原文と独立した任意の録音開始分（0..1439）
+	std::optional<std::uint16_t>		  recordingStartMinutes ;
+	/// 最新の普通保存ACKまで当該行の削除を拒否する非永続印
+	bool								  recordingClockDirty = false ;
 	/// 再起動と削除を跨いで再利用しない履歴ID
 	std::uint64_t						  id = 0 ;
 	/// UIで表示する利用者のlocal file
@@ -698,9 +704,8 @@ struct FileCard {
 						: record.code == static_cast<std::uint32_t>( WholeTextBoundedDiagnostic::PROTECTED_SPAN_CHANGED)
 							? IDS_TEXT_CONTEXT_PROTECTED
 						: record.reason == ReadingReason::RESOURCE_UNAVAILABLE ? IDS_WHOLE_RESOURCES
-						: record.reason == ReadingReason::MODEL_UNAVAILABLE
-							? IDS_WHOLE_MODELS
-							: IDS_READING_GENERATION_FAILED ; // 有限理由
+						: record.reason == ReadingReason::MODEL_UNAVAILABLE	   ? IDS_WHOLE_MODELS
+																			: IDS_READING_GENERATION_FAILED ; // 有限理由
 		return {id, -1,
 				record.reason == ReadingReason::RESOURCE_UNAVAILABLE ? ErrorKind::RESULT_TOO_LARGE
 																	 : ErrorKind::INFERENCE_FAILED,
@@ -729,6 +734,7 @@ struct FileCard {
 class MainWindow final {
 #if defined(KOEFUDE_WINDOW_TESTING)
     friend struct MainWindowTestAccess ; // 同じ試験process内だけで所有状態を照合する
+	friend struct RecordingClock1447TestAccess ; // 時計の保存ACKと失効を確認する自所有有限試験
 	friend struct SimpleUi1354TestAccess ; // 所有SW_HIDEの固定三caseだけ
 	friend struct Followup1376TestAccess ; // 同意/ACK/失効の自所有有限試験だけ
 	friend struct Settings1375TestAccess ; // 保存復元と起動barrierの有限試験だけ
@@ -897,9 +903,11 @@ class MainWindow final {
 	 * @brief fileカードを作成して有限queueへ投入します
 	 * @param[in] input 利用者の指定path。workerで改めて検証
 	 * @param[in] newRun trueは明示再実行。falseは登録済みの最新履歴を開きます
+	 * @param[in] recordingStartMinutes 同じ音声の明示再認識でだけ引き継ぐ開始分（0..1439）
 	 */
 	//------------------------------------------------------------------------------
-	void addFile( const std::filesystem::path &input, const bool newRun = false)
+	void addFile( const std::filesystem::path &input, const bool newRun = false,
+				 const std::optional<std::uint16_t> recordingStartMinutes = std::nullopt)
 	{
 		// 復元前/失敗時の明示dropも既定設定で誤受付しません
 		if( !transcriptionSettingsReady_) {
@@ -960,6 +968,8 @@ class MainWindow final {
 		request.asr().options.modelRoot = modelEvent_.plan->effectiveRoot ;
 		FileCard card ; // 受付前にpathの所有copyを済ませる新しい記録
 		card.id = nextHistoryId_ ;
+		card.recordingStartMinutes = recordingStartMinutes ;
+		card.recordingClockDirty = recordingStartMinutes.has_value() ;
 		card.audioApiRequested = audioApi ;
 		card.parakeetOfferRequested = !audioApi && request.asr().options.asrModel == AsrModel::PARAKEET ;
 		card.projectionFollowup = audioApi && request.asr().options.asrProfile == AsrProfile::QUALITY &&
@@ -1382,6 +1392,7 @@ class MainWindow final {
 		save.sourceKey = document_->view->key() ;
 		save.speakerText = card.speakerText.adopted ;
 		save.speakerAudio = card.apiAudio ;
+		save.recordingStartMinutes = card.recordingStartMinutes ;
 		save.format = ExportFormat::PLAIN_TEXT ;
 		// 既存単一workerへ渡す所有DTO
 		JobRequest job ;
@@ -1432,6 +1443,9 @@ class MainWindow final {
 				break ;
 			case IDC_HISTORY_REMOVE: // 原音声を保持し履歴だけを削除
 				removeHistory( target.id) ;
+				break ;
+			case IDC_RECORDING_CLOCK: // 元音声処理と独立した明示表示metadata
+				showRecordingClock( target) ;
 				break ;
 			case IDC_RENAME: // sourceを小dialogへ固定します
 				showSpeakerRename( target) ;
@@ -1812,9 +1826,9 @@ class MainWindow final {
 		auto audioPort = history_->apiAudioPort() ; // 通常と同じ一履歴writer
 		auto projectionPort = history_->speakerTextPort() ; // API/keyから独立した同writer
 		auto apiPort = history_->apiTextPort() ; // 同じ履歴worker/lock
-		auto apiLog = std::shared_ptr<IApiCorrectionEventLog>(
-			makeLocalDiagnosticApiLog( makeApiCorrectionEventLog( historyRoot_),
-									  localDiagnostics_)) ; // 旧sinkの返値を維持
+		auto apiLog =
+			std::shared_ptr<IApiCorrectionEventLog>( makeLocalDiagnosticApiLog( makeApiCorrectionEventLog( historyRoot_),
+																			  localDiagnostics_)) ; // 旧sinkの返値を維持
 		JobRunner runner =
 			//------------------------------------------------------------------------------
 			/**
@@ -2150,6 +2164,7 @@ class MainWindow final {
 		for( const auto &card : cards_) {
 			HistoryEntry entry ; // 一つの履歴IDへ対応する保存値
 			entry.id = card.id ;
+			entry.recordingStartMinutes = card.recordingStartMinutes ;
 			entry.input = card.path ;
 			entry.error = card.status.error ;
 			entry.code = card.status.code ;
@@ -2376,6 +2391,7 @@ class MainWindow final {
 				for( const auto &entry : event->loaded->entries) {
 					FileCard card ; // 復元した完了・未完了の表示カード
 					card.id = entry.id ;
+					card.recordingStartMinutes = entry.recordingStartMinutes ;
 					card.path = entry.input ;
 					card.status = restoredStatus( entry) ;
 					card.result = entry.result ;
@@ -2449,6 +2465,7 @@ class MainWindow final {
 					historyFailed_ = false ;
 					// 選択documentに依存せず、同じ保存owner/keyだけへackを渡します
 					for( auto &card : cards_) {
+						card.recordingClockDirty = false ; // 最新revisionに含めた時計だけを耐久確定
 						// 最大32件の耐久snapshot内で同じカードを照合します
 						for( const auto &original : event->savedOriginals) {
 							// 別IDの保存成功をこのカードへ適用しません
@@ -2509,6 +2526,7 @@ class MainWindow final {
 							})) {
 							FileCard card ; /* 復元する一カード */
 							card.id = entry.id ;
+							card.recordingStartMinutes = entry.recordingStartMinutes ;
 							card.path = entry.input ;
 							card.result = entry.result ;
 							card.reading = entry.reading ;
@@ -2636,6 +2654,11 @@ class MainWindow final {
 		if( found == cards_.end()) {
 			return ;
 		}
+		// 未保存の時計を削除失敗時の古い耐久snapshotで巻き戻さない
+		if( found->recordingClockDirty) {
+			showMessage( IDS_RECORDING_CLOCK_UNSAVED) ;
+			return ;
+		}
 		// 動作中のworkerを見えないまま残さず、先に取消しを依頼してもらう
 		if( found->busy || found->reading.active || found->wholeText.active ||
 		   (apiTextWindow_.busy() && apiTextWindow_.historyId() == sourceId) || found->apiText.saveFailed ||
@@ -2668,8 +2691,8 @@ class MainWindow final {
 		   std::any_of( cards_.begin(), cards_.end(),
 					   []( const FileCard &card)
 					   {
-						   return card.busy || card.reading.active.has_value() || card.wholeText.active.has_value() ||
-								  card.bounded.inFlight.has_value() ||
+						   return card.recordingClockDirty || card.busy || card.reading.active.has_value() ||
+								  card.wholeText.active.has_value() || card.bounded.inFlight.has_value() ||
 								  card.bounded.saveState == WholeTextBoundedSaveState::SAVE_FAILED ;
 					   })) {
 			return ;
@@ -2688,8 +2711,8 @@ class MainWindow final {
 					   //------------------------------------------------------------------------------
 					   []( const FileCard &card)
 					   {
-						   return card.busy || card.reading.active.has_value() || card.wholeText.active.has_value() ||
-								  card.bounded.inFlight.has_value() ||
+						   return card.recordingClockDirty || card.busy || card.reading.active.has_value() ||
+								  card.wholeText.active.has_value() || card.bounded.inFlight.has_value() ||
 								  card.bounded.saveState == WholeTextBoundedSaveState::SAVE_FAILED ;
 					   })) {
 			return ;
@@ -3263,7 +3286,7 @@ class MainWindow final {
 		}
 		const std::filesystem::path input = source->path ; // vectorの再確保前にpathを所有copyする
 		parakeetFollowup_.cancel( sourceId) ; // 明示再認識へ旧原文の送信意図を渡しません
-		addFile( input, true) ;
+		addFile( input, true, source->recordingStartMinutes) ;
 	}
 	//------------------------------------------------------------------------------
 	/**
@@ -3471,7 +3494,8 @@ class MainWindow final {
 		// この同期境界で所有する値、または確定状態の検証値です
 		const bool removable = !(apiTextWindow_.busy() && apiTextWindow_.historyId() == sourceId) &&
 							   !cards_[index].busy && !cards_[index].reading.active &&
-							   !cards_[index].wholeText.active ; // 全終端後
+							   !cards_[index].wholeText.active &&
+							   !cards_[index].recordingClockDirty ; // 当該時計の耐久ACK後
 		// 処理完了の有無に対応した履歴削除menuの表示文言
 		const auto removeLabel = resource( removable ? IDS_HISTORY_REMOVE : IDS_HISTORY_REMOVE_BUSY) ;
 		const bool canApi =
@@ -3486,8 +3510,9 @@ class MainWindow final {
 		const std::array operations{
 			std::tuple{IDC_SAVE, IDS_SAVE, ready}, std::tuple{IDC_COPY, IDS_COPY, ready},
 			std::tuple{IDC_CANCEL, IDS_CANCEL, target.operation != 0 || target.automaticWaiting},
-			std::tuple{IDC_RENAME, IDS_RENAME_MENU, rename}} ; // 常設buttonから移した操作
-		// 四操作の可否を同じtarget snapshotへ固定します
+			std::tuple{IDC_RENAME, IDS_RENAME_MENU, rename},
+			std::tuple{IDC_RECORDING_CLOCK, IDS_RECORDING_CLOCK_MENU, true}} ; // 常設buttonから移した操作
+		// 行操作の可否を同じtarget snapshotへ固定します
 		for( const auto &[id, text, enabled] : operations) {
 			// 登録失敗を操作可能として扱いません
 			if( !AppendMenuW( menu.get(), MF_STRING | (enabled ? MF_ENABLED : MF_GRAYED), id, resource( text).c_str())) {
@@ -4684,6 +4709,7 @@ class MainWindow final {
 		return documentOperation_ == 0 && document_ && documentRequest_ && document_->request == *documentRequest_ &&
 			   selected_ < cards_.size() && document_->request.historyId == cards_[selected_].id &&
 			   document_->request.source == cards_[selected_].result &&
+			   document_->request.recordingStartMinutes == cards_[selected_].recordingStartMinutes &&
 			   document_->request.apiText == cards_[selected_].apiText.adopted &&
 			   document_->request.speakerText == cards_[selected_].speakerText.adopted &&
 			   document_->request.speakerAudio == cards_[selected_].apiAudio &&
@@ -5374,6 +5400,7 @@ class MainWindow final {
 		const auto		   &card = cards_[selected_] ; // UIの不変snapshotのborrow
 		ChatDocumentRequest request ; // HWND/engineを持たない描画snapshot
 		request.historyId = card.id ;
+		request.recordingStartMinutes = card.recordingStartMinutes ;
 		request.source = card.result ;
 		request.formatted = card.reading.formatted ;
 		request.display = cardReadingDisplay( card) ;
@@ -5427,6 +5454,7 @@ class MainWindow final {
 		}
 		preserveDocumentView_ =
 			preserveView && document_ && document_->request.historyId == request.historyId &&
+			document_->request.recordingStartMinutes == request.recordingStartMinutes &&
 			document_->request.source == request.source && document_->request.apiText == request.apiText &&
 			document_->request.speakerText == request.speakerText &&
 			document_->request.speakerAudio == request.speakerAudio &&
@@ -5475,6 +5503,7 @@ class MainWindow final {
 		if( event->document && documentRequest_ && event->document->request == *documentRequest_ &&
 		   selected_ < cards_.size() && event->document->request.historyId == cards_[selected_].id &&
 		   detail::sameTranscriptOwner( event->document->request.source, cards_[selected_].result) &&
+		   event->document->request.recordingStartMinutes == cards_[selected_].recordingStartMinutes &&
 		   event->document->request.apiText == cards_[selected_].apiText.adopted &&
 		   event->document->request.speakerText == cards_[selected_].speakerText.adopted &&
 		   event->document->request.speakerAudio == cards_[selected_].apiAudio &&
@@ -5626,6 +5655,161 @@ class MainWindow final {
 			SetWindowTextW( chat_, text.c_str()) ;
 		}
 		refreshDocumentActions() ;
+	}
+	/** @brief 同期modal dialogの間だけ借用する小さい時計編集状態です */
+	struct RecordingClockDialog {
+		/// dialogより長寿命の自MainWindow。所有しません
+		MainWindow					*owner = nullptr ;
+		/// 適用前または検証済み適用後の開始分（0..1439）
+		std::optional<std::uint16_t> minutes ;
+	} ;
+	//------------------------------------------------------------------------------
+	/**
+	 * @brief 同じ行/sourceへ録音開始分を適用し、普通履歴workerへ保存要求します
+	 * @param[in] target 行menuまたはdialog前に固定した対象
+	 * @param[in] minutes 任意の開始分（0..1439）。空は明示解除です
+	 * @note UI thread限定。本文・元時刻・API候補を変更せず、同値でも未保存なら保存を再試行します
+	 * @throws OperationError 範囲外の開始分。失敗時に元metadataを保持します
+	 */
+	//------------------------------------------------------------------------------
+	void applyRecordingClock( const RowActionTarget &target, const std::optional<std::uint16_t> minutes)
+	{
+		// 不正な内部値を履歴へ渡さず、現在の設定を保持する
+		if( minutes && *minutes >= 1440) {
+			throw OperationError( ErrorKind::INVALID_INPUT) ;
+		}
+		const auto index = resolveRow( target) ; // 同じID/sourceだけを再照合
+		// 破棄済みや未復元の対象へmetadataを新設しない
+		if( index >= cards_.size() || !historyReady_) {
+			return ;
+		}
+		auto	  &card = cards_[index] ; // 再検索後のUI所有行
+		const bool changed = card.recordingStartMinutes != minutes ; // 同値の明示再保存を区別
+		// 保存済みの同値設定から不要な履歴更新や文書再構築を起こさない
+		if( !changed && !card.recordingClockDirty) {
+			return ;
+		}
+		card.recordingStartMinutes = minutes ;
+		card.recordingClockDirty = true ; // 最新revisionのACKまで当該行削除を拒否
+		// 別の行の閲覧や同値再試行で表示版を入れ替えない
+		if( changed && selected_ == index) {
+			showCard() ;
+		}
+		saveHistory() ;
+	}
+	//------------------------------------------------------------------------------
+	/**
+	 * @brief 標準dialogの任意HH:mm入力と解除だけを検証します
+	 * @param[in] window 自dialogの通知中有効なHWND
+	 * @param[in] message Win32通知種別
+	 * @param[in] wparam WM_COMMANDのcontrol ID。他通知では使用しません
+	 * @param[in] lparam WM_INITDIALOGだけで同期呼出し元のRecordingClockDialogを借用します
+	 * @return 処理済みはTRUE、未処理はFALSE。適用はEndDialogのIDOKで区別します
+	 * @note callback例外は自MainWindowの固定診断へ変換し、外へ送出しません
+	 */
+	//------------------------------------------------------------------------------
+	static INT_PTR CALLBACK recordingClockProc( HWND window, UINT message, WPARAM wparam, LPARAM lparam) noexcept
+	{
+		auto *state = reinterpret_cast<RecordingClockDialog *>( GetWindowLongPtrW( window, DWLP_USER)) ; // modal中borrow
+		try {
+			// 同期初期化だけで呼出し元の小さい状態を登録する
+			if( message == WM_INITDIALOG) {
+				state = reinterpret_cast<RecordingClockDialog *>( lparam) ;
+				SetWindowLongPtrW( window, DWLP_USER, lparam) ;
+				SetWindowTextW( window, resource( IDS_RECORDING_CLOCK_MENU).c_str()) ;
+				SetDlgItemTextW( window, IDC_RECORDING_CLOCK_LABEL, resource( IDS_RECORDING_CLOCK_LABEL).c_str()) ;
+				SetDlgItemTextW( window, IDOK, resource( IDS_SETTINGS_APPLY).c_str()) ;
+				SetDlgItemTextW( window, IDC_RECORDING_CLOCK_CLEAR, resource( IDS_RECORDING_CLOCK_CLEAR).c_str()) ;
+				SetDlgItemTextW( window, IDCANCEL, resource( IDS_SETTINGS_CLOSE).c_str()) ;
+				SendDlgItemMessageW( window, IDC_RECORDING_CLOCK_EDIT, EM_SETLIMITTEXT, 5, 0) ;
+				// 未設定には現在時刻などの既定値を捏造しない
+				if( state && state->minutes) {
+					SetDlgItemTextW( window, IDC_RECORDING_CLOCK_EDIT,
+									toWide( formatRecordingClock( 0, *state->minutes)).c_str()) ;
+				}
+				return TRUE ;
+			}
+			// 初期化前または無効ownerの通知を処理しない
+			if( !state || !state->owner) {
+				return FALSE ;
+			}
+			// close/Escはmetadataを変更せず終了する
+			if( message == WM_CLOSE || (message == WM_COMMAND && LOWORD(wparam) == IDCANCEL)) {
+				EndDialog( window, IDCANCEL) ;
+				return TRUE ;
+			}
+			// 明示解除だけで開始分を未設定へ戻す
+			if( message == WM_COMMAND && LOWORD(wparam) == IDC_RECORDING_CLOCK_CLEAR) {
+				state->minutes.reset() ;
+				EndDialog( window, IDOK) ;
+				return TRUE ;
+			}
+			// 正確なASCII HH:mmだけを適用し、不正入力はdialogへ保持する
+			if( message == WM_COMMAND && LOWORD(wparam) == IDOK) {
+				std::array<wchar_t, 7> text{} ; // 終端と過長検出を含む小さいUTF-16 buffer
+				const int			   length = GetDlgItemTextW( window, IDC_RECORDING_CLOCK_EDIT, text.data(),
+																static_cast<int>( text.size())) ; // 読取文字数
+				const bool digits = GetWindowTextLengthW( GetDlgItem( window, IDC_RECORDING_CLOCK_EDIT)) == 5 &&
+									length == 5 && text[2] == L':' && text[0] >= L'0' && text[0] <= L'2' &&
+									text[1] >= L'0' && text[1] <= L'9' && text[3] >= L'0' && text[3] <= L'5' &&
+									text[4] >= L'0' && text[4] <= L'9' ; // 未検証数字を分へ変換しない
+				// 24時以上や空欄は解除と区別して利用者へ形式を案内する
+				if( !digits || (text[0] == L'2' && text[1] > L'3')) {
+#if defined(KOEFUDE_WINDOW_TESTING)
+					state->owner->showMessage( IDS_RECORDING_CLOCK_INVALID) ;
+#else
+					showMessageDialog( window, resource( IDS_RECORDING_CLOCK_INVALID).c_str(),
+									  resource( IDS_RECORDING_CLOCK_MENU).c_str(), MB_OK | MB_ICONINFORMATION) ;
+#endif
+					return TRUE ;
+				}
+				state->minutes = static_cast<std::uint16_t>( ((text[0] - L'0') * 10 + text[1] - L'0') * 60 +
+															(text[3] - L'0') * 10 + text[4] - L'0') ;
+				EndDialog( window, IDOK) ;
+				return TRUE ;
+			}
+		} catch( const OperationError &error) {
+			// 検証・resource失敗もcallback外へ例外を出さない
+			if( state && state->owner) {
+				state->owner->showCallbackError( error.kind(), error.code()) ;
+			}
+		} catch( ...) {
+			// 予期しない割当て失敗を固定診断へ変換する
+			if( state && state->owner) {
+				state->owner->showCallbackError( ErrorKind::INTERNAL, 0, true) ;
+			}
+		}
+		return FALSE ;
+	}
+	//------------------------------------------------------------------------------
+	/**
+	 * @brief 音声行の開始時刻を標準modal dialogで明示設定・解除します
+	 * @param[in] target menu開始時の履歴ID/sourceと表示版
+	 * @note dialog後も同じsourceと開始分を照合し、古い編集を現在値へ上書きしません
+	 * @throws OperationError dialog生成失敗。現在metadataを保持します
+	 */
+	//------------------------------------------------------------------------------
+	void showRecordingClock( const RowActionTarget &target)
+	{
+		const auto index = resolveRow( target) ; // menu後の同一source
+		// 未復元や失効した対象へdialogを開かない
+		if( index >= cards_.size() || !historyReady_) {
+			return ;
+		}
+		const auto			 original = cards_[index].recordingStartMinutes ; // modal前の小さいCAS値
+		RecordingClockDialog state{this, original} ; // DialogBoxが返るまで同期所有
+		FollowupModalScope	 modal( followupModalDepth_) ; // nested pollで別の案内を重ねない
+		const auto chosen = DialogBoxParamW( GetModuleHandleW( nullptr), MAKEINTRESOURCEW(IDD_RECORDING_CLOCK), window_,
+											recordingClockProc, reinterpret_cast<LPARAM>( &state)) ; // OS標準modal
+		// 生成失敗を解除や成功へ読み替えない
+		if( chosen == -1) {
+			throw OperationError( ErrorKind::INTERNAL, GetLastError()) ;
+		}
+		const auto current = resolveRow( target) ; // modal中の削除・新原文を拒否
+		// 明示適用と同じ元metadataだけを採用する
+		if( chosen == IDOK && current < cards_.size() && cards_[current].recordingStartMinutes == original) {
+			applyRecordingClock( target, state.minutes) ;
+		}
 	}
 	//------------------------------------------------------------------------------
 	/**
@@ -6014,6 +6198,7 @@ class MainWindow final {
 			api.record = cards_[selected_].apiText ;
 			api.record.latest = api.record.adopted ;
 			api.exportPath = path ;
+			api.renderedExport = std::shared_ptr<const ApiTextRenderedExport>( document_, &document_->renderedExport) ;
 			JobRequest job ;
 			job.payload = std::move( api) ;
 			const auto id = controller_->submit( std::move( job)) ;
@@ -6026,6 +6211,7 @@ class MainWindow final {
 		ExportJobRequest save ; // 表示選択を受付時の所有値へ固定する
 		save.output = path ;
 		save.source = cards_[selected_].result ;
+		save.recordingStartMinutes = cards_[selected_].recordingStartMinutes ;
 		save.formatted = cards_[selected_].reading.formatted ;
 		save.display = cardReadingDisplay( cards_[selected_]) ;
 		// 整形の補正語句へ字幕時刻を推測せず、原文選択を案内する
@@ -7586,7 +7772,7 @@ int WINAPI wWinMain( HINSTANCE instance, HINSTANCE previous, PWSTR commandLine, 
 		std::vector<std::wstring>	seenOptions ; // 最大5optionの二重拒否
 		std::filesystem::path		diagnosticPath ; // 試験時だけの新規ローカルログfile
 		int							count = 0 ; // OSが解析した引数数
-		LPWSTR *arguments = CommandLineToArgvW( GetCommandLineW(), &count) ; // LocalFreeする所有配列
+		LPWSTR					   *arguments = CommandLineToArgvW( GetCommandLineW(), &count) ; // LocalFreeする所有配列
 		const std::unique_ptr<void, decltype(&LocalFree)> owned( arguments, LocalFree) ;
 		// 値を伴う既知optionだけを受け入れ、shellとして再評価しない
 		for( int index = 1; index < count; ++index) {

@@ -6,7 +6,7 @@
  *
  * @file resource.h
  * @brief UI表示resourceとcontrol IDを定義します
- * @version 1.0.0
+ * @version 1.1.0
  *
  * @date 2026/09/09
  * @author Shunji Ogawa
@@ -63,6 +63,8 @@
  * 1.0.0 Shunji Ogawa 2026/11/11 ADR1408の指定見本書式・コメント配置へ移行
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1433の更新履歴を新規作成からの昇順・末尾追記へ統一
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1437のコメント行末・終端の句点を省略
+ * 1.0.0 Shunji Ogawa 2026/11/17 ADR1447の任意録音開始時刻と連続話者見出しを接続
+ * 1.1.0 Shunji Ogawa 2026/11/17 ADR1448の録音開始時刻対応版1.1.0へ版を整合
  * </pre>
  */
 
@@ -1291,3 +1293,15 @@
 #define IDS_API_CATALOG_CANCELLED 3595 // metadata取得取消しの案内
 #define IDS_API_META_FAILED 3596 // 前回成功値のないmetadata取得失敗
 #define IDS_API_META_KEY_MISSING 3597 // 認証GET未実行と候補選択の区別
+
+// ADR1447: 音声行ごとの任意の録音開始時刻
+#define IDC_RECORDING_CLOCK 3600 // 行menuの開始時刻設定
+#define IDD_RECORDING_CLOCK 3601 // 標準時刻編集dialog
+#define IDC_RECORDING_CLOCK_EDIT 3602 // HH:mmのASCII入力
+#define IDC_RECORDING_CLOCK_LABEL 3603 // 入力形式の説明
+#define IDC_RECORDING_CLOCK_CLEAR 3604 // 明示解除
+#define IDS_RECORDING_CLOCK_MENU 3605 // 行menuとdialog見出し
+#define IDS_RECORDING_CLOCK_LABEL 3606 // 任意時計metadataの説明
+#define IDS_RECORDING_CLOCK_CLEAR 3607 // 開始時刻の解除
+#define IDS_RECORDING_CLOCK_INVALID 3608 // 不正なHH:mm入力
+#define IDS_RECORDING_CLOCK_UNSAVED 3609 // 未保存時計を保持する削除拒否

@@ -2,7 +2,7 @@
 /**
  * @file ui_en.rcinc
  * @brief 言語別のUI文字列と標準menuを定義します。
- * @version 1.0.0
+ * @version 1.1.0
  * @date 2026/09/09
  * @author Shunji Ogawa
  * @copyright Copyright (c) 2026 Shunji Ogawa. MIT License.
@@ -37,6 +37,8 @@
  * 0.1.0 Shunji Ogawa 2026/09/13 不足モデルの明示取得と準備状態を英語で表示。
  * 0.1.0 Shunji Ogawa 2026/09/27 設定欄のアクセシビリティ目的名を追加。
  * 0.1.0 Shunji Ogawa 2026/11/09 ADR1368の明示音声APIと従来経路の境界を接続。
+ * 1.0.0 Shunji Ogawa 2026/11/17 ADR1447の任意録音開始時刻と連続話者見出しを接続
+ * 1.1.0 Shunji Ogawa 2026/11/17 ADR1448の録音開始時刻対応版1.1.0へ版を整合
  * </pre>
  */
 //------------------------------------------------------------------------------
@@ -433,4 +435,9 @@ BEGIN
     IDS_SHORT_API "API text"
     IDS_SHORT_AUDIO "Audio API"
     IDS_SHORT_REMOVED "Removed"
+    IDS_RECORDING_CLOCK_MENU "Recording start time…"
+    IDS_RECORDING_CLOCK_LABEL "Recording start (24-hour HH:mm)\r\nAdds the original speech offset. No date is stored."
+    IDS_RECORDING_CLOCK_CLEAR "Clear"
+    IDS_RECORDING_CLOCK_INVALID "Enter ASCII HH:mm from 00:00 to 23:59. Choose Clear to remove the setting."
+    IDS_RECORDING_CLOCK_UNSAVED "The recording start time is not saved. Apply the same time again and complete saving before removing this history."
 END

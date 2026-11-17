@@ -5,7 +5,7 @@
  *
  * @file reading_export.h
  * @brief 原文または整形文を固定した所有export要求を定義します
- * @version 1.0.0
+ * @version 1.1.0
  * @date 2026/10/04
  * @author Shunji Ogawa
  * @par 更新履歴
@@ -18,12 +18,16 @@
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1428の関数ヘッダーを上下区切り線と複数行へ統一
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1433の更新履歴を新規作成からの昇順・末尾追記へ統一
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1437のコメント行末・終端の句点を省略
+ * 1.0.0 Shunji Ogawa 2026/11/17 ADR1447の任意録音開始時刻と連続話者見出しを接続
+ * 1.1.0 Shunji Ogawa 2026/11/17 ADR1448の録音開始時刻対応版1.1.0へ版を整合
  * </pre>
  */
 //------------------------------------------------------------------------------
 #pragma once
 #include "core/reading_view.h"
 #include "core/transcript_export.h"
+#include <cstdint>
+#include <optional>
 #include <filesystem>
 #include <memory>
 #include <string>
@@ -49,13 +53,15 @@ struct ExportJobRequest {
 	std::shared_ptr<const SpeakerTextProjectionRecord> speakerText ;
 	/// 同じ元API
 	std::shared_ptr<const ApiAudioRecord>			   speakerAudio ;
+	/// 受付時に固定する任意の録音開始分（0..1439）。字幕cueへは適用しない
+	std::optional<std::uint16_t>					   recordingStartMinutes ;
 } ;
 
 //------------------------------------------------------------------------------
 /**
  * @brief 固定した版の全文をUTF-8へ構築します
  * @param[in] request 所有source/overlayを持つ保存要求。変更しません
- * @return 原文の既存byte列、または元時刻/話者を保つ整形TXT
+ * @return 元offsetに基づく任意の時計付きTXT、または従来相対時刻の字幕
  * @throws OperationError 不整合なsource、未対応形式、容量超過
  * @note worker限定です。元音声・モデルを開きません
  */
