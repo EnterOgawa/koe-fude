@@ -5,7 +5,7 @@
  *
  * @file history_store.cpp
  * @brief 履歴をユーザー専用local folderで読み、検証済み一時fileから置換します
- * @version 1.0.0
+ * @version 1.1.0
  * @date 2026/09/10
  * @author Shunji Ogawa
  * @par 更新履歴
@@ -32,6 +32,7 @@
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1431の各関数へ役割・全引数・戻り値を直接記載
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1433の更新履歴を新規作成からの昇順・末尾追記へ統一
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1437のコメント行末・終端の句点を省略
+ * 1.1.0 Shunji Ogawa 2026/11/17 検証済みV9を旧履歴の退避対象から除き再起動後の保存を維持
  * </pre>
  */
 //------------------------------------------------------------------------------
@@ -511,7 +512,7 @@ class FileHistoryStorage final : public IHistoryStorage {
 		backupPath_ = directory_ / L"history.pre-v7.bin" ;
 		oldBackupPath_ = directory_ / L"history.pre-v5.bin" ;
 		HistorySnapshot snapshot ; // 未作成時には空の初期履歴
-		bool			loadedV7 = false ; // 完全検証した形式6でだけ旧退避を回収する
+		bool			loadedV7 = false ; // 完全検証したV7以降でだけ旧退避を回収する
 		// 既存fileがある場合は全内容とSHA-256を検証してから復元する
 		if( regularFileExists( dataPath_)) {
 			const UniqueHandle file( CreateFileW( dataPath_.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr,
@@ -551,7 +552,8 @@ class FileHistoryStorage final : public IHistoryStorage {
 				throw HistoryError( HistoryErrorKind::CORRUPT) ;
 			}
 			snapshot = decodeHistory( body) ;
-			loadedV7 = (bytes[8] == 7 || bytes[8] == 8) && bytes[9] == 0 && bytes[10] == 0 && bytes[11] == 0 ;
+			loadedV7 =
+				(bytes[8] == 7 || bytes[8] == 8 || bytes[8] == 9) && bytes[9] == 0 && bytes[10] == 0 && bytes[11] == 0 ;
 			// 旧形式の実byteを最大512MiB＋digestだけ保持し、初回保存前の退避に使う
 			if( !loadedV7) {
 				legacyBytes_ = std::move( bytes) ;
