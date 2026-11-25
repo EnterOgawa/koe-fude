@@ -173,7 +173,7 @@ foreach(index RANGE 0 ${model_last})
     string(APPEND DOWNLOAD_ENTRIES "    {ModelTransferKind::${cpp_transfer_${kind}}, \"${download_url}\", \"${download_revision}\", \"${download_license}\", \"${download_source}\", ${transfer_size}ULL, \"${transfer_hash}\", \"${member}\", \"${suffix}\"},\n")
 endforeach()
 
-foreach(role voice_activity segmentation embedding)
+foreach(role voice_activity segmentation embedding nemotron)
     string(JSON role_index GET "${model_manifest}" shared_roles ${role})
     if(NOT role_index MATCHES "^[0-9]+$" OR role_index GREATER_EQUAL model_count)
         message(FATAL_ERROR "Invalid shared model role")
@@ -187,6 +187,7 @@ foreach(role voice_activity segmentation embedding)
     set(ROLE_${upper_role} "${role_index}")
 endforeach()
 # 現行native adapterの用途契約と一致することを確認する。
-if(NOT ROLE_VOICE_ACTIVITY EQUAL 4 OR NOT ROLE_SEGMENTATION EQUAL 1 OR NOT ROLE_EMBEDDING EQUAL 2)
+if(NOT ROLE_VOICE_ACTIVITY EQUAL 4 OR NOT ROLE_SEGMENTATION EQUAL 1 OR NOT ROLE_EMBEDDING EQUAL 2 OR
+   NOT ROLE_NEMOTRON EQUAL 15)
     message(FATAL_ERROR "Shared model roles do not match the validated native adapters")
 endif()

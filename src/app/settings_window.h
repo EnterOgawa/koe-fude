@@ -6,7 +6,7 @@
  *
  * @file settings_window.h
  * @brief 既存推論設定の未適用値とAPI設定childを一つのtab画面へ配置します
- * @version 1.0.0
+ * @version 1.1.2
  * @date 2026/11/09
  * @author Shunji Ogawa
  * @par 更新履歴
@@ -28,6 +28,9 @@
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1431の各関数へ役割・全引数・戻り値を直接記載
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1433の更新履歴を新規作成からの昇順・末尾追記へ統一
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1437のコメント行末・終端の句点を省略
+ * 1.1.1 Shunji Ogawa 2026/11/24 ADR1451のNemotron 3を選択肢に加え自動人数と旧方式の指定を区別
+ * 1.1.1 Shunji Ogawa 2026/11/25 ADR1455の既定Spectralを話者分離方式の先頭に表示
+ * 1.1.2 Shunji Ogawa 2026/11/25 ADR1456の正式版へ試用時の変更を反映
  * </pre>
  */
 
@@ -238,7 +241,7 @@ class SettingsWindow final {
 
 		for( const int id : {IDC_ASR_MODEL, IDC_ASR_PROFILE, IDC_BACKEND, IDC_DIARIZE,
 
-							IDC_COUNT, IDC_SETTINGS_METHOD, IDC_SPEECH_FILTER}) {
+							IDC_SETTINGS_METHOD, IDC_SPEECH_FILTER}) {
 
 			EnableWindow( item( id), !locked && !localBusy_) ;
 		}
@@ -615,13 +618,12 @@ class SettingsWindow final {
 				   count == draft_.expectedSpeakers) ;
 		}
 
-		choice( IDC_SETTINGS_METHOD, resource( IDS_SPECTRAL_METHOD), 0,
-
-			   draft_.speakerMethod == SpeakerMethod::SPECTRAL) ;
-
-		choice( IDC_SETTINGS_METHOD, resource( IDS_LEGACY_METHOD), 1,
-
-			   draft_.speakerMethod == SpeakerMethod::LEGACY_THRESHOLD) ;
+		// 現行既定を先頭に出し、表示順と永続IDを分離します
+		for( const auto &[method, label] : {std::pair{SpeakerMethod::SPECTRAL, IDS_SPECTRAL_METHOD},
+										   std::pair{SpeakerMethod::LEGACY_THRESHOLD, IDS_LEGACY_METHOD},
+										   std::pair{SpeakerMethod::NEMOTRON_3, IDS_NEMOTRON_3_METHOD}}) {
+			choice( IDC_SETTINGS_METHOD, resource( label), static_cast<LPARAM>( method), draft_.speakerMethod == method) ;
+		}
 
 		// 系統の重複は表示名でなくenum値で除きます
 
@@ -673,8 +675,11 @@ class SettingsWindow final {
 		draft_.expectedSpeakers = static_cast<int>( selected( IDC_COUNT)) ;
 		draft_.diarization = IsDlgButtonChecked( window_, IDC_DIARIZE) == BST_CHECKED ;
 		draft_.speechFilter = IsDlgButtonChecked( window_, IDC_SPEECH_FILTER) == BST_CHECKED ;
-		draft_.speakerMethod =
-			selected( IDC_SETTINGS_METHOD) == 1 ? SpeakerMethod::LEGACY_THRESHOLD : SpeakerMethod::SPECTRAL ;
+		const auto method = static_cast<SpeakerMethod>( selected( IDC_SETTINGS_METHOD)) ; // 表示順でなく永続ID
+		// 未選択や設定画面生成失敗を別方式の明示選択へ変えません
+		if( isSupportedSpeakerMethod( method)) {
+			draft_.speakerMethod = method ;
+		}
 		language_ = UiLanguage::JAPANESE ; // 旧combo通知でもEnglishへ戻しません
 		updateCheck_ = IsDlgButtonChecked( window_, IDC_SETTINGS_UPDATE) == BST_CHECKED ;
 	}
@@ -696,7 +701,7 @@ class SettingsWindow final {
 
 	//------------------------------------------------------------------------------
 	/**
-	 * @brief 未適用値/lock/API ACKだけからApplyを更新し、通信や保存を開始しません
+	 * @brief 未適用値とlock/API ACKだけで人数指定とApplyの可否を更新し、通信や保存は開始しません
 	 */
 	//------------------------------------------------------------------------------
 	void updateApply()
@@ -707,6 +712,8 @@ class SettingsWindow final {
 			return ;
 		}
 		readDraft() ;
+		// Nemotron 3は常に自動推定します。旧方式の人数選択は保持します
+		EnableWindow( item( IDC_COUNT), !locked_ && !localBusy_ && draft_.speakerMethod != SpeakerMethod::NEMOTRON_3) ;
 		EnableWindow( item( IDC_SETTINGS_APPLY), !locked_ && !localBusy_ && !api_.busy() &&
 												   (localDirty() || (apiVisited_ && api_.settingsDirty()))) ;
 	}

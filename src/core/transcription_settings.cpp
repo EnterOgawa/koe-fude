@@ -5,7 +5,7 @@
  *
  * @file transcription_settings.cpp
  * @brief 明示選好の検証と有限設定workerを実装します
- * @version 1.0.0
+ * @version 1.1.2
  * @date 2026/11/10
  * @author Shunji Ogawa
  * @par 更新履歴
@@ -20,6 +20,8 @@
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1431の各関数へ役割・全引数・戻り値を直接記載
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1433の更新履歴を新規作成からの昇順・末尾追記へ統一
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1437のコメント行末・終端の句点を省略
+ * 1.1.1 Shunji Ogawa 2026/11/24 ADR1451のNemotron 3の選好を設定検証に追加
+ * 1.1.2 Shunji Ogawa 2026/11/25 ADR1456の正式版へ試用時の変更を反映
  * </pre>
  */
 //------------------------------------------------------------------------------
@@ -75,8 +77,7 @@ bool validTranscriptionPreferences( const TranscriptionPreferences &value) noexc
 {
 	return findAsrDefinition( value.model, value.profile) != nullptr &&
 		   (value.backend == Backend::AUTO || value.backend == Backend::CPU) && value.expectedSpeakers >= 0 &&
-		   value.expectedSpeakers <= 20 &&
-		   (value.method == SpeakerMethod::SPECTRAL || value.method == SpeakerMethod::LEGACY_THRESHOLD) ;
+		   value.expectedSpeakers <= 20 && isSupportedSpeakerMethod( value.method) ;
 }
 //------------------------------------------------------------------------------
 /**
@@ -243,7 +244,7 @@ void TranscriptionSettingsController::runIo()
 	// load一回後は受理済み保存を一件ずつ処理し、stopと未要求で終了します
 	for(;;) {
 		try {
-			// 起動復元は保存を伴わず、missingだけ従前既定になります
+			// 起動復元は保存を伴わず、missingには現在の既定を使用します
 			if( current.operation == 0) {
 				current.value = storage_->load() ;
 			} else {

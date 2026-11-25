@@ -164,7 +164,7 @@ def verify_tree(archive_file, definition, destination):
             raise ValueError(f"Existing dependency differs: {definition['id']} / {path.name}")
 
 
-CPU_IDS = ("kaldi-native-fbank", "kissfft", "whisper.cpp", "sherpa-onnx", "eigen", "onnxruntime-headers")
+CPU_IDS = ("kaldi-native-fbank", "kissfft", "whisper.cpp", "sherpa-onnx", "eigen", "onnxruntime-headers", "nemo-speech-cpu")
 
 
 PINNED_LINE_ENDINGS = (
@@ -195,6 +195,26 @@ def normalize_pinned_sources():
         path.write_bytes(converted)
 
 
+def prepare_onnxruntime_headers(item):
+    """同梱の原ヘッダーを固定値に照合し、include先へ配置します。"""
+    for asset in item["files"]:
+        name = relative_file(asset["file"])
+        source = ROOT / "vendor/onnxruntime-headers" / name
+        target = ROOT / "third_party/onnxruntime-headers" / name
+        size, digest = asset["size"], asset["sha256"]
+        if not valid(source, size, digest):
+            raise ValueError("Pinned ONNX Runtime source header mismatch: " + name.name)
+        if valid(target, size, digest):
+            continue
+        target.parent.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=target.parent, prefix="koefude-header-") as staging:
+            prepared = pathlib.Path(staging) / name.name
+            shutil.copyfile(source, prepared)
+            if not valid(prepared, size, digest):
+                raise ValueError("Prepared ONNX Runtime header mismatch: " + name.name)
+            prepared.replace(target)
+
+
 def prepare(cpu=False, cache_root=None):
     """固定lockだけから依存を準備し、cache指定時はnetworkへ接続しません。"""
     manifest = json.loads((ROOT / "dependencies.lock.json").read_text("utf-8"))
@@ -202,6 +222,9 @@ def prepare(cpu=False, cache_root=None):
         if cpu and item["id"] not in CPU_IDS:
             continue
         print("Preparing " + item["id"], flush=True)
+        if item["id"] == "onnxruntime-headers":
+            prepare_onnxruntime_headers(item)
+            continue
         relative_file(item["directory"])
         if "files" in item:
             assets = [(asset, ROOT / "third_party" / item["directory"] / relative_file(asset["file"]))
@@ -227,7 +250,7 @@ def prepare(cpu=False, cache_root=None):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--cpu", action="store_true", help="CPU buildに必要な6依存だけを準備")
+    parser.add_argument("--cpu", action="store_true", help="CPUビルドに必要な固定依存だけを準備")
     parser.add_argument("--dependencies", action="store_true", help=argparse.SUPPRESS)
     parser.add_argument("--cache-root", type=pathlib.Path, help="検証済み依存のあるlocal source root")
     args = parser.parse_args()

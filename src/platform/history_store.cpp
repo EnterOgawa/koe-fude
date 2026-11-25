@@ -5,7 +5,7 @@
  *
  * @file history_store.cpp
  * @brief 履歴をユーザー専用local folderで読み、検証済み一時fileから置換します
- * @version 1.1.0
+ * @version 1.1.2
  * @date 2026/09/10
  * @author Shunji Ogawa
  * @par 更新履歴
@@ -33,6 +33,9 @@
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1433の更新履歴を新規作成からの昇順・末尾追記へ統一
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1437のコメント行末・終端の句点を省略
  * 1.1.0 Shunji Ogawa 2026/11/17 検証済みV9を旧履歴の退避対象から除き再起動後の保存を維持
+ * 1.1.1 Shunji Ogawa 2026/11/24 ADR1451の設定v3を追加し旧Spectralの自動人数選好を読込時に移行
+ * 1.1.1 Shunji Ogawa 2026/11/25 ADR1455で旧設定の話者方式を保存値のまま復元
+ * 1.1.2 Shunji Ogawa 2026/11/25 ADR1456の正式版へ試用時の変更を反映
  * </pre>
  */
 //------------------------------------------------------------------------------
@@ -1286,7 +1289,7 @@ class FileTranscriptionSettingsStorage final : public ITranscriptionSettingsStor
 	//------------------------------------------------------------------------------
 	/**
 	 * @brief 一度だけ読込み/lockを行います
-	 * @return missingは従前既定
+	 * @return 保存済みの選好。fileがなければ現行既定
 	 * @throws HistoryError 破損/読込み/lock失敗。原fileを変更しません
 	 */
 	//------------------------------------------------------------------------------
@@ -1309,7 +1312,7 @@ class FileTranscriptionSettingsStorage final : public ITranscriptionSettingsStor
 		}
 		validateFileHandle( lock_.get()) ;
 		target_ = directory_ / L"transcription-settings-v1.bin" ;
-		TranscriptionPreferences value ; // 初回だけ従前既定
+		TranscriptionPreferences value ; // 正本がなければ現行既定
 		// 既存正本は全値が検証できた場合だけ採用します
 		if( regularFileExists( target_)) {
 			UniqueHandle file( CreateFileW( target_.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING,
@@ -1324,7 +1327,7 @@ class FileTranscriptionSettingsStorage final : public ITranscriptionSettingsStor
 			if( !GetFileSizeEx( file.get(), &size) || (size.QuadPart != 48 && size.QuadPart != 49)) {
 				throw HistoryError( HistoryErrorKind::CORRUPT) ;
 			}
-			std::vector<std::uint8_t> bytes( static_cast<std::size_t>( size.QuadPart)) ; // v1/v2固定長
+			std::vector<std::uint8_t> bytes( static_cast<std::size_t>( size.QuadPart)) ; // v1〜v3固定長
 			DWORD					  count = 0 ; // 実読取長
 			// 小さい固定fileも部分読取を採用しません
 			if( !ReadFile( file.get(), bytes.data(), static_cast<DWORD>( bytes.size()), &count, nullptr) ||
@@ -1407,7 +1410,7 @@ class FileTranscriptionSettingsStorage final : public ITranscriptionSettingsStor
 /**
  * @brief 固定schemaへ選好を符号化します
  * @param[in] value 選好
- * @return v2固定49byte、SHA付き
+ * @return v3固定49byte、SHA付き
  * @throws HistoryError 不正選好
  * @see koefude::encodeTranscriptionSettings
  */
@@ -1425,7 +1428,7 @@ std::vector<std::uint8_t> encodeTranscriptionSettings( const TranscriptionPrefer
 									'E',
 									'T',
 									'0',
-									'2',
+									'3',
 									static_cast<std::uint8_t>( value.model),
 									static_cast<std::uint8_t>( value.profile),
 									static_cast<std::uint8_t>( value.backend),
@@ -1434,16 +1437,16 @@ std::vector<std::uint8_t> encodeTranscriptionSettings( const TranscriptionPrefer
 									static_cast<std::uint8_t>( value.diarization),
 									static_cast<std::uint8_t>( value.expectedSpeakers),
 									static_cast<std::uint8_t>( value.method),
-									static_cast<std::uint8_t>( value.checkUpdates)} ; // schema2固定17byte
+									static_cast<std::uint8_t>( value.checkUpdates)} ; // schema3固定17byte
 	const auto				  sha = digest( bytes) ; // accidental corruption検出
 	bytes.insert( bytes.end(), sha.begin(), sha.end()) ;
 	return bytes ;
 }
 //------------------------------------------------------------------------------
 /**
- * @brief 固定v1/v2 schema/範囲/registry/SHAを検証します
- * @param[in] bytes 外部file byte
- * @return 正常時だけ全選好
+ * @brief 固定v1〜v3 schemaの設定を検証し、保存済みの話者方式を復元します
+ * @param[in] bytes 検証する設定fileの全byte。呼出し中のみ借用
+ * @return 保存された選好。v1で省略された更新確認はON
  * @throws HistoryError 未知版/破損/不正値
  * @see koefude::decodeTranscriptionSettings
  */
@@ -1456,30 +1459,33 @@ TranscriptionPreferences decodeTranscriptionSettings( std::span<const std::uint8
 		throw HistoryError( HistoryErrorKind::CORRUPT) ;
 	}
 	// 形式が未知の場合は破損と別に原fileを保護します
-	if( !std::equal( MAGIC.begin(), MAGIC.end(), bytes.begin()) || (bytes[7] != '1' && bytes[7] != '2')) {
+	if( !std::equal( MAGIC.begin(), MAGIC.end(), bytes.begin()) ||
+	   (bytes[7] != '1' && bytes[7] != '2' && bytes[7] != '3')) {
 		throw HistoryError( HistoryErrorKind::VERSION) ;
 	}
-	// 既存v1は全選好を維持し、読込だけではv2へ置換しません
-	if( (bytes[7] == '1' && bytes.size() != 48) || (bytes[7] == '2' && (bytes.size() != 49 || bytes[16] > 1))) {
+	const bool hasUpdateChoice = bytes[7] != '1' ; // v1には更新確認の選好がない
+	// 各版の固定長と更新確認booleanだけを受理します
+	if( (!hasUpdateChoice && bytes.size() != 48) || (hasUpdateChoice && (bytes.size() != 49 || bytes[16] > 1))) {
 		throw HistoryError( HistoryErrorKind::CORRUPT) ;
 	}
-	const auto body = bytes.size() - 32 ; // v1=16、v2=17byte
+	const auto body = bytes.size() - 32 ; // v1=16、v2/v3=17byte
 	const auto sha = digest( bytes.first( body)) ; // 固定bodyだけ
 	// 破損byteを既定値へ黙って戻しません
 	if( !std::equal( sha.begin(), sha.end(), bytes.begin() + static_cast<std::ptrdiff_t>( body))) {
 		throw HistoryError( HistoryErrorKind::CORRUPT) ;
 	}
-	TranscriptionPreferences value{static_cast<AsrModel>( bytes[8]),
-								   static_cast<AsrProfile>( bytes[9]),
-								   static_cast<Backend>( bytes[10]),
-								   bytes[11] != 0,
-								   bytes[12] != 0,
-								   bytes[13] != 0,
-								   bytes[14],
-								   static_cast<SpeakerMethod>( bytes[15]),
-								   bytes[7] == '1' || bytes[16] != 0} ; // v1の追加選好はON既定
-	// enumのrangeだけでなく実在profileとの組合せも照合します
-	if( !validTranscriptionPreferences( value)) {
+	const bool					   previousSpeakerChoices = bytes[7] != '3' ; // v1/v2にはNemotron 3がない
+	const TranscriptionPreferences value{static_cast<AsrModel>( bytes[8]),
+										 static_cast<AsrProfile>( bytes[9]),
+										 static_cast<Backend>( bytes[10]),
+										 bytes[11] != 0,
+										 bytes[12] != 0,
+										 bytes[13] != 0,
+										 bytes[14],
+										 static_cast<SpeakerMethod>( bytes[15]),
+										 !hasUpdateChoice || bytes[16] != 0} ; // v1の追加選好はON既定
+	// 版ごとの話者方式と実在profileの組合せを照合します
+	if( !validTranscriptionPreferences( value) || (previousSpeakerChoices && value.method == SpeakerMethod::NEMOTRON_3)) {
 		throw HistoryError( HistoryErrorKind::CORRUPT) ;
 	}
 	return value ;

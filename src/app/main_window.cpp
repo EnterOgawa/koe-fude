@@ -5,7 +5,7 @@
  *
  * @file main_window.cpp
  * @brief 対応音声を投入して話者付き文字起こしを読むWin32画面を実装します
- * @version 1.1.1
+ * @version 1.1.2
  * @date 2026/09/09
  * @author Shunji Ogawa
  * @par 更新履歴
@@ -84,6 +84,11 @@
  * 1.0.0 Shunji Ogawa 2026/11/17 ADR1447の任意録音開始時刻と連続話者見出しを接続
  * 1.1.0 Shunji Ogawa 2026/11/17 ADR1448の録音開始時刻対応版1.1.0へ版を整合
  * 1.1.1 Shunji Ogawa 2026/11/17 ADR1449の未対応履歴を保持した更新表示と協調終了を接続
+ * 1.1.1 Shunji Ogawa 2026/11/24 ADR1451の話者方式の変更時にモデルを再検査し履歴に採用方式を表示
+ * 1.1.1 Shunji Ogawa 2026/11/24 ADR1452の文章改善メニューに受付できない理由を表示
+ * 1.1.1 Shunji Ogawa 2026/11/24 ADR1454の元音声が見つからない場合の案内を追加
+ * 1.1.1 Shunji Ogawa 2026/11/25 ADR1455の起動時の話者分離をSpectralに戻す
+ * 1.1.2 Shunji Ogawa 2026/11/25 ADR1456の正式版へ試用時の変更を反映
  * </pre>
  * @note UIはengineを所有せず、worker終了まで通知先Windowを維持します
  */
@@ -149,6 +154,7 @@
 #include "app/whole_text_preparation_window.h"
 #include "core/api_text_provenance.h"
 #include "core/app_update.h"
+#include "core/engines.h"
 #include "core/history_controller.h"
 #include "core/job_controller.h"
 #include "core/local_diagnostic_hooks.h"
@@ -189,12 +195,12 @@ constexpr UINT_PTR		   K_POLL_TIMER = 1 ; // PostMessage失敗とworker終了を
 [[nodiscard]] std::wstring errorText( const ErrorKind kind, const std::uint32_t code)
 {
 	UINT		   id = IDS_PROCESS_ERROR ; // 既定の再実行案内
-	const unsigned inputId = inputErrorResource( kind) ; // 入力の理由別の表示先
+	const unsigned inputId = inputErrorResource( kind, code) ; // 入力の理由別の表示先
 	// モデル未準備は音声認識失敗と区別し、準備手順へ案内する
 	if( kind == ErrorKind::MODEL_MISSING || kind == ErrorKind::MODEL_REJECTED) {
 		id = IDS_MODEL_HELP ;
 	}
-	// 形式・破損・上限・時刻を区別して復旧へ案内する
+	// 元音声の欠落・形式・破損・上限・時刻を区別して復旧へ案内する
 	else if( inputId != 0) {
 		id = inputId ;
 	}
@@ -1575,7 +1581,8 @@ class MainWindow final {
 	{
 		return left.asrModel == right.asrModel && left.asrProfile == right.asrProfile &&
 			   left.speechFilter == right.speechFilter && left.diarization == right.diarization &&
-			   left.autoLanguage == right.autoLanguage ;
+			   left.autoLanguage == right.autoLanguage &&
+			   (!left.diarization || left.speakerMethod == right.speakerMethod) ;
 	}
 	//------------------------------------------------------------------------------
 	/**
@@ -2625,17 +2632,38 @@ class MainWindow final {
 		EnableMenuItem( GetMenu( window_), IDC_HISTORY_REMOVE, MF_BYCOMMAND | (removable ? MF_ENABLED : MF_GRAYED)) ;
 		EnableMenuItem( GetMenu( window_), IDC_HISTORY_RETRY,
 					   MF_BYCOMMAND | (historyFailed_ && !closing_ ? MF_ENABLED : MF_GRAYED)) ;
-		const bool canApi =
-			editable && !historyDirty_ && !historyFailed_ && selected_ < cards_.size() && cards_[selected_].result &&
-			!cards_[selected_].result->lines.empty() && !cards_[selected_].busy && !cards_[selected_].reading.active &&
-			!cards_[selected_].wholeText.active && !cards_[selected_].apiText.saveFailed && apiTextWindow_.ready() &&
-			(!cards_[selected_].apiAudio ||
-			 cards_[selected_].apiAudio->terminal == ApiAudioTerminal::COMPLETED) ; // 完全音声原文だけ
+		const bool canApi = selected_ < cards_.size() &&
+							apiImproveMenuLabel( cards_[selected_]) == IDS_API_OPEN ; // 行メニューと同じ受付条件
 		EnableMenuItem( GetMenu( window_), IDC_API_TEXT_OPEN, MF_BYCOMMAND | (canApi ? MF_ENABLED : MF_GRAYED)) ;
 		DragAcceptFiles( window_, editable) ;
 		DragAcceptFiles( chat_, editable) ;
 		refreshWholeTextActions() ;
 		refreshReadingActions() ;
+	}
+	//------------------------------------------------------------------------------
+	/**
+	 * @brief 固定行の文章改善メニューに使う操作名または無効理由を返します
+	 * @param[in] card UIスレッドで同期借用する対象行。状態や本文を変更しません
+	 * @return 受付可能ならIDS_API_OPEN、それ以外は無効理由の文字列resource ID
+	 * @note 適用済みの状態を照会するだけで、設定・保存・通信を開始しません
+	 */
+	//------------------------------------------------------------------------------
+	[[nodiscard]] UINT apiImproveMenuLabel( const FileCard &card) const
+	{
+		// 別の行でもAPI処理中は待つ必要があることを示します
+		if( closing_ || apiTextWindow_.busy() || card.busy || card.reading.active || card.wholeText.active) {
+			return IDS_API_OPEN_PROCESSING ;
+		}
+		// 原文が空または音声APIの部分結果なら、全文の改善を受け付けません
+		if( !card.result || card.result->lines.empty() ||
+		   (card.apiAudio && card.apiAudio->terminal != ApiAudioTerminal::COMPLETED)) {
+			return IDS_API_OPEN_INCOMPLETE ;
+		}
+		// 履歴や直前の改善結果の保存が確定してから新しい要求を受け付けます
+		if( !historyReady_ || historyDirty_ || historyFailed_ || card.apiText.saveFailed) {
+			return IDS_API_OPEN_CHECK_SAVE ;
+		}
+		return apiTextWindow_.ready() ? IDS_API_OPEN : IDS_API_OPEN_CHECK_SETTINGS ;
 	}
 	//------------------------------------------------------------------------------
 	/**
@@ -3350,10 +3378,7 @@ class MainWindow final {
 					return card.id == sourceId ;
 				}) ; // 最大32件
 			// 消えた行・未完了行は別の選択行へ読み替えません
-			if( closing_ || !historyReady_ || historyDirty_ || historyFailed_ || found == cards_.end() ||
-			   !found->result || found->result->lines.empty() || found->busy || found->wholeText.active ||
-			   found->reading.active || !apiTextWindow_.ready() || found->apiText.saveFailed ||
-			   (found->apiAudio && found->apiAudio->terminal != ApiAudioTerminal::COMPLETED)) {
+			if( found == cards_.end() || apiImproveMenuLabel( *found) != IDS_API_OPEN) {
 				setStatus( {IDS_API_BUSY}) ;
 				return ;
 			}
@@ -3529,12 +3554,7 @@ class MainWindow final {
 							   !cards_[index].recordingClockDirty ; // 当該時計の耐久ACK後
 		// 処理完了の有無に対応した履歴削除menuの表示文言
 		const auto removeLabel = resource( removable ? IDS_HISTORY_REMOVE : IDS_HISTORY_REMOVE_BUSY) ;
-		const bool canApi =
-			apiTextWindow_.ready() &&
-			(!cards_[index].apiAudio || cards_[index].apiAudio->terminal == ApiAudioTerminal::COMPLETED) &&
-			!cards_[index].apiText.saveFailed && historyReady_ && !historyDirty_ && !historyFailed_ &&
-			cards_[index].result && !cards_[index].result->lines.empty() && !cards_[index].busy &&
-			!cards_[index].reading.active && !cards_[index].wholeText.active ; // 明示送信前提
+		const UINT apiLabel = apiImproveMenuLabel( cards_[index]) ; // 対象行の現在の受付可否と表示理由
 		const bool ready = resolveRow( target, true) < cards_.size() ; // 同じ準備済み本文
 		const bool rename = cards_[index].result && cards_[index].result->speakerCount > 0 &&
 							!rowOperation( cards_[index]) ; // 未処理sourceを変更しません
@@ -3551,8 +3571,8 @@ class MainWindow final {
 			}
 		}
 		// API操作も追跡開始時の同じhistory IDへ固定します
-		if( !AppendMenuW( menu.get(), MF_STRING | (canApi ? MF_ENABLED : MF_GRAYED), IDC_API_TEXT_OPEN,
-						resource( IDS_API_OPEN).c_str())) {
+		if( !AppendMenuW( menu.get(), MF_STRING | (apiLabel == IDS_API_OPEN ? MF_ENABLED : MF_GRAYED), IDC_API_TEXT_OPEN,
+						resource( apiLabel).c_str())) {
 			throw OperationError( ErrorKind::INTERNAL, GetLastError()) ;
 		}
 		// 部分終端だけへ同じ行の明示再開を追加します
@@ -5639,9 +5659,11 @@ class MainWindow final {
 													 : IDS_GPU_USED ; // 実際の成功経路
 			text += resource( card.result->apiAudioWindowTimes ? IDS_AUDIO_DEVICE : backendResource) + L"  ·  " +
 					resource( IDS_ESTIMATE) + std::to_wstring( card.result->speakerCount) + L"\r\n" ;
-			text += resource( !card.result->diarizationRequested						 ? IDS_NO_DIARIZATION
-							 : card.result->speakerMethod == SpeakerMethod::SPECTRAL ? IDS_SPECTRAL_METHOD
-																					 : IDS_LEGACY_METHOD) +
+			const auto method = card.result->speakerMethod ; // 保存した方式を現在設定へ読み替えない
+			text += resource( !card.result->diarizationRequested	   ? IDS_NO_DIARIZATION
+							 : method == SpeakerMethod::NEMOTRON_3 ? IDS_NEMOTRON_3_METHOD
+							 : method == SpeakerMethod::SPECTRAL   ? IDS_SPECTRAL_METHOD
+																   : IDS_LEGACY_METHOD) +
 					L"\r\n" ;
 			text += processingTimeSummary( *card.result) ;
 			if( card.apiAudio) {
@@ -7236,6 +7258,7 @@ class MainWindow final {
 				speakerMethod_ = id == IDC_SPECTRAL_METHOD ? SpeakerMethod::SPECTRAL : SpeakerMethod::LEGACY_THRESHOLD ;
 				CheckMenuRadioItem( GetMenu( window_), IDC_SPECTRAL_METHOD, IDC_LEGACY_METHOD, static_cast<UINT>( id),
 								   MF_BYCOMMAND) ;
+				requestModelCheck() ;
 				break ; // 次に投入されるjobだけへ方式変更を反映する
 			case IDC_ASR_QUALITY:
 			case IDC_ASR_STANDARD:
@@ -7586,8 +7609,8 @@ class MainWindow final {
     /// 専用試験の所有者がWindow/workerより長く保持する依存
 	MainWindowTestHooks &testHooks_ ;
 #endif
-    /// 次jobに適用する研究/従来方式
-	SpeakerMethod									 speakerMethod_ = SpeakerMethod::SPECTRAL ;
+	/// 次jobに適用する話者分離方式
+	SpeakerMethod									 speakerMethod_ = K_DEFAULT_SPEAKER_METHOD ;
 	/// 利用者指定の品質優先を初期選択する
 	AsrProfile										 asrProfile_ = AsrProfile::QUALITY ;
 	/// 独立した日本語評価を通った構成を初期選択

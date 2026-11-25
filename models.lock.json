@@ -323,12 +323,23 @@
       "source": "https://huggingface.co/mistralai/Ministral-3-14B-Instruct-2512-GGUF/tree/74fac473c43357d7fb2671713608183cc72496d0",
       "acquisition_scope": "whole_text",
       "url": "https://huggingface.co/mistralai/Ministral-3-14B-Instruct-2512-GGUF/resolve/74fac473c43357d7fb2671713608183cc72496d0/Ministral-3-14B-Instruct-2512-Q4_K_M.gguf"
+    },
+    {
+      "id": "nemotron-3-diarization-q8-0",
+      "file": "Nemotron-3-Diarization.q8_0.gguf",
+      "size": 107012128,
+      "sha256": "08456d9e22cd9a323c0364d98375f3746d6e68507ebb705cd46438c534c7a3a1",
+      "url": "https://huggingface.co/nvidia/Nemotron-3-Diarization/resolve/f667ed73aee57d40cc39428eb768b4fd87a0a29e/Nemotron-3-Diarization.q8_0.gguf",
+      "revision": "f667ed73aee57d40cc39428eb768b4fd87a0a29e",
+      "license": "OpenMDW 1.1",
+      "source": "https://huggingface.co/nvidia/Nemotron-3-Diarization/tree/f667ed73aee57d40cc39428eb768b4fd87a0a29e"
     }
   ],
   "shared_roles": {
     "voice_activity": 4,
     "segmentation": 1,
-    "embedding": 2
+    "embedding": 2,
+    "nemotron": 15
   },
   "whole_text_roles": {
     "native_cpu": 13,

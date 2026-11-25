@@ -5,7 +5,7 @@
  *
  * @file history_store.h
  * @brief ユーザー専用folderへ履歴を検証付きで保存するstorageを宣言します
- * @version 1.0.0
+ * @version 1.1.2
  * @date 2026/09/10
  * @author Shunji Ogawa
  * @par 更新履歴
@@ -20,6 +20,9 @@
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1428の関数ヘッダーを上下区切り線と複数行へ統一
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1433の更新履歴を新規作成からの昇順・末尾追記へ統一
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1437のコメント行末・終端の句点を省略
+ * 1.1.1 Shunji Ogawa 2026/11/24 ADR1451の設定v3と旧話者設定の復元契約を記載
+ * 1.1.1 Shunji Ogawa 2026/11/25 ADR1455で既存の話者方式を保存値のまま復元
+ * 1.1.2 Shunji Ogawa 2026/11/25 ADR1456の正式版へ試用時の変更を反映
  * </pre>
  */
 //------------------------------------------------------------------------------
@@ -59,16 +62,16 @@ namespace koefude {
 /**
  * @brief 固定schemaへ選好を符号化します
  * @param[in] value 選好
- * @return v2固定49byte、SHA付き
+ * @return v3固定49byte、SHA付き
  * @throws HistoryError 不正選好
  */
 //------------------------------------------------------------------------------
 [[nodiscard]] std::vector<std::uint8_t> encodeTranscriptionSettings( const TranscriptionPreferences &value) ;
 //------------------------------------------------------------------------------
 /**
- * @brief 固定v1/v2 schema/範囲/registry/SHAを検証します
- * @param[in] bytes 外部file byte
- * @return 正常時だけ全選好
+ * @brief 固定v1〜v3 schemaの設定を検証し、保存済みの話者方式を復元します
+ * @param[in] bytes 検証する設定fileの全byte。呼出し中のみ借用
+ * @return 保存された選好。v1で省略された更新確認はON
  * @throws HistoryError 未知版/破損/不正値
  */
 //------------------------------------------------------------------------------

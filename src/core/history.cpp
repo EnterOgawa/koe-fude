@@ -5,7 +5,7 @@
  *
  * @file history.cpp
  * @brief 履歴の保存形式と外部byte列の件数・文字・時刻を検証します
- * @version 1.1.0
+ * @version 1.1.2
  * @date 2026/09/10
  * @author Shunji Ogawa
  * @par 更新履歴
@@ -32,10 +32,13 @@
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1437のコメント行末・終端の句点を省略
  * 1.0.0 Shunji Ogawa 2026/11/17 ADR1447の任意録音開始時刻と連続話者見出しを接続
  * 1.1.0 Shunji Ogawa 2026/11/17 ADR1448の録音開始時刻対応版1.1.0へ版を整合
+ * 1.1.1 Shunji Ogawa 2026/11/24 ADR1451の既存の履歴形式でNemotron 3の方式を保存・復元
+ * 1.1.2 Shunji Ogawa 2026/11/25 ADR1456の正式版へ試用時の変更を反映
  * </pre>
  */
 //------------------------------------------------------------------------------
 #include "core/history.h"
+#include "core/engines.h"
 #include "core/job_controller.h"
 #include "core/speaker_attribution.h"
 #include "platform/whole_text_journal_store.h"
@@ -120,7 +123,7 @@ void					requireHistory( const bool valid)
 void validateResult( const Transcript &result)
 {
 	requireHistory( result.speakerCount >= 0 && result.speakerCount <= static_cast<int>( K_MAXIMUM_SEGMENTS) &&
-				   static_cast<unsigned>( result.speakerMethod) <= 1 && static_cast<unsigned>( result.asrProfile) <= 1 &&
+				   isSupportedSpeakerMethod( result.speakerMethod) && static_cast<unsigned>( result.asrProfile) <= 1 &&
 				   static_cast<unsigned>( result.asrModel) <= 3 &&
 				   static_cast<unsigned>( result.diarizationError) <=
 					   static_cast<unsigned>( ErrorKind::TEMPORARY_STORAGE)) ;

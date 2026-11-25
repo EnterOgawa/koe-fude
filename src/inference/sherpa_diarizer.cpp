@@ -5,7 +5,7 @@
  *
  * @file sherpa_diarizer.cpp
  * @brief CPUで話者区間とfile内clusterを推定します
- * @version 1.0.0
+ * @version 1.1.2
  * @date 2026/09/09
  * @author Shunji Ogawa
  * @par 更新履歴
@@ -22,6 +22,8 @@
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1431の各関数へ役割・全引数・戻り値を直接記載
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1433の更新履歴を新規作成からの昇順・末尾追記へ統一
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1437のコメント行末・終端の句点を省略
+ * 1.1.1 Shunji Ogawa 2026/11/24 ADR1451のNemotron 3への話者処理経路を追加
+ * 1.1.2 Shunji Ogawa 2026/11/25 ADR1456の正式版へ試用時の変更を反映
  * </pre>
  * @note 固定版のprogress callback戻り値では推論を中断できません
  */
@@ -40,6 +42,7 @@
 #include <sherpa-onnx/c-api/c-api.h>
 
 #include "inference/model_store.h"
+#include "inference/nemotron_diarizer.h"
 #include "inference/spectral_diarizer.h"
 #include "platform/win_helpers.h"
 
@@ -97,7 +100,11 @@ std::vector<SpeakerTurn> SherpaDiarizer::diarize( const AudioData &audio, const 
 												 const std::stop_token stop, const ProgressCallback &progress)
 {
 	checkCancelled( stop) ;
-	// 試用方式はclustering前の音響特徴を直接利用する
+	// Nemotron 3の明示選択時だけ、別native ABIで元音声の話者を推定する
+	if( options.speakerMethod == SpeakerMethod::NEMOTRON_3) {
+		return nemotronDiarize( audio, options, stop, progress) ;
+	}
+	// 既定のSpectralではclustering前の音響特徴を直接利用する
 	if( options.speakerMethod == SpeakerMethod::SPECTRAL) {
 		return spectralDiarize( audio, options, stop, progress) ;
 	}

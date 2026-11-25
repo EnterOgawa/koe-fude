@@ -1,6 +1,6 @@
 # KoeFudeの使い方
 
-KoeFude 1.1.1はWindows 11 x64向けの日本語版です。配布ファイルは[リリース](https://github.com/EnterOgawa/koe-fude/releases/latest)から取得します。
+KoeFude 1.1.2はWindows 11 x64向けの日本語版です。配布ファイルは[リリース](https://github.com/EnterOgawa/koe-fude/releases/latest)から取得します。
 
 ## 導入
 
@@ -48,9 +48,11 @@ TXT保存と全文コピーにも同じ時計付き見出しを使います。SR
 
 保存に成功した音声モデルの選択は、次回起動にも復元します。設定内で送信先、モデル、単価を確認できます。送信の条件やキーの扱いは[通信と保存の説明](privacy.md)を参照してください。
 
+話者分離の既定はSpectralです。「設定…」の「話者」タブで試用方式のNemotron 3も選べます。Nemotron 3は人数を自動推定し、AVX2を含むx86-64-v3対応CPUと追加モデルが必要です。
+
 ## 動作環境と更新
 
-Windows 11 x64、SSE4.2・BMI2対応CPUが対象です。搭載RAM16GB級を開発上の最低対象とし、GPUメモリ12GiB以内を目標にしています。実環境での未確認条件は[リリースノート](releases/1.1.1.md)を参照してください。
+Windows 11 x64、SSE4.2・BMI2対応CPUが対象です。搭載RAM16GB級を開発上の最低対象とし、GPUメモリ12GiB以内を目標にしています。実環境での未確認条件は[リリースノート](releases/1.1.2.md)を参照してください。
 
 入力はM4A、WAV、MP3、FLACに対応し、M4AではAAC-LCを優先しています。コーデックごとの条件は[入力形式の対応表](design/input-acceptance.md)に記載しています。
 

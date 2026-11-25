@@ -4,7 +4,7 @@ KoeFude 1.0.0 / 2026/11/10 / Shunji Ogawa。原条件と既存固定runtimeの�
 自作部分はMIT License、第三者部分は各原文の条件に従います。
 配布バイナリのfileごとのhash・componentは`PACKAGE.json`、帰属と原文は
 [LICENSE_INVENTORY.md](LICENSE_INVENTORY.md)と`licenses/`で確認できます。
-配布バイナリにはモデルweight、研究worker/DLL、開発用sourceを同梱しません。このリポジトリには製品のビルドに必要なソースと固定依存の準備を含めます。取得可能な通常モデル11 artifactの帰属を維持します。
+配布バイナリにはモデルweight、研究worker/DLL、開発用sourceを同梱しません。このリポジトリには製品のビルドに必要なソースと固定依存の準備を含めます。取得可能なモデルの帰属は同梱一覧を参照してください。
 
 ## アプリに組み込むcodeとruntime
 
@@ -31,6 +31,8 @@ WindowsのMedia Foundation、WinHTTP、tar.exe、oleacc.dll、任意のVulkan lo
 MSVC/Windows SDKはOS又は開発環境のcomponentで、配布バイナリやソースリポジトリへ同梱しません。
 研究モデル、Python、会話音声・注釈、比較probeは同梱しません。
 
+任意のNemotron 3話者分離には、[NeMo-Speech.cpp v0.2.0](https://github.com/NVIDIA/NeMo-Speech.cpp/releases/tag/v0.2.0) の固定Windows CPUランタイムを使います。原ライセンス類は配布バイナリとビルド出力の `nemotron-3/licenses/nemo-speech/` に付属します。Microsoft OpenMPのVCOMP140にはVisual Studio 2022のVC Redistと同じ配布条件を適用します。
+
 ## アプリから取得するモデル
 
 モデルは用途・条件・通信先を表示した明示操作で必要分だけ取得します。
@@ -44,7 +46,7 @@ FP32 graphにはKoeFudeがsherpa用metadata 338byteを追加し、weightは変�
 原著作者・固定revision・変換元へのリンクは対応一覧とPACKAGE.jsonのモデル帰属に保持しています。
 配布元・著作者がKoeFudeを推奨しているという意味ではありません。
 
-モデルweightを含まないZIPにも、取得可能な製品モデルの原license・model cardを添えます。
+配布物には、取得できるモデルの帰属、配布元、条件の案内を添えます。
 第三者のアクセス条件やgated modelの同意を回避しません。
 
 ソースビルドで使う固定依存12件のrevision・取得元・size・SHA-256は`dependencies.lock.json`を参照してください。

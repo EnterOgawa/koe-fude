@@ -5,7 +5,7 @@
  *
  * @file model_preparation.cpp
  * @brief モデル依存・転送容量とlocal cacheの再利用を読取り専用で解決します
- * @version 1.0.0
+ * @version 1.1.2
  * @date 2026/09/13
  * @author Shunji Ogawa
  * @par 更新履歴
@@ -22,6 +22,8 @@
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1431の各関数へ役割・全引数・戻り値を直接記載
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1433の更新履歴を新規作成からの昇順・末尾追記へ統一
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1437のコメント行末・終端の句点を省略
+ * 1.1.1 Shunji Ogawa 2026/11/24 ADR1451の話者方式ごとに必要weightを選択
+ * 1.1.2 Shunji Ogawa 2026/11/25 ADR1456の正式版へ試用時の変更を反映
  * </pre>
  */
 //------------------------------------------------------------------------------
@@ -56,7 +58,7 @@ namespace {
 //------------------------------------------------------------------------------
 [[nodiscard]] bool isDeviceComponent( const std::wstring_view value)
 {
-	const auto stem = value.substr( 0, value.find( L'.')) ; // 拡張子より前のdevice識別部分
+	const auto								   stem = value.substr( 0, value.find( L'.')) ; // 拡張子より前のdevice識別部分
 	constexpr std::array<std::wstring_view, 4> K_DEVICES{L"CON", L"PRN", L"AUX", L"NUL"} ; // 予約名
 	// 短い固定device名をcase-insensitiveで照合する
 	for( const auto device : K_DEVICES) { // 比較する固定名
@@ -198,7 +200,6 @@ void addRequired( std::vector<ModelId> &ids, const ModelId id)
  * @param[in] options ジョブまたは準備操作で固定した設定
  * @return registryの用途だけを保持する所有列
  * @throws OperationError 未定義構成や準備対象外の依存
- * @see koefude::requiredModels
  */
 //------------------------------------------------------------------------------
 std::vector<ModelId> requiredModels( const EngineOptions &options)
@@ -222,10 +223,15 @@ std::vector<ModelId> requiredModels( const EngineOptions &options)
 	if( options.speechFilter) {
 		addRequired( ids, roles.voiceActivity) ;
 	}
-	// 話者分離を行う操作だけに共有の区間・埋込みmodelを加える
+	// 話者分離を行う操作だけに選択した方式のweightを加える
 	if( options.diarization) {
-		addRequired( ids, roles.segmentation) ;
-		addRequired( ids, roles.embedding) ;
+		// Nemotron 3は区間推定と話者の識別を単一モデルで行う
+		if( options.speakerMethod == SpeakerMethod::NEMOTRON_3) {
+			addRequired( ids, roles.nemotron) ;
+		} else {
+			addRequired( ids, roles.segmentation) ;
+			addRequired( ids, roles.embedding) ;
+		}
 	}
 	// 日本語Qualityの明示音声操作はPOST前に後続のPC内参照モデルも準備する
 	if( options.asrModel == AsrModel::OPEN_AI_AUDIO && options.asrProfile == AsrProfile::QUALITY &&
@@ -354,9 +360,8 @@ ModelPreparationPlan planModelPreparation( const EngineOptions &options, const s
 	for( const ModelId id : ids) { // 今回検査する用途
 		checkCancelled( stop) ;
 		const auto cached = inspector.inspect( plan.cacheRoot, id, stop) ; // cacheの確認結果
-		const auto bundled = plan.cacheRoot == plan.bundleRoot
-								 ? cached
-								 : inspector.inspect( plan.bundleRoot, id, stop) ; // 同梱の確認結果
+		const auto bundled =
+			plan.cacheRoot == plan.bundleRoot ? cached : inspector.inspect( plan.bundleRoot, id, stop) ; // 同梱の確認結果
 		allCache = allCache && cached == ModelPresence::VALID ;
 		allBundle = allBundle && bundled == ModelPresence::VALID ;
 		plan.entries.push_back( {id, cached, bundled, ModelPreparationAction::DOWNLOAD}) ;

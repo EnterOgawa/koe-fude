@@ -5,7 +5,7 @@
  *
  * @file transcription_settings.h
  * @brief 適用済み推論選好だけを専用workerで保存・復元します
- * @version 1.0.0
+ * @version 1.1.2
  * @date 2026/11/10
  * @author Shunji Ogawa
  * @par 更新履歴
@@ -21,6 +21,9 @@
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1431の各関数へ役割・全引数・戻り値を直接記載
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1433の更新履歴を新規作成からの昇順・末尾追記へ統一
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1437のコメント行末・終端の句点を省略
+ * 1.1.1 Shunji Ogawa 2026/11/24 ADR1451のNemotron 3を既定の話者設定に変更
+ * 1.1.1 Shunji Ogawa 2026/11/25 ADR1455の話者設定の既定をSpectralに戻す
+ * 1.1.2 Shunji Ogawa 2026/11/25 ADR1456の正式版へ試用時の変更を反映
  * </pre>
  */
 //------------------------------------------------------------------------------
@@ -50,10 +53,10 @@ struct TranscriptionPreferences {
 	bool		  speechFilter = true ;
 	/// 明示話者分離
 	bool		  diarization = true ;
-	/// 自動0、任意1〜20
+	/// 人数指定を扱う方式の自動0、任意1〜20。Nemotron 3選択中も保持
 	int			  expectedSpeakers = 0 ;
-	/// 明示人数推定方式
-	SpeakerMethod method = SpeakerMethod::SPECTRAL ;
+	/// 適用済みの話者分離方式
+	SpeakerMethod method = K_DEFAULT_SPEAKER_METHOD ;
 	/// 起動一回の固定GitHub確認
 	bool		  checkUpdates = true ;
 	//------------------------------------------------------------------------------

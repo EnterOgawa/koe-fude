@@ -5,7 +5,7 @@
  *
  * @file reading_view.cpp
  * @brief 確定原文のfingerprintと整形結果の全体検証・表示投影を実装します
- * @version 1.0.0
+ * @version 1.1.2
  * @date 2026/09/28
  * @author Shunji Ogawa
  * @par 更新履歴
@@ -21,6 +21,8 @@
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1431の各関数へ役割・全引数・戻り値を直接記載
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1433の更新履歴を新規作成からの昇順・末尾追記へ統一
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1437のコメント行末・終端の句点を省略
+ * 1.1.1 Shunji Ogawa 2026/11/24 ADR1451のNemotron 3の話者方式を原文の検証と照合に接続
+ * 1.1.2 Shunji Ogawa 2026/11/25 ADR1456の正式版へ試用時の変更を反映
  * </pre>
  */
 //------------------------------------------------------------------------------
@@ -45,6 +47,7 @@
 // Windows基本型を定義した後に暗号APIのhandleと定数を参照する
 #include <bcrypt.h>
 
+#include "core/engines.h"
 #include "core/speaker_attribution.h"
 #include "platform/win_helpers.h"
 
@@ -241,7 +244,7 @@ void writeSpeakers( DigestWriter &writer, const std::span<const int> speakers)
 void validateSource( const Transcript &source)
 {
 	requireReading( source.speakerCount >= 0 && source.speakerCount <= static_cast<int>( K_MAXIMUM_SEGMENTS) &&
-				   static_cast<unsigned>( source.speakerMethod) <= 1 && static_cast<unsigned>( source.asrProfile) <= 1 &&
+				   isSupportedSpeakerMethod( source.speakerMethod) && static_cast<unsigned>( source.asrProfile) <= 1 &&
 				   static_cast<unsigned>( source.asrModel) <= 3 && std::isfinite( source.durationSeconds) &&
 				   source.durationSeconds > 0 &&
 				   source.durationSeconds <= static_cast<double>( K_MAXIMUM_TIMELINE_MS) / 1000) ;

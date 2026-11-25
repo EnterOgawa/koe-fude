@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.25)
-project(KoeFude VERSION 1.1.1 LANGUAGES C CXX RC)
+project(KoeFude VERSION 1.1.2 LANGUAGES C CXX RC)
 
 if(NOT WIN32 OR NOT MSVC OR NOT CMAKE_SIZEOF_VOID_P EQUAL 8)
     message(FATAL_ERROR "KoeFude requires Windows, MSVC, and an x64 toolchain.")
@@ -21,6 +21,7 @@ include(cmake/model_registry.cmake)
 koefude_generate_model_registry("${CMAKE_CURRENT_SOURCE_DIR}/models.lock.json"
     "${CMAKE_CURRENT_BINARY_DIR}/generated/model_manifest.h")
 configure_file(cmake/version.h.in generated/version.h @ONLY)
+include(cmake/nemotron_runtime.cmake)
 
 set_property(SOURCE src/app/koefude.rc APPEND PROPERTY OBJECT_DEPENDS
     "${CMAKE_CURRENT_SOURCE_DIR}/src/app/icons/koefude.ico"
@@ -218,9 +219,11 @@ add_library(koefude_core STATIC
     src/inference/spectral_clustering.cpp
     src/inference/speaker_stream.cpp
     src/inference/spectral_diarizer.cpp
+    src/inference/nemotron_diarizer.cpp
     src/inference/sherpa_diarizer.cpp)
 target_include_directories(koefude_core PUBLIC src PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
 target_include_directories(koefude_core SYSTEM PRIVATE third_party/eigen third_party/onnxruntime-headers third_party/whisper.cpp/examples)
+target_include_directories(koefude_core SYSTEM PRIVATE "${KOEFUDE_NEMOTRON_ROOT}/include")
 # GPU archiveにimport libraryがないため、同じ固定API版のCPU import libraryを使う。
 target_link_libraries(koefude_core PRIVATE "${KOEFUDE_SHERPA_CPU_DIR}/lib/onnxruntime.lib" koefude_ctc_fbank)
 target_link_libraries(koefude_core PUBLIC mfplat mfreadwrite mfuuid ole32 propsys whisper koefude_sherpa bcrypt shell32 advapi32 runtimeobject winhttp uxtheme wintrust crypt32 version)

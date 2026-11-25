@@ -6,7 +6,7 @@
  *
  * @file resource.h
  * @brief UI表示resourceとcontrol IDを定義します
- * @version 1.1.1
+ * @version 1.1.2
  *
  * @date 2026/09/09
  * @author Shunji Ogawa
@@ -66,6 +66,10 @@
  * 1.0.0 Shunji Ogawa 2026/11/17 ADR1447の任意録音開始時刻と連続話者見出しを接続
  * 1.1.0 Shunji Ogawa 2026/11/17 ADR1448の録音開始時刻対応版1.1.0へ版を整合
  * 1.1.1 Shunji Ogawa 2026/11/17 ADR1449の未対応履歴と更新の個別状態を追加
+ * 1.1.1 Shunji Ogawa 2026/11/24 ADR1451のNemotron 3の話者方式表示を追加
+ * 1.1.1 Shunji Ogawa 2026/11/24 ADR1452の文章改善を選べない理由の文字列IDを追加
+ * 1.1.1 Shunji Ogawa 2026/11/24 ADR1454の元音声が見つからない場合の文字列IDを追加
+ * 1.1.2 Shunji Ogawa 2026/11/25 ADR1456の正式版へ試用時の変更を反映
  * </pre>
  */
 
@@ -179,7 +183,7 @@
 
 #define IDC_SPEECH_FILTER 1105 // 発話区間検出の有効・無効を切り替えるmenu
 
-#define IDS_SPECTRAL_METHOD 148 // 実行した研究方式の表示
+#define IDS_SPECTRAL_METHOD 148 // 旧既定のSpectral方式の表示
 
 #define IDS_LEGACY_METHOD 149 // 実行した従来方式の表示
 
@@ -198,6 +202,8 @@
 #define IDS_QUALITY_CHOICE 156 // 品質優先のcombo選択肢
 
 #define IDS_STANDARD_CHOICE 157 // 標準・高速のcombo選択肢
+
+#define IDS_NEMOTRON_3_METHOD 158 // Nemotron 3と人数自動推定の表示
 
 #define IDS_STAGES 160 // 以後Stage enum順の処理説明
 
@@ -1307,3 +1313,9 @@
 #define IDS_RECORDING_CLOCK_CLEAR 3607 // 開始時刻の解除
 #define IDS_RECORDING_CLOCK_INVALID 3608 // 不正なHH:mm入力
 #define IDS_RECORDING_CLOCK_UNSAVED 3609 // 未保存時計を保持する削除拒否
+
+#define IDS_API_OPEN_PROCESSING 3610 // 処理中の文章改善メニュー
+#define IDS_API_OPEN_INCOMPLETE 3611 // 全文未確定の文章改善メニュー
+#define IDS_API_OPEN_CHECK_SAVE 3612 // 保存確認が必要な文章改善メニュー
+#define IDS_API_OPEN_CHECK_SETTINGS 3613 // API設定の確認が必要な文章改善メニュー
+#define IDS_INPUT_FILE_MISSING 3614 // 元音声が見つからない場合の案内

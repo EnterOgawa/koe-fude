@@ -2,7 +2,7 @@
 /**
  * @file ui_en.rcinc
  * @brief 言語別のUI文字列と標準menuを定義します。
- * @version 1.1.1
+ * @version 1.1.2
  * @date 2026/09/09
  * @author Shunji Ogawa
  * @copyright Copyright (c) 2026 Shunji Ogawa. MIT License.
@@ -40,6 +40,11 @@
  * 1.0.0 Shunji Ogawa 2026/11/17 ADR1447の任意録音開始時刻と連続話者見出しを接続
  * 1.1.0 Shunji Ogawa 2026/11/17 ADR1448の録音開始時刻対応版1.1.0へ版を整合
  * 1.1.1 Shunji Ogawa 2026/11/17 ADR1449の未対応履歴を保護した更新案内を追加
+ * 1.1.1 Shunji Ogawa 2026/11/24 ADR1451のNemotron 3と旧方式を話者設定と履歴に表示
+ * 1.1.1 Shunji Ogawa 2026/11/24 ADR1452の文章改善を選べない理由を行メニューに表示
+ * 1.1.1 Shunji Ogawa 2026/11/24 ADR1454の元音声が見つからない場合の案内を追加
+ * 1.1.1 Shunji Ogawa 2026/11/25 ADR1455のSpectralの表示名を更新
+ * 1.1.2 Shunji Ogawa 2026/11/25 ADR1456の正式版へ試用時の変更を反映
  * </pre>
  */
 //------------------------------------------------------------------------------
@@ -129,7 +134,8 @@ END
 STRINGTABLE
 BEGIN
     IDS_TITLE "KoeFude"
-    IDS_SPECTRAL_METHOD "Speaker method: new (experimental)"
+    IDS_NEMOTRON_3_METHOD "Speaker method: Nemotron 3 (automatic count)"
+    IDS_SPECTRAL_METHOD "Speaker method: Spectral"
     IDS_LEGACY_METHOD "Speaker method: legacy"
     IDS_NO_DIARIZATION "Speaker separation off"
     IDS_ASR_QUALITY "Model: Whisper large-v3 FP16 (quality)"
@@ -179,6 +185,7 @@ BEGIN
     IDS_ERROR "Could not complete the operation"
     IDS_MODEL_HELP "Models could not be verified. Open Prepare models and check again; download any missing or damaged files. Also check folder permissions and free space."
     IDS_INVALID "Cannot process this input. Select a regular M4A, WAV, MP3, or FLAC audio file stored on this PC. Folders, URLs, and network files are not supported."
+    IDS_INPUT_FILE_MISSING "The original audio file could not be found. If you moved it, add the audio file from its current location."
     IDS_PROCESS_ERROR "Audio processing failed. Check the models. If using a GPU, select “CPU only” and add the file again."
     IDS_SAVED "Saved"
     IDS_SAVE_ERROR "Could not save. Check the format and extension, folder permissions, and free disk space."
@@ -442,4 +449,8 @@ BEGIN
     IDS_RECORDING_CLOCK_CLEAR "Clear"
     IDS_RECORDING_CLOCK_INVALID "Enter ASCII HH:mm from 00:00 to 23:59. Choose Clear to remove the setting."
     IDS_RECORDING_CLOCK_UNSAVED "The recording start time is not saved. Apply the same time again and complete saving before removing this history."
+    IDS_API_OPEN_PROCESSING "Improve text with API (processing)"
+    IDS_API_OPEN_INCOMPLETE "Improve text with API (transcript incomplete)"
+    IDS_API_OPEN_CHECK_SAVE "Improve text with API (check saved results)"
+    IDS_API_OPEN_CHECK_SETTINGS "Improve text with API (check settings)"
 END

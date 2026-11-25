@@ -2,6 +2,29 @@
   "schema_version": 1,
   "dependencies": [
     {
+      "id": "nemo-speech-cpu",
+      "revision": "v0.2.0",
+      "url": "https://github.com/NVIDIA/NeMo-Speech.cpp/releases/download/v0.2.0/nemo-speech-0.2.0-windows-x86_64-cpu.zip",
+      "size": 5528418,
+      "sha256": "82c80451086e86194aba9af19f800da77cd66d1c28d993d0efceffd6cdb49bb8",
+      "archive_format": "zip",
+      "archive_root": "nemo-speech-0.2.0-windows-x86_64-cpu",
+      "directory": "nemo-speech-cpu",
+      "license": "Apache-2.0; bundled ggml MIT",
+      "expanded_limit": 33554432,
+      "diarization_runtime_files": [
+        {"file": "bin/nemo_speech_asr_c.dll", "size": 56320, "sha256": "9f6390224bf8d9c7a81830507ec9d937277beb079c9f0bdee15bd0f25b11a7f5"},
+        {"file": "bin/nemo_speech_asr.dll", "size": 4192256, "sha256": "f7129dc212c4d353fb76279e10244fed92c4f7814e80e408c51777a6045f11be"},
+        {"file": "bin/ggml.dll", "size": 61952, "sha256": "25dfa47637ebc9b92d9a34fc72b897800d88877dabb2e95a5b3df6d43fa99f6f"},
+        {"file": "bin/ggml-cpu.dll", "size": 946688, "sha256": "f090417018ab0b87420cb81a56db9d44ae5e6750ecfe36aa38f58863a0cc52e2"},
+        {"file": "bin/ggml-base.dll", "size": 680960, "sha256": "460afaa830b390add25ac11ee4f247ba2ea99368d337d068a5d84158e737f923"},
+        {"file": "bin/msvcp140.dll", "size": 557728, "sha256": "0f885b509a685d2bbfa652fed26b5fb31d88fbdab0a978c641d1c7b8aa460aa9"},
+        {"file": "bin/vcruntime140.dll", "size": 124544, "sha256": "d5e4d9a3e835fa679450145d6a7d94e36573a509317111904d9b3712c30d9066"},
+        {"file": "bin/vcruntime140_1.dll", "size": 49792, "sha256": "1f2d41c4aa5db0bc33ebf7b66d72943a817d7ce6cbe880502a9403823633093f"},
+        {"file": "bin/vcomp140.dll", "size": 193152, "sha256": "55aba23cdcd6484fbb06f4155b8ca75adfce7a881f10afd0c49457165e677164"}
+      ]
+    },
+    {
       "id": "kaldi-native-fbank",
       "revision": "v1.22.3 / b09e686fe2084732ddd30d1ef80acfc0f13eaf01",
       "url": "https://github.com/csukuangfj/kaldi-native-fbank/archive/refs/tags/v1.22.3.tar.gz",

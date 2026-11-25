@@ -5,7 +5,7 @@
  *
  * @file model_preparation_window.cpp
  * @brief 単一registryからモデル準備の説明と実測進捗を表示します
- * @version 1.0.0
+ * @version 1.1.2
  * @date 2026/09/13
  * @author Shunji Ogawa
  * @par 更新履歴
@@ -22,6 +22,8 @@
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1431の各関数へ役割・全引数・戻り値を直接記載
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1433の更新履歴を新規作成からの昇順・末尾追記へ統一
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1437のコメント行末・終端の句点を省略
+ * 1.1.1 Shunji Ogawa 2026/11/24 ADR1451のNemotron weightを話者分離用途として表示
+ * 1.1.2 Shunji Ogawa 2026/11/25 ADR1456の正式版へ試用時の変更を反映
  * </pre>
  */
 //------------------------------------------------------------------------------
@@ -69,8 +71,8 @@ namespace {
 	if( id == shared.voiceActivity) {
 		return resource( IDS_PREP_ROLE_VAD) ;
 	}
-	// 話者の二つの依存fileを同じ話者推定用途として示す
-	if( id == shared.segmentation || id == shared.embedding) {
+	// 選択した方式のweightを同じ話者推定用途として示す
+	if( id == shared.nemotron || id == shared.segmentation || id == shared.embedding) {
 		return resource( IDS_DIARIZE) ;
 	}
 	return resource( IDS_PREP_ROLE_ASR) ;

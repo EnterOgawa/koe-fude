@@ -27,6 +27,8 @@ KoeFude 1.0.0 / 2026/11/10 / Shunji Ogawa。原条件確認: 2026/09/27、既存
 | parakeet-model | CC-BY-4.0 | [CC-BY-4.0.txt](licenses/CC-BY-4.0.txt) |
 | msvc-runtime | Microsoft Software License Terms | [vc-runtime.docx](licenses/msvc/vc-runtime.docx), [visual-studio-community.docx](licenses/msvc/visual-studio-community.docx), [Redist.txt](licenses/msvc/Redist.txt) |
 
+Nemotron 3のCPUランタイムと推移依存の原ライセンス類は [NeMo-Speech.cpp v0.2.0の配布元](https://github.com/NVIDIA/NeMo-Speech.cpp/releases/tag/v0.2.0) から取得し、ビルド出力と配布物の `nemotron-3/licenses/nemo-speech/` に添付します。
+
 ## モデルの帰属と取得元
 
 | 製品artifact | Component | 固定revision | 著作者・変換元 |
@@ -42,6 +44,8 @@ KoeFude 1.0.0 / 2026/11/10 / Shunji Ogawa。原条件確認: 2026/09/27、既存
 | parakeet-ja-tokens | parakeet-model | github-release-asset-271243108 | [出典](https://huggingface.co/nvidia/parakeet-tdt_ctc-0.6b-ja/tree/44edb27eea9317daf89333e75eb830db4b1cc298) / [配布](https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-nemo-parakeet-tdt_ctc-0.6b-ja-35000-int8.tar.bz2) |
 | parakeet-ja-ctc-fp32 | parakeet-model | 4353e7b9e2e9ebdd35e85b8140c7351d03c2219c | [出典](https://huggingface.co/OpenVoiceOS/nvidia-parakeet-tdt_ctc-0.6b-ja-onnx/tree/4353e7b9e2e9ebdd35e85b8140c7351d03c2219c) / [配布](https://huggingface.co/OpenVoiceOS/nvidia-parakeet-tdt_ctc-0.6b-ja-onnx/resolve/4353e7b9e2e9ebdd35e85b8140c7351d03c2219c/model.onnx) |
 | parakeet-ja-ctc-fp32-data | parakeet-model | 4353e7b9e2e9ebdd35e85b8140c7351d03c2219c | [出典](https://huggingface.co/OpenVoiceOS/nvidia-parakeet-tdt_ctc-0.6b-ja-onnx/tree/4353e7b9e2e9ebdd35e85b8140c7351d03c2219c) / [配布](https://huggingface.co/OpenVoiceOS/nvidia-parakeet-tdt_ctc-0.6b-ja-onnx/resolve/4353e7b9e2e9ebdd35e85b8140c7351d03c2219c/model.onnx_data) |
+
+Nemotron 3 Diarization Q8_0の固定版・著作者は [NVIDIAのモデルページ](https://huggingface.co/nvidia/Nemotron-3-Diarization/tree/f667ed73aee57d40cc39428eb768b4fd87a0a29e) を、利用条件は [OpenMDW 1.1](https://openmdw.ai/license/1-1/) を参照してください。
 
 ParakeetはNVIDIA NeMo team、FP32 ONNX変換はOpenVoiceOS、INT8/token配布はsherpa。
 FP32 graphへsherpa用metadata 338byteを追加し、weightは未変更です。

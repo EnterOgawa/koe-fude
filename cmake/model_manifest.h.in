@@ -5,7 +5,7 @@
  *
  * @file model_manifest.h.in
  * @brief 固定registryから生成するモデル・ASR構成の定義templateです
- * @version 1.0.0
+ * @version 1.1.2
  * @date 初回追加日不明（2026/10/19にヘッダー整備）
  * @author Shunji Ogawa
  * @par 更新履歴
@@ -16,6 +16,8 @@
  * 1.0.0 Shunji Ogawa 2026/11/11 ADR1410の生成C++識別子を所有宣言へ整合
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1433の更新履歴を新規作成からの昇順・末尾追記へ統一
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1437のコメント行末・終端の句点を省略
+ * 1.1.1 Shunji Ogawa 2026/11/24 ADR1451のNemotron 3の共有用途を追加
+ * 1.1.2 Shunji Ogawa 2026/11/25 ADR1456の正式版へ話者分離モデルの定義を反映
  * </pre>
  */
 //------------------------------------------------------------------------------
@@ -35,10 +37,10 @@ inline constexpr std::array<AsrDefinition, @ASR_COUNT@> K_ASR_DEFINITIONS{{
 // 同じregistryから生成する、許可された取得元と展開対象の定義
 inline constexpr std::array<ModelDownloadDefinition, @MODEL_COUNT@> K_MODEL_DOWNLOADS{{
 @DOWNLOAD_ENTRIES@}};
-// ASRと独立したVAD・segmentation・embeddingの共有モデルID
+// ASRと独立したVAD・話者分離の共有モデルID
 inline constexpr SharedModelRoles K_SHARED_MODEL_ROLES{
     static_cast<ModelId>(@ROLE_VOICE_ACTIVITY@), static_cast<ModelId>(@ROLE_SEGMENTATION@),
-    static_cast<ModelId>(@ROLE_EMBEDDING@)};
+    static_cast<ModelId>(@ROLE_EMBEDDING@), static_cast<ModelId>(@ROLE_NEMOTRON@)};
 // 全文補正専用のモデル用途。通常ASR一覧とは独立します
 inline constexpr ModelId K_WHOLE_TEXT_NATIVE_MODEL_ID = static_cast<ModelId>(@ROLE_WHOLE_TEXT_NATIVE@);
 // 16GB評価用の独立した末尾用途

@@ -5,7 +5,7 @@
  *
  * @file model_store.h
  * @brief 固定モデルの定義と検証中のfile所有権を宣言します
- * @version 1.0.0
+ * @version 1.1.2
  * @date 2026/09/09
  * @author Shunji Ogawa
  * @par 更新履歴
@@ -30,6 +30,8 @@
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1428の関数ヘッダーを上下区切り線と複数行へ統一
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1433の更新履歴を新規作成からの昇順・末尾追記へ統一
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1437のコメント行末・終端の句点を省略
+ * 1.1.1 Shunji Ogawa 2026/11/24 ADR1451のNemotron 3の固定モデル用途を追加
+ * 1.1.2 Shunji Ogawa 2026/11/25 ADR1456の正式版へ試用時の変更を反映
  * </pre>
  */
 //------------------------------------------------------------------------------
@@ -79,7 +81,9 @@ enum class ModelId {
 	/// 専用Direct取得とlocal導入に使う全文補正weight
 	WHOLE_TEXT_GEMMA = 13,
 	/// 16GB評価専用の末尾用途
-	WHOLE_TEXT_MINISTRAL14_B = 14
+	WHOLE_TEXT_MINISTRAL14_B = 14,
+	/// Nemotron 3話者分離用のQ8_0 GGUF
+	NEMOTRON_3_DIARIZATION = 15
 } ;
 
 /** @brief 単一registryからworker内で選択するnative ASR実装です */
@@ -148,6 +152,8 @@ struct SharedModelRoles {
 	ModelId segmentation ;
 	/// diarization有効時の話者埋込み
 	ModelId embedding ;
+	/// Nemotron 3方式で使う区間推定・話者識別の統合モデル
+	ModelId nemotron ;
 } ;
 
 //------------------------------------------------------------------------------

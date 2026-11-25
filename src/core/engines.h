@@ -5,7 +5,7 @@
  *
  * @file engines.h
  * @brief ASRと話者分離を差し替えるinterfaceを定義します
- * @version 1.0.0
+ * @version 1.1.2
  * @date 2026/09/09
  * @author Shunji Ogawa
  * @par 更新履歴
@@ -26,6 +26,9 @@
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1428の関数ヘッダーを上下区切り線と複数行へ統一
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1433の更新履歴を新規作成からの昇順・末尾追記へ統一
  * 1.0.0 Shunji Ogawa 2026/11/12 ADR1437のコメント行末・終端の句点を省略
+ * 1.1.1 Shunji Ogawa 2026/11/24 ADR1451のNemotron 3を既定の話者分離方式として追加
+ * 1.1.1 Shunji Ogawa 2026/11/25 ADR1455の話者分離の既定をSpectralに戻す
+ * 1.1.2 Shunji Ogawa 2026/11/25 ADR1456の正式版へ試用時の変更を反映
  * </pre>
  */
 //------------------------------------------------------------------------------
@@ -54,13 +57,30 @@ enum class Backend {
 	CUDA
 } ;
 
-/** @brief 全体話者数を推定する方式です */
+/** @brief 話者分離方式です。保存済みの数値を維持します */
 enum class SpeakerMethod {
-	/// NME-SCによる人数と近傍数の自動推定。試用方式
-	SPECTRAL,
+	/// NME-SCによる人数と近傍数の推定
+	SPECTRAL = 0,
 	/// 従来の距離しきい値。明示的な比較用
-	LEGACY_THRESHOLD
+	LEGACY_THRESHOLD = 1,
+	/// Nemotron 3のCPU話者分離。人数は自動推定
+	NEMOTRON_3 = 2
 } ;
+
+inline constexpr SpeakerMethod K_DEFAULT_SPEAKER_METHOD = SpeakerMethod::SPECTRAL ; // 保存設定がない場合の話者方式
+
+//------------------------------------------------------------------------------
+/**
+ * @brief 保存値と設定値に使える話者分離方式を判定します
+ * @param[in] method 外部値からの変換を含む話者分離方式
+ * @return 定義済みの話者分離方式ならtrue、未定義ならfalse
+ */
+//------------------------------------------------------------------------------
+[[nodiscard]] constexpr bool   isSupportedSpeakerMethod( const SpeakerMethod method) noexcept
+{
+	return method == SpeakerMethod::SPECTRAL || method == SpeakerMethod::LEGACY_THRESHOLD ||
+		   method == SpeakerMethod::NEMOTRON_3 ;
+}
 
 /** @brief NME-SCの近傍graph選択方式です。Independentは開発診断専用です */
 enum class SpectralGraphSelection {
@@ -112,8 +132,8 @@ struct EngineOptions {
 	int					   threads = 4 ;
 	/// 0は自動推定、1～20は利用者が指定した人数
 	int					   expectedSpeakers = 0 ;
-	/// 利用者指定の研究手法を既定にする
-	SpeakerMethod		   speakerMethod = SpeakerMethod::SPECTRAL ;
+	/// 選択した話者分離方式。既定はSpectral
+	SpeakerMethod		   speakerMethod = K_DEFAULT_SPEAKER_METHOD ;
 	/// 製品は現行graph選択を維持する
 	SpectralGraphSelection spectralGraphSelection = SpectralGraphSelection::COUPLED ;
 	/// 人数自動推定のclustering threshold、0より大きく2以下
@@ -240,8 +260,7 @@ struct Recognition {
 	AsrExecutionTrace			 execution ;
 } ;
 
-using RecognitionObserver =
-	std::function<void( const Recognition &)> ; // worker同期の借用通知。空可、pointerの保持は禁止
+using RecognitionObserver = std::function<void( const Recognition &)> ; // worker同期の借用通知。空可、pointerの保持は禁止
 
 /** @brief workerから利用する同期ASR interfaceです */
 class ITranscriptionEngine {

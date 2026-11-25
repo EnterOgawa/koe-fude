@@ -1,6 +1,6 @@
 # 製品ソースのビルド
 
-KoeFude 1.0.0 / 2026/11/13 / Shunji Ogawa / MIT License
+KoeFude 1.1.2 / 2026/11/25 / Shunji Ogawa / MIT License
 
 公開ソースはWindows用アプリのビルドに必要な製品ソース・固定依存の準備・利用案内・ライセンスに絞っています。
 研究用ターゲット、評価音声、モデル本体、開発履歴、署名鍵を含みません。
@@ -25,13 +25,13 @@ cmake -S . -B build/cpu-release -G Ninja -DCMAKE_BUILD_TYPE=Release -DKOEFUDE_CU
 cmake --build build/cpu-release --target koefude --parallel 4
 ```
 
-`build/cpu-release/bin/KoeFude.exe` と同じフォルダーの3 DLLを一式で使います。
+`build/cpu-release/bin/KoeFude.exe` と付属ファイルを、サブフォルダーも含めて一式で使います。
 Debug版は別フォルダーを使い、`-DCMAKE_BUILD_TYPE=Debug` を指定します。
-初回の依存準備は接続が必要です。モデルはアプリの準備画面から必要分だけ取得します。
+初回の依存準備は接続が必要です。ONNX Runtimeの固定ヘッダー5件は、同梱の原ファイルをサイズとSHA-256で検証して準備します。モデルはアプリの準備画面から必要分だけ取得します。
 
 ## CUDA / Vulkan版
 
-Vulkan SDKの環境を設定し、固定GPU runtimeを含む12依存を準備します。
+Vulkan SDKの環境を設定し、固定GPUランタイムを含む13依存を準備します。
 
 ```powershell
 python scripts/setup.py
@@ -39,9 +39,11 @@ cmake -S . -B build/gpu-release -G Ninja -DCMAKE_BUILD_TYPE=Release -DKOEFUDE_CU
 cmake --build build/gpu-release --target koefude --parallel 4
 ```
 
-`build/gpu-release/bin` にアプリと固定runtime18 DLLを出力します。対応するNVIDIA driverが必要です。
+`build/gpu-release/bin` にアプリと固定GPUランタイムを出力します。対応するNVIDIA driverが必要です。
 Vulkan loaderはOSから任意読込みし、ビルドしたアプリの起動・CPU処理には必須としません。driverやloaderをこのソースから取得しません。
 CUDAとVulkanは個別にOFFへできます。既定は両方ONです。
+
+Nemotron 3用のCPUランタイムは両構成で専用の `nemotron-3` サブフォルダーに出力します。Nemotron 3を選択する場合にAVX2を含むx86-64-v3対応CPUと追加モデルが必要です。
 
 ## 固定依存と再現条件
 
